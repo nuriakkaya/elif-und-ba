@@ -107,6 +107,11 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
 /* ============== ROOT ============== */
 function App() {
   const [tweaks, setTweak] = window.useTweaks ? window.useTweaks(TWEAK_DEFAULTS) : [TWEAK_DEFAULTS, ()=>{}];
+  // Von der Lehrkraft geänderte Buchstaben: sobald neue Überschreibungen
+  // eintreffen, wird die ganze Oberfläche neu gezeichnet — dadurch steht die
+  // neue Umschrift sofort überall, ohne dass jemand neu laden muss.
+  const [, bumpCards] = useState(0);
+  useEffect(() => window.CardEdits && window.CardEdits.onChange(() => bumpCards(x => x + 1)), []);
 
   // apply tweak side-effects
   useEffect(() => {
@@ -365,6 +370,35 @@ function InstallBanner() {
 // Seit 06.08.2026 automatisch: Wer mit Namen angemeldet ist und einen Kurs-Code
 // hat, dessen Fortschritt wandert von selbst zur Lehrkraft (SimpleSync →
 // /api/class). Der alte Kopier-Code bleibt als Offline-Ersatz erhalten.
+/* Einstieg ins Live-Duell auf der Startseite — mit Hinweis, wenn
+   gerade jemand herausfordert. */
+function DuelCard({ ctx }) {
+  const [inv, setInv] = useState(window.DuelInvites ? window.DuelInvites.list() : []);
+  useEffect(() => window.DuelInvites && window.DuelInvites.onChange(setInv), []);
+  const has = inv.length > 0;
+  return (
+    <div className="card" style={{padding: 16, marginTop: 14,
+         borderLeft: has ? '5px solid var(--accent, #2A6BE0)' : undefined}}>
+      <div className="row" style={{gap: 12, alignItems: 'center', flexWrap: 'wrap'}}>
+        <div style={{fontSize: 30}}>⚔️</div>
+        <div style={{flex: '1 1 200px'}}>
+          <div style={{fontWeight: 800, fontSize: 16}}>
+            {has ? '🔔 ' + inv[0].from + ' fordert dich heraus!' : 'Live-Duell'}
+          </div>
+          <div className="muted" style={{fontSize: 13, marginTop: 2}}>
+            {has
+              ? 'Tippe auf Annehmen — ihr bekommt beide dieselben Fragen.'
+              : 'Spiel gegen deine Freunde: gleiche Fragen, wer schneller richtig ist, gewinnt.'}
+          </div>
+        </div>
+        <button className="btn btn-primary" onClick={() => ctx.go('duel')}>
+          {has ? 'Annehmen' : 'Duell starten'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function ClassroomCard({ ctx }) {
   const CR = window.Classroom;
   const [name, setName] = useState(() => (CR ? CR.getName() : ''));
@@ -552,6 +586,15 @@ function MobileNav({ ctx }) {
             {n.label}
           </button>
         ))}
+      <button className={"mn-item " + (route.screen === 'duel' ? 'is-active' : '')} onClick={() => go('duel')}>
+        <span className="mn-ico" style={{position:'relative'}}>
+          <span style={{fontSize:22}}>⚔️</span>
+          {!!(window.DuelInvites && window.DuelInvites.list().length) && (
+            <span style={{position:'absolute', top:-2, right:-4, width:9, height:9, borderRadius:9, background:'var(--rose, #D64545)'}}/>
+          )}
+        </span>
+        Duell
+      </button>
       <button className={"mn-item " + (route.screen === 'teacher' ? 'is-active' : '')} onClick={() => go('teacher')}>
         <span className="mn-ico"><span style={{fontSize:22}}>🏫</span></span>
         Klasse
@@ -631,6 +674,8 @@ function Routes({ ctx }) {
     case 'live':     return <LiveLobbyReal ctx={ctx}/>;
     case 'league':   return window.League ? <window.League.LeagueScreen ctx={ctx}/> : <Home ctx={ctx}/>;
     case 'teacher':  return <TeacherCorner ctx={ctx}/>;
+    case 'cardedit': return <CardEditor ctx={ctx}/>;
+    case 'duel':     return window.DuelScreen ? <window.DuelScreen ctx={ctx}/> : <Home ctx={ctx}/>;
     case '404':      return <NotFound ctx={ctx}/>;
     default:         return <Home ctx={ctx}/>;
   }
@@ -673,6 +718,7 @@ function Home({ ctx }) {
           </button>
         )}
         <InstallBanner/>
+        <DuelCard ctx={ctx}/>
         <ClassroomCard ctx={ctx}/>
       </div>
 
@@ -3720,6 +3766,174 @@ function AudioStudio() {
   );
 }
 
+/* ==============================================================
+   ✏️ BUCHSTABEN & SILBEN BEARBEITEN (Lehrkraft, 09.08.2026)
+   Suchen, einzeln antippen, Umschrift ändern, Aussprache neu
+   aufnehmen. Eine Änderung gilt SOFORT überall, wo der Buchstabe
+   vorkommt — der Lernfortschritt der Kinder bleibt erhalten.
+   ============================================================== */
+function CardEditor({ ctx }) {
+  const CE = window.CardEdits;
+  const QV = window.QuranVoice;
+  const [q, setQ] = useState('');
+  const [sel, setSel] = useState(null);
+  const [draft, setDraft] = useState('');
+  const [msg, setMsg] = useState('');
+  const [err, setErr] = useState('');
+  const [onlyChanged, setOnlyChanged] = useState(false);
+  const [recAr, setRecAr] = useState(null);
+  const [busyAr, setBusyAr] = useState(null);
+  const [, force] = useState(0);
+  const recRef = useRef(null);
+
+  useEffect(() => CE && CE.onChange(() => force(x => x + 1)), []);
+  useEffect(() => { CE && CE.refresh(true); }, []);
+
+  if (!CE) return null;
+  const all = CE.catalog();
+  const needle = q.trim().toLowerCase();
+  const list = all.filter(c => {
+    if (onlyChanged && !c.changed) return false;
+    if (!needle) return true;
+    return c.q.indexOf(q.trim()) >= 0
+      || String(c.a).toLowerCase().indexOf(needle) >= 0
+      || String(c.orig).toLowerCase().indexOf(needle) >= 0
+      || String(c.topic).toLowerCase().indexOf(needle) >= 0;
+  });
+  const changedCount = all.filter(c => c.changed).length;
+
+  const open = (c) => {
+    if (sel === c.q) { setSel(null); return; }
+    setSel(c.q); setDraft(c.a); setMsg(''); setErr('');
+  };
+  const save = async (c) => {
+    const val = draft.trim();
+    if (!val) { setErr('Bitte etwas eintragen.'); return; }
+    setErr(''); setMsg('Speichere …');
+    const r = val === c.orig ? await CE.reset(c.q) : await CE.set(c.q, val);
+    if (r.ok) { setMsg('Gespeichert ✅ — gilt ab sofort überall.'); setTimeout(() => setMsg(''), 3000); }
+    else { setMsg(''); setErr(r.error || 'Das hat nicht geklappt.'); }
+    force(x => x + 1);
+  };
+  const undo = async (c) => {
+    setMsg('Setze zurück …');
+    const r = await CE.reset(c.q);
+    if (r.ok) { setDraft(c.orig); setMsg('Auf das Original zurückgesetzt ✅'); setTimeout(() => setMsg(''), 3000); }
+    else { setMsg(''); setErr(r.error || 'Das hat nicht geklappt.'); }
+    force(x => x + 1);
+  };
+
+  const startRec = async (ar) => {
+    setErr('');
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+      const mime = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', ''].find(m => !m || (window.MediaRecorder && MediaRecorder.isTypeSupported(m)));
+      const mr = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 64000 } : undefined);
+      const chunks = [];
+      mr.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
+      mr.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop());
+        const blob = new Blob(chunks, { type: mr.mimeType || 'audio/webm' });
+        setRecAr(null);
+        if (blob.size < 1200) { setErr('Aufnahme war zu kurz — nochmal versuchen.'); return; }
+        setBusyAr(ar);
+        const r = await QV.put(ar, blob);
+        setBusyAr(null);
+        if (!r.ok) setErr(r.error || 'Hochladen fehlgeschlagen.');
+        else { setMsg('Neue Aussprache gespeichert ✅'); setTimeout(() => setMsg(''), 3000); }
+        force(x => x + 1);
+      };
+      recRef.current = { mr, stream };
+      mr.start();
+      setRecAr(ar);
+      setTimeout(() => { try { if (recRef.current && recRef.current.mr === mr && mr.state === 'recording') mr.stop(); } catch (e) {} }, 6000);
+    } catch (e) { setErr('Mikrofon nicht verfügbar — bitte den Zugriff erlauben.'); }
+  };
+  const stopRec = () => { try { recRef.current && recRef.current.mr.state === 'recording' && recRef.current.mr.stop(); } catch (e) {} };
+
+  return (
+    <div className="page" style={{maxWidth: 780}}>
+      <div className="row" style={{justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10}}>
+        <h1 style={{margin: 0}}>✏️ Buchstaben &amp; Silben</h1>
+        <button className="btn btn-ghost" onClick={() => ctx.go('teacher')}>← Klassenzimmer</button>
+      </div>
+      <div className="muted" style={{fontSize: 13.5, marginTop: 6, lineHeight: 1.55}}>
+        Such dir eine einzelne Karte, ändere die Umschrift und sprich sie bei Bedarf neu ein.
+        Beides gilt <b>sofort überall</b>, wo dieser Buchstabe vorkommt — in jeder Lektion,
+        auf jeder Karte und in jeder Antwortauswahl. Der Fortschritt der Kinder bleibt erhalten.
+      </div>
+
+      <div className="row" style={{gap: 8, marginTop: 14, flexWrap: 'wrap'}}>
+        <input value={q} onChange={e => setQ(e.target.value)} placeholder="Suchen: Buchstabe, Umschrift oder Lektion…"
+               style={{flex: '1 1 220px', minWidth: 0, padding: '11px 14px', borderRadius: 12, border: '1px solid var(--line)', background: 'var(--surface)', font: 'inherit'}}/>
+        <button className={'btn ' + (onlyChanged ? 'btn-primary' : 'btn-ghost')} onClick={() => setOnlyChanged(v => !v)}>
+          Nur geänderte ({changedCount})
+        </button>
+      </div>
+      {!!msg && <div style={{color: 'var(--success, #1B8A5A)', fontWeight: 800, marginTop: 10}}>{msg}</div>}
+      {!!err && <div style={{color: 'var(--rose, #D64545)', fontWeight: 800, marginTop: 10}}>{err}</div>}
+      <div className="muted" style={{fontSize: 12.5, marginTop: 8}}>{list.length} von {all.length} Karten</div>
+
+      <div className="col" style={{gap: 8, marginTop: 10}}>
+        {list.slice(0, 300).map(c => {
+          const isOpen = sel === c.q;
+          const hasRec = QV && QV.has(c.q);
+          const isRec = recAr === c.q;
+          const isBusy = busyAr === c.q;
+          return (
+            <div key={c.q} className="card" style={{padding: 12, cursor: 'pointer'}} onClick={() => open(c)}>
+              <div className="row" style={{alignItems: 'center', gap: 12}}>
+                <span dir="rtl" style={{fontSize: 30, fontWeight: 700, minWidth: 52, textAlign: 'center', fontFamily: '"Amiri Quran", "Scheherazade New", serif'}}>{c.q}</span>
+                <span style={{flex: 1, minWidth: 0}}>
+                  <div style={{fontWeight: 800, fontSize: 15}}>{c.a}</div>
+                  <div className="muted" style={{fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{c.topic}</div>
+                </span>
+                {c.changed && <span className="pill" style={{background: 'var(--success-soft, #E7F7EE)', fontWeight: 800}}>geändert</span>}
+                {hasRec && <span className="pill" title="eigene Aufnahme vorhanden">🎙️</span>}
+              </div>
+              {isOpen && (
+                <div style={{marginTop: 12, borderTop: '1px solid var(--line)', paddingTop: 12}} onClick={e => e.stopPropagation()}>
+                  <div className="muted" style={{fontSize: 12.5, marginBottom: 6}}>
+                    Kommt vor in: <b>{CE.places(c.q).join(' · ')}</b>
+                  </div>
+                  <label className="muted" style={{fontSize: 12.5, fontWeight: 700}}>Umschrift / Name</label>
+                  <input value={draft} autoFocus onChange={e => setDraft(e.target.value)}
+                         onKeyDown={e => e.key === 'Enter' && save(c)}
+                         style={{width: '100%', marginTop: 4, padding: '11px 14px', borderRadius: 12, border: '1px solid var(--line)', background: 'var(--surface)', font: 'inherit', fontSize: 16, fontWeight: 700, boxSizing: 'border-box'}}/>
+                  {c.orig !== c.a && (
+                    <div className="muted" style={{fontSize: 12, marginTop: 4}}>Original war: <b>{c.orig}</b></div>
+                  )}
+                  <div className="row" style={{gap: 8, marginTop: 12, flexWrap: 'wrap'}}>
+                    <button className="btn btn-primary" onClick={() => save(c)}>💾 Speichern</button>
+                    {c.changed && <button className="btn btn-ghost" onClick={() => undo(c)}>↩︎ Original</button>}
+                    {!isRec && (
+                      <button className="btn btn-ghost" disabled={isBusy} onClick={() => startRec(c.q)}>
+                        {isBusy ? '⏳ Lädt hoch…' : hasRec ? '🎙️ Neu aufnehmen' : '🎙️ Aussprache aufnehmen'}
+                      </button>
+                    )}
+                    {isRec && <button className="btn btn-primary" onClick={stopRec}>⏹ Stopp</button>}
+                    {hasRec && !isRec && (
+                      <button className="btn btn-ghost" onClick={() => QV.play(c.q)}>▶️ Anhören</button>
+                    )}
+                  </div>
+                  <div className="muted" style={{fontSize: 12, marginTop: 8}}>
+                    Die Aufnahme gilt ebenfalls überall — beim Lernen, beim Aufdecken und im Duell.
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      {list.length > 300 && (
+        <div className="muted" style={{fontSize: 12.5, marginTop: 10}}>
+          Es werden 300 Karten angezeigt — nutze die Suche, um gezielt eine zu finden.
+        </div>
+      )}
+    </div>
+  );
+}
+
 function TeacherCorner({ ctx }) {
   const { teacherUnlocked, setTeacherUnlocked } = ctx;
   const CR = window.Classroom;
@@ -3918,6 +4132,19 @@ function TeacherCorner({ ctx }) {
           </div>
         )}
         {!!srvErr && <div className="muted" style={{fontWeight: 700, fontSize: 13, marginTop: 8}}>{srvErr}</div>}
+      </div>
+
+      <div className="card" style={{padding: 16, marginTop: 12}}>
+        <div className="row" style={{justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap'}}>
+          <div style={{flex: '1 1 220px'}}>
+            <div style={{fontWeight: 800}}>✏️ Buchstaben &amp; Silben bearbeiten</div>
+            <div className="muted" style={{fontSize: 13, marginTop: 2}}>
+              Einzelne Karte suchen, Umschrift ändern, Aussprache neu einsprechen —
+              die Änderung gilt sofort überall, wo der Buchstabe vorkommt.
+            </div>
+          </div>
+          <button className="btn btn-primary" onClick={() => ctx.go('cardedit')}>✏️ Bearbeiten</button>
+        </div>
       </div>
 
       <AudioStudio/>

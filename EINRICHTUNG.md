@@ -1,4 +1,4 @@
-# 🌙 Elif & Ba — Einrichtung & Update (Version 7.1)
+# 🌙 Elif & Ba — Einrichtung & Update (Version 7.4)
 
 **Das Wichtigste in einem Satz:** Ein Kind tippt auf *Anmelden*, schreibt seinen
 **Namen**, drückt einmal — und ist im Kurs. Kein Anmeldecode, kein Passwort,
@@ -91,6 +91,54 @@ Ein Klick auf ein Kind öffnet die Einzelheiten:
    Gruppennamen eintragen (z. B. `KLASSE4A`) und denselben den Kindern unter
    „▾ Mehr“ eintragen lassen. Ohne Gruppe sind alle in einer Sammelliste.
 
+## ✏️ Buchstaben & Silben selbst ändern (neu in 7.4)
+
+Du musst für Korrekturen niemanden mehr fragen. **Klassenzimmer → „✏️ Buchstaben
+& Silben bearbeiten" → Bearbeiten.**
+
+1. **Suchen**: Tippe in das Suchfeld, was du ändern willst — den arabischen
+   Buchstaben, die Umschrift („cha") oder den Lektionsnamen. Aus über
+   500 Karten bleibt sofort nur die eine übrig.
+2. **Antippen**: Die Karte klappt auf. Oben steht, in welchen Lektionen dieser
+   Buchstabe überall vorkommt.
+3. **Umschreiben**: Feld ändern → **💾 Speichern**. Fertig.
+4. **Neu einsprechen**: Im selben Kasten **🎙️ Aussprache aufnehmen** → sprechen
+   → ⏹. Mit ▶️ probehören, jederzeit überschreiben.
+5. **Zurück zum Original**: **↩︎ Original** stellt die mitgelieferte Fassung
+   wieder her.
+
+**Eine Änderung gilt sofort überall.** Der Eintrag hängt an der arabischen
+Seite der Karte — also greift er in jeder Lektion, auf jeder Karteikarte, in
+jeder Antwortauswahl, in der Buchstabenübersicht und im Duell. Die Kinder
+bekommen die neue Fassung beim nächsten Öffnen automatisch, ohne etwas zu tun.
+
+**Der Lernfortschritt bleibt erhalten.** Der Karteikasten merkt sich jede Karte
+an ihrer arabischen Seite, nicht an der Umschrift — Umbenennen setzt also nichts
+zurück.
+
+Der Filter **„Nur geänderte"** zeigt auf einen Blick, was du bereits angepasst
+hast.
+
+## ⚔️ Live-Duell: Freunde herausfordern (neu in 7.4)
+
+Zwei bis sechs Kinder spielen dieselben Fragen gleichzeitig gegeneinander —
+über euren eigenen Server, ohne Zusatzkonto.
+
+1. Startseite → **„Duell starten"** (am Handy der Tab **⚔️ Duell**).
+2. Lektion wählen.
+3. Einen **Mitschüler antippen** — die Einladung erscheint sofort auf dessen
+   Gerät („🔔 … fordert dich heraus!"), er tippt auf **Annehmen**.
+   Ohne Namen geht es auch: **Duell eröffnen** und den **4-Zeichen-Code**
+   weitergeben.
+4. Der Herausforderer drückt **▶️ Start!** — dann läuft es.
+
+Pro Frage 15 Sekunden. Richtig gibt 100 Punkte, wer schneller ist, bekommt bis
+zu 50 Punkte Tempo-Bonus obendrauf. Beide sehen live den Punktestand des
+anderen. Am Ende gibt es das Siegertreppchen und **🔁 Revanche**.
+
+Die Aussprache-Aufnahmen und deine geänderten Umschriften gelten im Duell
+genauso wie beim Lernen.
+
 ## 🎙️ Aussprache-Studio (sehr empfohlen!)
 
 Die wichtigste Zutat ist die richtige Aussprache — und die kommt am besten von
@@ -133,11 +181,12 @@ in der App stand das nackte **„Not found“**. Jetzt gilt:
 - Für dich gibt es **„🔧 Verbindung prüfen“** (im Profil und im Klassenzimmer):
   zeigt jede geprüfte Adresse, den Speicherzustand und die genaue Anleitung.
 
-## 🎮 Live-Duell (optional, einziger Supabase-Rest)
+## 🎮 Altes Supabase-Duell (nicht mehr nötig)
 
-Nur das Echtzeit-Duell braucht ein kostenloses Supabase-Projekt
-(Anmelde-Fenster → „⚙️ Experten“). Alles andere — Konten, Sync, Klassenzimmer,
-komplettes Lernen — läuft **ohne**.
+Das frühere Echtzeit-Duell über Supabase ist überflüssig geworden — das neue
+Live-Duell läuft über euren eigenen Server. Der Supabase-Zugang unter
+„⚙️ Experten" im Anmelde-Fenster bleibt nur für alte Einrichtungen erhalten
+und kann ignoriert werden.
 
 ## 🤖 Optional: KI-Erklärungen (Gemini)
 
@@ -149,7 +198,7 @@ unter **Site settings → Environment variables** als `GEMINI_API_KEY` eintragen
 
 - **„Es hat sich nichts geändert“** → fast immer läuft noch die alte Version:
   Profil → Anmelde-/Konto-Fenster → ganz unten muss
-  **„Version 7.1 · 09.08.2026“** stehen. Sonst „🔄 App aktualisieren“ drücken.
+  **„Version 7.4 · 09.08.2026“** stehen. Sonst „🔄 App aktualisieren“ drücken.
 - **Klassenzimmer bleibt leer** → auf „🔧 Verbindung prüfen“ tippen. Steht dort
   grün „Alles in Ordnung“, hat sich schlicht noch kein Kind angemeldet.
 - **„Speicher nur vorübergehend“** in der Prüfung → der Server läuft, kann aber

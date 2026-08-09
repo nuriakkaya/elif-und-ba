@@ -29,7 +29,7 @@ import { pbkdf2Sync, randomBytes, timingSafeEqual } from "node:crypto";
 import { gunzipSync } from "node:zlib";
 import { Buffer } from "node:buffer";
 
-const VERSION = "7.3";
+const VERSION = "7.4";
 const TEACHER_PW = "1907";          // Lehrer-Passwort — hier zentral änderbar
 const DEFAULT_CLASS = "ALLE";       // Klasse, in die JEDES Kind automatisch kommt
 const STORE = "site:elifba-sync";   // Blobs-Store (Präfix "site:" = siteweit)
@@ -421,6 +421,170 @@ export default async (req) => {
         await bSet("audio:" + k, { mime: String(body.mime || "audio/webm"), b64, ts: Date.now() });
         if (!(idx.keys || []).includes(k)) { idx.keys = [...(idx.keys || []), k]; await bSet("audio-index", idx); }
         return json({ ok: true, count: (idx.keys || []).length });
+      }
+      return json({ error: "Methode nicht unterstützt" }, 405);
+    }
+
+    /* ==========================================================
+       cards: Buchstaben & Silben von der Lehrkraft überschreiben
+       Ein Eintrag gilt für die ARABISCHE Vorderseite — dadurch wirkt
+       eine Änderung automatisch in jeder Lektion, in der sie vorkommt.
+       GET  cards                       → { ok, cards, rev }
+       POST cards {tpw, q, a}           → setzen
+       POST cards {tpw, q, del:true}    → zurücksetzen
+    ========================================================== */
+    if (route === "cards") {
+      if (req.method === "GET") {
+        const rec = (await bGet("card-overrides")) || { cards: {}, rev: 0 };
+        return json({ ok: true, cards: rec.cards || {}, rev: rec.rev || 0 });
+      }
+      if (req.method === "POST") {
+        const body = await readBody(req);
+        if (String(body.tpw || "") !== TEACHER_PW) return json({ error: "Lehrer-Passwort erforderlich" }, 403);
+        const q = String(body.q || "").trim().slice(0, 60);
+        if (!q) return json({ error: "Karte fehlt" }, 400);
+        const rec = (await bGet("card-overrides")) || { cards: {}, rev: 0 };
+        rec.cards = rec.cards || {};
+        if (body.del) delete rec.cards[q];
+        else {
+          const a = String(body.a || "").trim().slice(0, 80);
+          if (!a) return json({ error: "Neue Umschrift fehlt" }, 400);
+          rec.cards[q] = { a, ts: Date.now() };
+        }
+        rec.rev = (rec.rev || 0) + 1;
+        await bSet("card-overrides", rec);
+        return json({ ok: true, rev: rec.rev, count: Object.keys(rec.cards).length });
+      }
+      return json({ error: "Methode nicht unterstützt" }, 405);
+    }
+
+    /* ==========================================================
+       duel: Live-Duell (zwei oder mehr Kinder gegeneinander)
+       Der Raum liegt als eine kleine Datei im Speicher; die Geräte
+       fragen ihn im Sekundentakt ab. Kein WebSocket nötig.
+    ========================================================== */
+    if (route === "duel") {
+      const PER_Q = 15000;        // Zeit je Frage
+      const roomKey = (c) => "duel:" + cleanCode(c);
+      const invKey = (n) => "inv:" + Buffer.from(cleanName(n).toLowerCase(), "utf8").toString("hex");
+      const newCode = () => {
+        const AB = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";   // ohne I/O/0/1
+        let out = "";
+        const b = randomBytes(4);
+        for (let i = 0; i < 4; i++) out += AB[b[i] % AB.length];
+        return out;
+      };
+      /* Zustand fortschreiben: alle geantwortet oder Zeit um → nächste Frage */
+      const tick = (room) => {
+        if (room.state !== "run") return room;
+        const names = Object.keys(room.players || {});
+        const allIn = names.length > 0 && names.every((n) => (room.players[n].answered || {})[room.i] !== undefined);
+        if (allIn || Date.now() > (room.deadline || 0)) {
+          room.i = (room.i || 0) + 1;
+          if (room.i >= (room.qs || []).length) { room.state = "done"; room.endedAt = Date.now(); }
+          else room.deadline = Date.now() + PER_Q;
+        }
+        return room;
+      };
+
+      if (req.method === "GET") {
+        // Einladungen abholen
+        const inv = url.searchParams.get("inv");
+        if (inv) {
+          const rec = (await bGet(invKey(inv))) || { list: [] };
+          const fresh = (rec.list || []).filter((x) => Date.now() - (x.ts || 0) < 10 * 60000);
+          return json({ ok: true, invites: fresh });
+        }
+        const code = cleanCode(url.searchParams.get("code"));
+        if (code.length !== 4) return json({ error: "Code fehlt" }, 400);
+        let room = await bGet(roomKey(code));
+        if (!room) return json({ ok: true, found: false });
+        const before = JSON.stringify({ i: room.i, s: room.state });
+        room = tick(room);
+        if (JSON.stringify({ i: room.i, s: room.state }) !== before) await bSet(roomKey(code), room);
+        return json({ ok: true, found: true, room });
+      }
+
+      if (req.method === "POST") {
+        const body = await readBody(req);
+        const name = cleanName(body.name);
+        if (!name) return json({ error: "Name fehlt" }, 400);
+
+        if (body.action === "create") {
+          const qs = Array.isArray(body.qs) ? body.qs.slice(0, 15) : [];
+          if (!qs.length) return json({ error: "Fragen fehlen" }, 400);
+          let code = newCode();
+          for (let t = 0; t < 5 && (await bGet(roomKey(code))); t++) code = newCode();
+          const room = {
+            code, host: name, topic: String(body.topic || "").slice(0, 60),
+            topicName: String(body.topicName || "").slice(0, 60),
+            qs, state: "lobby", i: 0, created: Date.now(),
+            players: { [name]: { score: 0, answered: {}, ts: Date.now() } },
+          };
+          await bSet(roomKey(code), room);
+          // Einladung hinterlegen
+          const target = cleanName(body.invite || "");
+          if (target) {
+            const rec = (await bGet(invKey(target))) || { list: [] };
+            rec.list = (rec.list || []).filter((x) => Date.now() - (x.ts || 0) < 10 * 60000 && x.from !== name);
+            rec.list.push({ from: name, code, topicName: room.topicName, ts: Date.now() });
+            await bSet(invKey(target), rec);
+          }
+          return json({ ok: true, room });
+        }
+
+        const code = cleanCode(body.code);
+        if (code.length !== 4) return json({ error: "Code fehlt" }, 400);
+        let room = await bGet(roomKey(code));
+        if (!room) return json({ error: "Dieses Duell gibt es nicht (mehr)" }, 404);
+
+        if (body.action === "join") {
+          if (!room.players[name]) {
+            if (Object.keys(room.players).length >= 6) return json({ error: "Das Duell ist voll" }, 409);
+            room.players[name] = { score: 0, answered: {}, ts: Date.now() };
+          } else room.players[name].ts = Date.now();
+          await bSet(roomKey(code), room);
+          return json({ ok: true, room });
+        }
+        if (body.action === "start") {
+          if (room.state === "lobby") {
+            room.state = "run"; room.i = 0; room.deadline = Date.now() + PER_Q; room.startedAt = Date.now();
+            await bSet(roomKey(code), room);
+          }
+          return json({ ok: true, room });
+        }
+        if (body.action === "answer") {
+          const p = room.players[name];
+          if (!p) return json({ error: "Nicht im Duell" }, 400);
+          const idx = Number(body.i);
+          if (!(idx >= 0) || idx !== room.i || room.state !== "run") return json({ ok: true, room });
+          p.answered = p.answered || {};
+          if (p.answered[idx] === undefined) {
+            const ms = Math.max(0, Math.min(PER_Q, Number(body.ms) || PER_Q));
+            const correct = !!body.correct;
+            // Punkte: richtig = 100, plus bis zu 50 Tempo-Bonus
+            const pts = correct ? 100 + Math.round(50 * (1 - ms / PER_Q)) : 0;
+            p.answered[idx] = { c: correct, ms, pts };
+            p.score = (p.score || 0) + pts;
+            p.ts = Date.now();
+          }
+          room = tick(room);
+          await bSet(roomKey(code), room);
+          return json({ ok: true, room });
+        }
+        if (body.action === "leave") {
+          delete room.players[name];
+          if (!Object.keys(room.players).length) await bDel(roomKey(code));
+          else await bSet(roomKey(code), room);
+          return json({ ok: true });
+        }
+        if (body.action === "decline") {
+          const rec = (await bGet(invKey(name))) || { list: [] };
+          rec.list = (rec.list || []).filter((x) => x.code !== code);
+          await bSet(invKey(name), rec);
+          return json({ ok: true });
+        }
+        return json({ error: "Unbekannte Aktion" }, 400);
       }
       return json({ error: "Methode nicht unterstützt" }, 405);
     }
