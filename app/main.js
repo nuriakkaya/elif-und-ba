@@ -4291,7 +4291,14 @@ function TeacherCorner({ ctx }) {
     const c = (a && a.classCode) || (function () { try { return localStorage.getItem('lern_class_code_v1') || ''; } catch (e) { return ''; } })();
     return (c === 'ALLE') ? '' : c;   // "ALLE" = Sammelklasse → kein Filter
   });
-  const [serverStudents, setServerStudents] = useState(null); // null = noch nicht geladen
+  /* Die zuletzt erfolgreich geladene Klassenliste bleibt auf dem Gerät.
+     Fällt der Server einmal aus, sieht die Lehrkraft weiterhin ihre Klasse
+     (mit ehrlichem Hinweis) statt einer leeren Liste — niemand „verschwindet". */
+  const [serverStudents, setServerStudents] = useState(() => {
+    try { const o = JSON.parse(localStorage.getItem('eb_last_roster_v1') || 'null'); return (o && o.list) || null; }
+    catch (e) { return null; }
+  });
+  const [stale, setStale] = useState(false);
   const [loading, setLoading] = useState(false);
   const [srvErr, setSrvErr] = useState('');
   const [showPaste, setShowPaste] = useState(false);
@@ -4316,12 +4323,15 @@ function TeacherCorner({ ctx }) {
         .map(n => Object.assign({ n }, r.students[n]))
         .filter(e => (e.role || 'student') !== 'teacher');
       setServerStudents(list);
+      setStale(false);
+      try { localStorage.setItem('eb_last_roster_v1', JSON.stringify({ list, ts: Date.now(), code: cc })); } catch (e) {}
       if (!list.length) setSrvErr('Noch niemand angemeldet. Sobald ein Kind seinen Namen einträgt, erscheint es hier — sofort, noch bevor es die erste Karte lernt.');
     } else {
-      setServerStudents([]);
+      // NICHTS löschen: die zuletzt bekannte Liste bleibt stehen.
+      setStale(true);
       setSrvErr(r.missing
         ? 'Der Mini-Server antwortet auf dieser Seite nicht. Tippe unten auf „🔧 Verbindung prüfen“ — dort steht in Klartext, was zu tun ist.'
-        : (r.error || 'Klasse konnte nicht geladen werden.'));
+        : (r.error || 'Klasse konnte gerade nicht geladen werden.'));
     }
   };
   useEffect(() => { if (teacherUnlocked) loadClass(code); }, [teacherUnlocked]);
@@ -4466,6 +4476,15 @@ function TeacherCorner({ ctx }) {
                    style={{flex: '1 1 160px', minWidth: 0, padding: '10px 12px', borderRadius: 10, border: '1px solid var(--line)', background: 'var(--surface)', font: 'inherit', textTransform: 'uppercase'}}/>
             <button className="btn btn-primary" disabled={loading} onClick={() => loadClass(code)}>Anzeigen</button>
             {!!code && <button className="btn btn-ghost" onClick={() => { setCode(''); loadClass(''); }}>Alle zeigen</button>}
+          </div>
+        )}
+        {stale && (
+          <div className="card flat" style={{padding: 12, marginTop: 10, borderLeft: '4px solid #E0A800'}}>
+            <div style={{fontWeight: 800, fontSize: 13.5}}>⚠️ Gerade keine Verbindung zum Server</div>
+            <div className="muted" style={{fontSize: 12.5, marginTop: 4, lineHeight: 1.5}}>
+              Du siehst den <b>zuletzt bekannten Stand</b>. Es ist nichts verloren gegangen —
+              sobald der Server wieder antwortet, aktualisiert sich die Liste von selbst.
+            </div>
           </div>
         )}
         {!!srvErr && <div className="muted" style={{fontWeight: 700, fontSize: 13, marginTop: 8}}>{srvErr}</div>}

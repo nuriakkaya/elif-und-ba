@@ -1,4 +1,4 @@
-# 🌙 Elif & Ba — Einrichtung & Update (Version 7.5)
+# 🌙 Elif & Ba — Einrichtung & Update (Version 7.6)
 
 **Das Wichtigste in einem Satz:** Ein Kind tippt auf *Anmelden*, schreibt seinen
 **Namen**, drückt einmal — und ist im Kurs. Kein Anmeldecode, kein Passwort,
@@ -225,13 +225,38 @@ https://aistudio.google.com/apikey → kostenlosen Key erstellen → bei Netlify
 unter **Site settings → Environment variables** als `GEMINI_API_KEY` eintragen
 → neu deployen.
 
+## 🛡️ Warum kein Kind mehr „verschwinden" kann (7.6)
+
+Am 09.08. trat einmal die Meldung **„Serverfehler: Speicher-Lesefehler 401"**
+auf, und die Klassenliste war leer. Die Ursache lag tief im Mini-Server:
+Netlify reicht bei jedem Aufruf einen **frischen, kurzlebigen Schlüssel** für
+den Speicher durch. Der Server hatte sich den allerersten Schlüssel gemerkt
+und für immer weiterbenutzt — solange derselbe Prozess warmlief, ging das gut;
+lief der Schlüssel ab, wurde ab da **jede** Anfrage abgewiesen.
+
+Drei Dinge sind seitdem anders:
+
+1. Der Schlüssel wird bei **jedem** Aufruf frisch gelesen.
+2. Wird er trotzdem einmal abgewiesen, holt der Server **automatisch einen
+   neuen und wiederholt die Anfrage**.
+3. Das Klassenzimmer zeigt bei einer Störung den **zuletzt bekannten Stand**
+   mit einem Hinweis, statt eine leere Liste anzuzeigen. Auch nach einem
+   Neuladen bleibt die Klasse sichtbar.
+
+Wichtig zu wissen: **Bei so einem Fehler geht nie etwas verloren.** Konten,
+Fortschritt und Aufnahmen liegen unverändert im Speicher — nur der Zugang
+dorthin war kurzzeitig blockiert.
+
 ## Stolpersteine
 
 - **„Es hat sich nichts geändert“** → fast immer läuft noch die alte Version:
   Profil → Anmelde-/Konto-Fenster → ganz unten muss
-  **„Version 7.5 · 09.08.2026“** stehen. Sonst „🔄 App aktualisieren“ drücken.
+  **„Version 7.6 · 09.08.2026“** stehen. Sonst „🔄 App aktualisieren“ drücken.
 - **Klassenzimmer bleibt leer** → auf „🔧 Verbindung prüfen“ tippen. Steht dort
   grün „Alles in Ordnung“, hat sich schlicht noch kein Kind angemeldet.
+- **„Speicher-Lesefehler" / „Zugang abgelehnt"** → seit 7.6 heilt sich das
+  von selbst. Bleibt es stehen: Seite in Netlify einmal neu veröffentlichen.
+  Die Daten sind davon nicht betroffen.
 - **„Speicher nur vorübergehend“** in der Prüfung → der Server läuft, kann aber
   nicht dauerhaft speichern. Seite bei Netlify einmal neu deployen; in den
   Site-Einstellungen muss **Blobs** verfügbar sein.

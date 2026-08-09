@@ -213,7 +213,7 @@ function AuthModal({ ctx }) {
     const stateTxt = st.state === 'syncing' ? '⏳ Wird gerade abgeglichen …'
       : st.state === 'lokal' ? '📱 Nur auf diesem Gerät gespeichert — verbindet sich automatisch, sobald der Server da ist.'
       : st.state === 'offline' ? '📴 Offline — Abgleich startet automatisch, sobald Internet da ist.'
-      : st.state === 'error' ? '⚠️ ' + (st.error || 'Abgleich fehlgeschlagen — wird automatisch erneut versucht.')
+      : st.state === 'error' ? '⚠️ ' + (st.error || 'Abgleich fehlgeschlagen') + ' — dein Fortschritt ist auf dem Gerät sicher, die App versucht es automatisch weiter.'
       : st.lastSync ? '✅ Fortschritt gesichert (zuletzt ' + new Date(st.lastSync).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr)'
       : '🔄 Erster Abgleich läuft gleich …';
     return (

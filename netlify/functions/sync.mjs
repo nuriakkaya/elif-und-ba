@@ -29,7 +29,7 @@ import { pbkdf2Sync, randomBytes, timingSafeEqual } from "node:crypto";
 import { gunzipSync } from "node:zlib";
 import { Buffer } from "node:buffer";
 
-const VERSION = "7.5";
+const VERSION = "7.6";
 const TEACHER_PW = "1907";          // Lehrer-Passwort — hier zentral änderbar
 const DEFAULT_CLASS = "ALLE";       // Klasse, in die JEDES Kind automatisch kommt
 const STORE = "site:elifba-sync";   // Blobs-Store (Präfix "site:" = siteweit)
@@ -40,17 +40,39 @@ const STORE = "site:elifba-sync";   // Blobs-Store (Präfix "site:" = siteweit)
    (Base64-JSON mit siteID, token, edgeURL, uncachedEdgeURL, apiURL). Genau die
    liest auch das offizielle Paket — wir sparen uns nur den Import.
 --------------------------------------------------------------------------- */
-let _ctx;
-function ctx() {
-  if (_ctx !== undefined) return _ctx;
-  const raw =
-    globalThis.netlifyBlobsContext ||
-    (typeof process !== "undefined" && process.env && process.env.NETLIFY_BLOBS_CONTEXT) ||
-    "";
-  if (!raw) { _ctx = null; return _ctx; }
-  try { _ctx = JSON.parse(Buffer.from(String(raw), "base64").toString("utf8")); }
-  catch (e) { _ctx = null; }
-  return _ctx;
+/* ---------------------------------------------------------------------------
+   WICHTIGE KORREKTUR (09.08.2026) — Ursache des Fehlers „Speicher-Lesefehler 401":
+
+   Netlify legt die Zugangsdaten für den Speicher NICHT ein für alle Mal ab,
+   sondern reicht bei JEDEM Aufruf einen frischen, kurzlebigen Schlüssel
+   durch (globalThis.netlifyBlobsContext). Die alte Fassung hat den allerersten
+   Schlüssel in einer Variablen gemerkt und für immer weiterbenutzt. Solange
+   derselbe Server-Prozess warmlief, ging das gut — sobald der Schlüssel
+   ablief, antwortete der Speicher auf JEDE Anfrage mit 401. Für die Lehrkraft
+   sah das so aus, als wären plötzlich alle Schüler verschwunden.
+
+   Jetzt gilt: der Kontext wird bei jedem Aufruf frisch gelesen (nur das
+   Zerlegen desselben Textes wird gespart), und bei 401/403 wird EINMAL mit
+   neu geholtem Schlüssel wiederholt. Damit kann dieser Fehler nicht wiederkehren.
+--------------------------------------------------------------------------- */
+let _rawSeen = null, _ctxCache = null;
+function rawContext() {
+  const g = globalThis.netlifyBlobsContext;
+  if (g && typeof g === "object") return g;                 // manche Laufzeiten reichen ein Objekt durch
+  return (typeof g === "string" && g)
+    || (typeof process !== "undefined" && process.env && process.env.NETLIFY_BLOBS_CONTEXT)
+    || "";
+}
+function ctx(forceFresh) {
+  const raw = rawContext();
+  if (!raw) return null;
+  if (typeof raw === "object") return raw;
+  if (!forceFresh && raw === _rawSeen) return _ctxCache;     // identischer Text → nicht neu zerlegen
+  try {
+    _ctxCache = JSON.parse(Buffer.from(String(raw), "base64").toString("utf8"));
+    _rawSeen = raw;
+  } catch (e) { _ctxCache = null; _rawSeen = raw; }
+  return _ctxCache;
 }
 
 const authHdr = (c) => ({ authorization: "Bearer " + c.token });
@@ -82,12 +104,30 @@ async function apiURLFor(c, key, method, params) {
   return { url: j.url, headers: {} };
 }
 
-async function target(key, method, params) {
-  const c = ctx();
+async function target(key, method, params, forceFresh) {
+  const c = ctx(forceFresh);
   if (!c || !c.siteID || !c.token) return null;
   const direct = edgeURL(c, key, params);
   if (direct) return { url: direct, headers: authHdr(c) };
   return await apiURLFor(c, key, method, params);
+}
+
+/* Eine Speicher-Anfrage — mit genau einer Wiederholung, falls der Schlüssel
+   zwischenzeitlich abgelaufen ist (401/403). */
+async function blobRequest(key, method, { params, body, extraHeaders } = {}) {
+  let t = await target(key, method, params);
+  if (!t) return null;                                   // kein Blobs-Zugang → Notbetrieb
+  const send = (tt) => fetch(tt.url, {
+    method: method === "GET" ? undefined : method,
+    headers: { ...tt.headers, ...(extraHeaders || {}) },
+    body,
+  });
+  let r = await send(t);
+  if (r.status === 401 || r.status === 403) {
+    const t2 = await target(key, method, params, true);   // Schlüssel frisch holen
+    if (t2) r = await send(t2);
+  }
+  return r;
 }
 
 /* Notnagel: Wenn gar kein Blobs-Zugang da ist, wird wenigstens nach /tmp
@@ -99,14 +139,21 @@ const TMP = "/tmp/elifba-store";
 const tmpName = (k) => TMP + "/" + Buffer.from(String(k)).toString("hex") + ".json";
 function tmpEnsure() { try { if (!existsSync(TMP)) mkdirSync(TMP, { recursive: true }); return true; } catch (e) { return false; } }
 
+/* Fehlermeldungen, die einer Lehrkraft etwas sagen */
+function storageMsg(was, status) {
+  if (status === 401 || status === 403)
+    return "Der Zugang zum Speicher wurde abgelehnt (" + status + "). Bitte die Seite in Netlify einmal neu veröffentlichen — deine Daten sind nicht verloren.";
+  if (status === 429) return "Der Speicher ist gerade überlastet — bitte in einer Minute nochmal.";
+  return "Speicher konnte nicht " + was + " (" + status + ").";
+}
+
 let STORAGE_MODE = "unbekannt";
 
 async function bGet(key) {
-  const t = await target(key, "GET");
-  if (!t) { STORAGE_MODE = "temporaer"; try { return JSON.parse(readFileSync(tmpName(key), "utf8")); } catch (e) { return null; } }
-  const r = await fetch(t.url, { headers: t.headers });
+  const r = await blobRequest(key, "GET");
+  if (!r) { STORAGE_MODE = "temporaer"; try { return JSON.parse(readFileSync(tmpName(key), "utf8")); } catch (e) { return null; } }
   if (r.status === 404) { STORAGE_MODE = "blobs"; return null; }
-  if (!r.ok) throw new Error("Speicher-Lesefehler " + r.status);
+  if (!r.ok) throw new Error(storageMsg("lesen", r.status));
   STORAGE_MODE = "blobs";
   const txt = await r.text();
   if (!txt) return null;
@@ -115,26 +162,22 @@ async function bGet(key) {
 
 async function bSet(key, value) {
   const body = JSON.stringify(value);
-  const t = await target(key, "PUT");
-  if (!t) {
+  const r = await blobRequest(key, "PUT", {
+    body, extraHeaders: { "cache-control": "max-age=0, stale-while-revalidate=60" },
+  });
+  if (!r) {
     STORAGE_MODE = "temporaer";
     if (!tmpEnsure()) throw new Error("Kein Speicher verfügbar");
     writeFileSync(tmpName(key), body); return true;
   }
-  const r = await fetch(t.url, {
-    method: "PUT",
-    headers: { ...t.headers, "cache-control": "max-age=0, stale-while-revalidate=60" },
-    body,
-  });
-  if (!r.ok) throw new Error("Speicher-Schreibfehler " + r.status);
+  if (!r.ok) throw new Error(storageMsg("schreiben", r.status));
   STORAGE_MODE = "blobs";
   return true;
 }
 
 async function bDel(key) {
-  const t = await target(key, "DELETE");
-  if (!t) { try { unlinkSync(tmpName(key)); } catch (e) {} return true; }
-  await fetch(t.url, { method: "DELETE", headers: t.headers });
+  const r = await blobRequest(key, "DELETE");
+  if (!r) { try { unlinkSync(tmpName(key)); } catch (e) {} return true; }
   return true;
 }
 
@@ -153,10 +196,10 @@ async function bList(prefix) {
   for (let i = 0; i < 25; i++) {                     // max. 25 Seiten = viele tausend Kinder
     const params = { prefix };
     if (cursor) params.cursor = cursor;
-    const t = await target("", "GET", params);
-    const r = await fetch(t.url, { headers: t.headers });
+    const r = await blobRequest("", "GET", { params });
+    if (!r) break;
     if (r.status === 404) break;
-    if (!r.ok) throw new Error("Speicher-Listenfehler " + r.status);
+    if (!r.ok) throw new Error(storageMsg("auflisten", r.status));
     const page = await r.json();
     (page.blobs || []).forEach((b) => { if (b && b.key) keys.push(b.key); });
     if (!page.next_cursor) break;
