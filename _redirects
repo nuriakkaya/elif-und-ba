@@ -1,0 +1,7 @@
+# Elif & Ba — Wegweiser für den Klassen-Server.
+# Diese Datei ist reine Konfiguration und wird von Netlify AUCH DANN gelesen,
+# wenn die Seite ohne Build hochgeladen wird (Drag & Drop). Sie sorgt dafür,
+# dass /api/... beim Mini-Server landet, selbst wenn Netlify die moderne
+# Routen-Angabe in der Function-Datei nicht auswertet.
+/api/*        /.netlify/functions/sync/:splat   200
+/media/audio  /.netlify/functions/sync/media/audio   200

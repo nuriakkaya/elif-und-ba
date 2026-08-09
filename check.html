@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Elif &amp; Ba — Prüfseite</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 18px 16px 60px; font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+         background: #F5F7FB; color: #1B2436; }
+  h1 { font-size: 21px; margin: 0 0 4px; }
+  .sub { color: #667; font-size: 13.5px; margin-bottom: 16px; }
+  .box { background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 14px;
+         box-shadow: 0 1px 3px rgba(20,30,60,.08); }
+  .verdict { font-size: 19px; font-weight: 800; margin-bottom: 6px; }
+  .ok { color: #12805C; } .bad { color: #C42B2B; } .warn { color: #A9700A; }
+  .row { display: flex; gap: 10px; align-items: baseline; padding: 7px 0; border-bottom: 1px solid #EDF0F5; font-size: 13.5px; }
+  .row:last-child { border-bottom: 0; }
+  .row b { flex: 0 0 22px; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; word-break: break-all; color: #445; }
+  .tag { margin-left: auto; color: #667; white-space: nowrap; font-size: 12.5px; }
+  .big { font-size: 26px; font-weight: 900; letter-spacing: .3px; }
+  button { font: inherit; font-weight: 700; padding: 13px 16px; border-radius: 12px; border: 1px solid #D6DCE8;
+           background: #fff; width: 100%; margin-top: 10px; cursor: pointer; }
+  button.p { background: #1B2436; color: #fff; border-color: #1B2436; }
+  ol { padding-left: 20px; margin: 8px 0 0; } li { margin-bottom: 7px; }
+  .muted { color: #667; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<h1>🌙 Elif &amp; Ba — Prüfseite</h1>
+<div class="sub">Diese Seite braucht nichts von der App. Sie sagt in einem Satz, ob alles läuft.</div>
+
+<div class="box">
+  <div class="verdict" id="verdict">⏳ Prüfe …</div>
+  <div id="explain" class="muted"></div>
+</div>
+
+<div class="box">
+  <div style="font-weight:800; margin-bottom:6px">Hochgeladene Version</div>
+  <div class="big" id="ver">…</div>
+  <div class="muted" id="veri"></div>
+</div>
+
+<div class="box">
+  <div style="font-weight:800; margin-bottom:6px">Mini-Server (Anmelden &amp; Klassenzimmer)</div>
+  <div id="routes"></div>
+</div>
+
+<div class="box">
+  <div style="font-weight:800; margin-bottom:6px">Dateien im Hochgeladenen</div>
+  <div id="files"></div>
+</div>
+
+<div class="box">
+  <div style="font-weight:800; margin-bottom:6px">Adresse dieser Seite</div>
+  <code id="loc"></code>
+  <div class="muted" id="host" style="margin-top:6px"></div>
+</div>
+
+<div class="box" id="fixbox" style="display:none">
+  <div style="font-weight:800; margin-bottom:4px">So wird es repariert</div>
+  <div id="fix" class="muted"></div>
+</div>
+
+<button class="p" onclick="location.reload()">🔄 Nochmal prüfen</button>
+<button onclick="hardReset()">🧹 Zwischenspeicher leeren (Fortschritt bleibt)</button>
+<button onclick="location.href='./'">← Zur App</button>
+
+<script>
+/* Kein Framework, keine Abhängigkeit — läuft auf jedem Handy. */
+var E = function (id) { return document.getElementById(id); };
+function esc(s) { return String(s).replace(/[&<>]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]; }); }
+function row(into, okState, label, tag) {
+  var d = document.createElement('div');
+  d.className = 'row';
+  d.innerHTML = '<b>' + (okState === true ? '✅' : okState === false ? '❌' : '⚠️') + '</b>'
+    + '<code>' + esc(label) + '</code><span class="tag">' + esc(tag || '') + '</span>';
+  E(into).appendChild(d);
+}
+async function head(path) {
+  try {
+    var r = await fetch(path + (path.indexOf('?') >= 0 ? '&' : '?') + 't=' + Date.now(), { cache: 'no-store' });
+    return r;
+  } catch (e) { return null; }
+}
+async function hardReset() {
+  try {
+    if (window.caches && caches.keys) { var ks = await caches.keys(); await Promise.all(ks.map(function (k) { return caches.delete(k); })); }
+    if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
+      var rs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(rs.map(function (r) { return r.unregister(); }));
+    }
+    try { sessionStorage.clear(); } catch (e) {}
+    alert('Zwischenspeicher geleert. Der Lernfortschritt ist unberührt.');
+    location.reload();
+  } catch (e) { alert('Konnte nicht leeren: ' + e); }
+}
+
+(async function () {
+  E('loc').textContent = location.href;
+
+  /* --- 1) Version --- */
+  var vr = await head('version.json');
+  var vjson = null;
+  if (vr && vr.ok) { try { vjson = await vr.json(); } catch (e) {} }
+  if (vjson && vjson.build) {
+    E('ver').textContent = 'Version ' + vjson.build;
+    E('veri').textContent = 'vom ' + (vjson.date || '?') + ' — das ist der Stand, der wirklich auf dem Server liegt.';
+  } else {
+    E('ver').innerHTML = '<span class="bad">unbekannt</span>';
+    E('veri').textContent = 'version.json wurde nicht gefunden — es liegt noch eine ältere Fassung auf dem Server.';
+  }
+
+  /* --- 2) Mini-Server über alle drei Wege --- */
+  var ways = [
+    ['api/ping', 'über die Umleitung /api/…'],
+    ['.netlify/functions/sync/ping', 'direkt zur Funktion'],
+    ['.netlify/functions/sync?r=ping', 'Funktion mit Kennzeichen']
+  ];
+  var live = null;
+  for (var i = 0; i < ways.length; i++) {
+    var path = (location.pathname.replace(/[^/]*$/, '')) + ways[i][0];
+    if (ways[i][0].charAt(0) === '.') path = '/' + ways[i][0];   // Funktionen liegen immer ganz oben
+    var r = await head(path);
+    var body = null;
+    if (r) { try { body = await r.json(); } catch (e) {} }
+    var good = !!(body && body.ok);
+    if (good && !live) live = body;
+    row('routes', good, ways[i][0], (r ? r.status : 'keine Antwort') + ' · ' + ways[i][1]);
+  }
+
+  /* --- 3) Liegen die Pflichtdateien oben? --- */
+  var files = ['index.html', 'version.json', 'app/config.js', 'netlify.toml', '_redirects', '_headers'];
+  for (var j = 0; j < files.length; j++) {
+    var rr = await head(files[j]);
+    var isHtml = rr ? (rr.headers.get('content-type') || '').indexOf('text/html') >= 0 : false;
+    var found = !!(rr && rr.ok && (!isHtml || files[j] === 'index.html'));
+    row('files', found ? true : null, files[j], found ? 'gefunden' : 'nicht abrufbar');
+  }
+  var note = document.createElement('div');
+  note.className = 'muted';
+  note.style.marginTop = '8px';
+  note.textContent = 'Ein „nicht abrufbar“ bei netlify.toml, _redirects oder _headers ist kein Problem — '
+    + 'Netlify blendet Konfigurationsdateien manchmal aus. Entscheidend ist der oberste Kasten.';
+  E('files').appendChild(note);
+
+  /* Sicherer Nachweis für „ein Ordner lag drumherum“: die Seite liegt dann
+     nicht ganz oben, sondern in einem Unterverzeichnis. */
+  var segs = location.pathname.split('/').filter(Boolean);
+  var inSubfolder = segs.length > 1;
+
+  /* --- 4) Urteil --- */
+  var nf = (vr && vr.headers.get('x-nf-request-id')) ? true : false;
+  E('host').textContent = nf ? 'Diese Seite läuft auf Netlify.' : 'Hinweis: Es wurde kein Netlify-Kennzeichen gefunden — läuft die Seite vielleicht woanders?';
+
+  var zipSteps = '<ol>'
+      + '<li><b>app.netlify.com/drop</b> im Browser öffnen (nicht die Deploys-Seite deiner alten Seite).</li>'
+      + '<li>Die ZIP-Datei dort hineinziehen. Netlify legt eine <b>neue</b> Seite an und führt dabei einen '
+      +   'Build aus — nur dann wird der Mini-Server mitinstalliert.</li>'
+      + '<li>Warten bis „Published“, dann die neue Adresse + <b>/check.html</b> öffnen.</li>'
+      + '<li>Steht hier grün „Alles in Ordnung“, ist die neue Adresse ab jetzt die richtige.</li></ol>'
+      + '<div style="margin-top:8px"><b>Warum?</b> Netlify installiert den Mini-Server nur, wenn beim '
+      + 'Hochladen ein Build läuft. Zieht man Dateien auf die <i>Deploys</i>-Seite einer bestehenden '
+      + 'Website, läuft kein Build — die Seite wird zwar aktualisiert, der Mini-Server bleibt aber aus. '
+      + 'Das ist bei Netlify so vorgesehen und lässt sich von der App aus nicht ändern.</div>'
+      + '<div style="margin-top:8px">Dauerhaft am saubersten: die Seite einmal mit einem '
+      + '<b>GitHub-Konto</b> verbinden — dann läuft bei jedem Hochladen automatisch ein Build.</div>';
+
+  if (live) {
+    E('verdict').innerHTML = '<span class="ok">✅ Alles in Ordnung</span>';
+    E('explain').innerHTML = 'Der Klassen-Server läuft (Version ' + esc(live.version) + '), Speicher: <b>'
+      + (live.storage === 'blobs' ? 'dauerhaft ✓' : esc(live.storage)) + '</b>. '
+      + 'Anmelden mit Namen und das Klassenzimmer funktionieren. Wenn im Handy trotzdem etwas Altes zu sehen ist: '
+      + 'unten „Zwischenspeicher leeren“ drücken.';
+  } else if (inSubfolder) {
+    E('verdict').innerHTML = '<span class="bad">❌ Ein Ordner liegt um die Dateien herum</span>';
+    E('explain').innerHTML = 'Diese Seite liegt unter <code>/' + esc(segs.slice(0, -1).join('/')) + '/</code> statt ganz oben. '
+      + 'Dadurch findet Netlify die Datei <b>netlify.toml</b> nicht und richtet den Mini-Server nie ein — '
+      + 'genau deshalb kam beim Anmelden „Not found“.';
+    E('fixbox').style.display = '';
+    E('fix').innerHTML = zipSteps;
+  } else {
+    E('verdict').innerHTML = '<span class="warn">⚠️ Die App ist aktuell — nur der Mini-Server fehlt</span>';
+    E('explain').innerHTML = 'Alle App-Dateien liegen richtig auf dem Server. Es fehlt allein die kleine '
+      + 'Server-Funktion, und die installiert Netlify <b>nur bei einem Build</b>. Wurde die Seite über die '
+      + '<i>Deploys</i>-Seite aktualisiert, läuft kein Build — dann kann es gar nicht funktionieren. '
+      + 'Der Ausweg steht unten.<br><br>Bis dahin funktioniert die App ganz normal: Die Kinder können sich '
+      + 'mit Namen anmelden und lernen, der Fortschritt wird auf dem Gerät gespeichert. Nur der Abgleich '
+      + 'zwischen Geräten und die Klassenliste brauchen den Mini-Server.';
+    E('fixbox').style.display = '';
+    E('fix').innerHTML = zipSteps;
+  }
+})();
+</script>
+</body></html>

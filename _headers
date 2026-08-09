@@ -1,0 +1,21 @@
+# Elif & Ba — Zwischenspeicher-Regeln (wird auch bei Drag-&-Drop gelesen).
+# App-Code darf NIE aus einem alten Zwischenspeicher kommen, sonst sieht man
+# nach einem Update weiterhin die alte Version.
+/index.html
+  Cache-Control: no-cache, must-revalidate
+/version.json
+  Cache-Control: no-store
+/sw.js
+  Cache-Control: no-cache, must-revalidate
+/app/*
+  Cache-Control: no-cache, must-revalidate
+/manifest.webmanifest
+  Cache-Control: no-cache
+
+# Unveränderliches darf lange liegen bleiben.
+/vendor/*
+  Cache-Control: public, max-age=604800
+/assets/*
+  Cache-Control: public, max-age=604800
+/fonts/*
+  Cache-Control: public, max-age=2592000

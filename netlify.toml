@@ -1,0 +1,49 @@
+# Elif & Ba — Netlify-Konfiguration
+#
+# WICHTIG: Netlify installiert Functions NUR, wenn ein Build läuft (Git-Anbindung,
+# CLI oder ein Drop auf app.netlify.com/drop, das einen Build auslöst). Beim
+# Nachladen einer bestehenden Seite über "Deploys" läuft KEIN Build — dann bleibt
+# der Mini-Server aus, auch wenn alle Dateien korrekt hochgeladen sind.
+# Deshalb steht hier ein echter (wenn auch trivialer) Build-Befehl.
+[build]
+  publish = "."
+  command = "echo Elif-und-Ba-Build-fuer-Netlify-Functions"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# Doppelte Absicherung zusätzlich zu _redirects: /api/... → Klassen-Server.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/sync/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/media/audio"
+  to = "/.netlify/functions/sync/media/audio"
+  status = 200
+  force = true
+
+# App-Code nie aus einem alten Zwischenspeicher ausliefern — sonst sieht man
+# nach dem Hochladen weiterhin die alte Version.
+[[headers]]
+  for = "/app/*"
+  [headers.values]
+    Cache-Control = "no-cache, must-revalidate"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache, must-revalidate"
+
+[[headers]]
+  for = "/version.json"
+  [headers.values]
+    Cache-Control = "no-store"
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache, must-revalidate"

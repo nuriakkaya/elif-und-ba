@@ -1,0 +1,8 @@
+{
+  "name": "elif-ba",
+  "version": "7.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Elif & Ba — Koran lesen lernen. Der Klassen-Server braucht bewusst KEINE npm-Pakete, damit er auch ohne Build-Schritt (Drag & Drop zu Netlify) funktioniert.",
+  "dependencies": {}
+}
