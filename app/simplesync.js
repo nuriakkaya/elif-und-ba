@@ -431,6 +431,38 @@
   }
   const smartLogin = join;   // alter Name bleibt gültig
 
+  /* Geheimwort setzen / ändern / entfernen */
+  async function setPassword(oldPass, newPass) {
+    const acc = account();
+    if (!acc || !acc.key) return { error: 'Nicht angemeldet' };
+    try {
+      const r = await req('auth', { method: 'POST', body: JSON.stringify({
+        action: 'setpass', name: acc.name, oldPass: oldPass || '', newPass: newPass || '' }) });
+      if (r.body && r.body.ok) return { ok: true, hasPass: !!r.body.hasPass };
+      return { error: (r.body && r.body.error) || 'Das hat nicht geklappt' };
+    } catch (e) { return { error: e.offline ? 'Keine Verbindung' : 'Server nicht erreichbar' }; }
+  }
+  /* Hat mein Konto ein Geheimwort? */
+  async function hasPassword() {
+    const acc = account();
+    if (!acc) return false;
+    const info = await check(acc.name);
+    return !!info.hasPass;
+  }
+  /* Eigenes Konto endgültig löschen (Server + Gerät) */
+  async function deleteAccount(pass) {
+    const acc = account();
+    if (!acc) return { error: 'Nicht angemeldet' };
+    try {
+      if (acc.key) {
+        const r = await req('auth', { method: 'POST', body: JSON.stringify({ action: 'delete', name: acc.name, pass: pass || '' }) });
+        if (!(r.body && r.body.ok)) return { error: (r.body && r.body.error) || 'Löschen fehlgeschlagen' };
+      }
+    } catch (e) { return { error: 'Server nicht erreichbar' }; }
+    logout();
+    return { ok: true };
+  }
+
   async function setClassCode(code) {
     const acc = account();
     if (!acc) return { error: 'Nicht angemeldet' };
@@ -482,6 +514,7 @@
   window.SimpleSync = {
     account, status, onChange: (fn) => { listeners.push(fn); return () => { const i = listeners.indexOf(fn); if (i >= 0) listeners.splice(i, 1); }; },
     join, smartLogin, check, logout, syncNow, setClassCode,
+    setPassword, hasPassword, deleteAccount,
     fetchClass, removeStudentRemote, postClassSummary, listNames,
     isTeacher, setTeacherMode,
     ping, diagnose, localLogin, url, req,

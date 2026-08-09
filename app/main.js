@@ -675,6 +675,8 @@ function Routes({ ctx }) {
     case 'league':   return window.League ? <window.League.LeagueScreen ctx={ctx}/> : <Home ctx={ctx}/>;
     case 'teacher':  return <TeacherCorner ctx={ctx}/>;
     case 'cardedit': return <CardEditor ctx={ctx}/>;
+    case 'account':  return <AccountScreen ctx={ctx}/>;
+    case 'help':     return <HelpScreen ctx={ctx}/>;
     case 'duel':     return window.DuelScreen ? <window.DuelScreen ctx={ctx}/> : <Home ctx={ctx}/>;
     case '404':      return <NotFound ctx={ctx}/>;
     default:         return <Home ctx={ctx}/>;
@@ -743,19 +745,20 @@ function Home({ ctx }) {
         })}
       </div>
 
+      {/* (09.08.2026) Das alte Supabase-Live-Quiz ist raus — es funktionierte
+          ohne Supabase-Projekt nie. Das echte Duell steht oben als eigene Karte. */}
       <div className="section-head" style={{marginTop:14}}>
         <div className="title">Freunde herausfordern</div>
-        <button className="link" onClick={() => openModal('live')}>Live-Quiz öffnen</button>
+        <button className="link" onClick={() => go('duel')}>Duell öffnen</button>
       </div>
-      {/* Klassen-Edition: keine Fake-Freunde mehr — ehrlicher Hinweis statt Beispiel-Karten. */}
       <div className="card" style={{textAlign:'center', padding:22}}>
-        <div style={{fontSize:28}}>🎮</div>
+        <div style={{fontSize:28}}>⚔️</div>
         <div style={{fontWeight:800, marginTop:4}}>Live gegeneinander spielen</div>
-        <div className="muted" style={{fontSize:13}}>Erstellt im Live-Quiz einen Raum und tretet mit dem 6-stelligen Code gegeneinander an.</div>
-        <button className="btn btn-primary" style={{marginTop:10}} onClick={() => openModal('live')}>Live-Quiz starten</button>
+        <div className="muted" style={{fontSize:13}}>
+          Tipp einen Mitschüler an — ihr bekommt dieselben Fragen, wer schneller richtig ist, gewinnt.
+        </div>
+        <button className="btn btn-primary" style={{marginTop:10}} onClick={() => go('duel')}>⚔️ Duell starten</button>
       </div>
-
-      {ctx.session && <WaveSection ctx={ctx}/>}
     </div>
   );
 }
@@ -3157,6 +3160,33 @@ function Shop({ ctx }) {
      ersatzlos (kein Bezahlmodell, Phase 15). */
 function Settings({ ctx }) {
   const t = { sounds: ctx.tweaks.sounds !== false, haptik: ctx.tweaks.haptik !== false, dark: !!ctx.tweaks.dark };
+  const SS = window.SimpleSync;
+  const acc = SS && SS.account();
+  const [msg, setMsg] = useState('');
+
+  /* Freunde einladen = den Link zur App teilen. Kein Konto, keine Punkte —
+     bei einer Klassen-App ist das Weitergeben der Adresse der ganze Zweck. */
+  const invite = async () => {
+    const url = location.origin + location.pathname.replace(/[^/]*$/, '');
+    const text = 'Lern mit mir Koran lesen! 🌙 Elif & Ba — einfach Namen eingeben und loslegen: ' + url;
+    try {
+      if (navigator.share) { await navigator.share({ title: 'Elif & Ba', text: text, url: url }); return; }
+      await navigator.clipboard.writeText(text);
+      setMsg('Einladung kopiert ✅ — jetzt einfach einfügen und verschicken.');
+    } catch (e) {
+      setMsg('Adresse zum Weitergeben: ' + url);
+    }
+    setTimeout(() => setMsg(''), 6000);
+  };
+
+  const row = (icon, label, right, onClick) => (
+    <div className="setting-row" style={onClick ? {cursor:'pointer'} : undefined} onClick={onClick}>
+      {icon && <span style={{fontSize:22}}>{icon}</span>}
+      <span className="lbl">{label}</span>
+      {right !== undefined ? right : <Icon.Caret style={{color:'var(--ink-mute)'}}/>}
+    </div>
+  );
+
   return (
     <div className="page" style={{maxWidth:720}}>
       <div className="row" style={{justifyContent:'space-between'}}>
@@ -3164,63 +3194,245 @@ function Settings({ ctx }) {
         <h1 style={{fontSize:22}}>Einstellungen</h1>
         <div style={{width:40}}/>
       </div>
+
       <div className="card flat settings-list">
-        {/* PWA-Installation (06.08.2026): Android zeigt nach Klick den echten
-            Install-Dialog (beforeinstallprompt); iOS bekommt die Kurz-Anleitung. */}
-        <div className="setting-row" style={{cursor:'pointer'}} onClick={() => {
+        {row('📲', 'Als App installieren', undefined, () => {
           if (window.PWAInstall && window.PWAInstall.prompt()) return;
           alert(/iPhone|iPad|iPod/i.test(navigator.userAgent)
             ? 'Auf dem iPhone/iPad: In Safari unten auf das Teilen-Symbol tippen und dann "Zum Home-Bildschirm" wählen.'
             : 'Im Browser-Menü (⋮) auf "App installieren" bzw. "Zum Startbildschirm hinzufügen" tippen — dann öffnet sich die App wie eine echte App mit eigenem Icon.');
-        }}>
-          <span style={{fontSize:22}}>📲</span>
-          <span className="lbl">Als App installieren</span>
-          <Icon.Caret style={{color:'var(--ink-mute)'}}/>
-        </div>
-        <div className="setting-row" style={{cursor:'pointer'}} onClick={() => ctx.openModal('invite')}>
-          <span style={{fontSize:22}}>📧</span>
-          <span className="lbl">Freunde einladen</span>
-          <span className="pill" style={{fontSize:11.5}}>+{window.Referral ? window.Referral.REWARD_COINS : 10} 🪙 pro Freund:in</span>
-        </div>
-        {[['💬','Kontakt'],['❓','Hilfe'],['🌍','Sprache','Deutsch']].map((r, i) => (
-          <div key={i} className="setting-row">
-            <span style={{fontSize:22}}>{r[0]}</span>
-            <span className="lbl">{r[1]}</span>
-            {r[2] ? <span className="muted">{r[2]}</span> : <Icon.Caret style={{color:'var(--ink-mute)'}}/>}
-          </div>
-        ))}
+        })}
+        {row('📧', 'Freunde einladen', <span className="muted" style={{fontSize:12.5}}>Link teilen</span>, invite)}
+        {row('❓', 'Hilfe', undefined, () => ctx.go('help'))}
+        {row('💬', 'Kontakt', undefined, () => ctx.go('help'))}
+        {row('🌍', 'Sprache', <span className="muted">Deutsch</span>, () => ctx.go('help'))}
       </div>
+      {!!msg && <div className="muted" style={{fontWeight:700, margin:'8px 2px', fontSize:13}}>{msg}</div>}
+
       <div className="card flat settings-list">
         {[['sounds','Sounds'],['haptik','Haptik'],['dark','Dunkelmodus']].map(([k,l]) => (
           <div key={k} className="setting-row">
             <span className="lbl">{l}</span>
-            {k === 'hearts' && <span className="muted" style={{fontSize:12, marginRight:8}}>Begrenzte Versuche wie bei Gizmo</span>}
             <button className={"toggle " + (t[k]?'on':'')} onClick={() => ctx.setTweak(k, !t[k])}/>
           </div>
         ))}
       </div>
+
       <div className="card flat settings-list">
-        <div className="setting-row" style={{cursor:'pointer'}} onClick={() => ctx.openModal('accountInfo')}>
-          <span className="lbl">Kontoinformationen</span><Icon.Caret style={{color:'var(--ink-mute)'}}/>
-        </div>
-        <div className="setting-row" style={{cursor:'pointer'}} onClick={() => ctx.openModal('security')}>
-          <span className="lbl">Anmeldung & Sicherheit</span><Icon.Caret style={{color:'var(--ink-mute)'}}/>
-        </div>
-        {ctx.session ? (
-          <div className="setting-row" style={{cursor:'pointer'}} onClick={async () => { await window.Auth.signOut(); ctx.go('home'); }}>
-            <span className="lbl" style={{color:'var(--rose)'}}>Abmelden</span>
-          </div>
-        ) : (
-          <div className="setting-row" style={{cursor:'pointer'}} onClick={() => ctx.openModal('auth')}>
-            <span className="lbl">Anmelden</span>
-          </div>
-        )}
-        <div className="setting-row" style={{cursor:'pointer'}} onClick={() => ctx.openModal('deleteAccount')}>
-          <span className="lbl" style={{color:'var(--rose)'}}>Konto löschen</span><Icon.Caret style={{color:'var(--ink-mute)'}}/>
-        </div>
+        {row(null, 'Konto & Sicherheit',
+             <span className="muted" style={{fontSize:12.5}}>{acc ? acc.name : 'nicht angemeldet'}</span>,
+             () => acc ? ctx.go('account') : ctx.openModal('auth'))}
+        {row(null, '🔧 Verbindung prüfen', undefined, () => ctx.openModal('servercheck'))}
+        {acc
+          ? <div className="setting-row" style={{cursor:'pointer'}}
+                 onClick={() => { if (window.confirm('Wirklich abmelden? Dein Fortschritt bleibt gespeichert.')) { SS.logout(); ctx.go('home'); } }}>
+              <span className="lbl" style={{color:'var(--rose)'}}>Abmelden</span>
+            </div>
+          : <div className="setting-row" style={{cursor:'pointer'}} onClick={() => ctx.openModal('auth')}>
+              <span className="lbl">Anmelden</span>
+            </div>}
         <div className="setting-row" style={{cursor:'default'}}>
           <span className="lbl muted" style={{fontSize:12.5}}>🌙 Elif &amp; Ba — {window.APP_VERSION || 'Version unbekannt'}</span>
         </div>
+      </div>
+    </div>
+  );
+}
+
+/* ==============================================================
+   KONTO & SICHERHEIT — ersetzt die alten Supabase-Fenster, die ohne
+   Supabase-Projekt nur „bitte anmelden" anzeigen konnten.
+   ============================================================== */
+function AccountScreen({ ctx }) {
+  const SS = window.SimpleSync;
+  const acc = SS && SS.account();
+  const st = SS && SS.status();
+  const [hasPass, setHasPass] = useState(null);
+  const [oldPass, setOldPass] = useState('');
+  const [newPass, setNewPass] = useState('');
+  const [msg, setMsg] = useState('');
+  const [err, setErr] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [, force] = useState(0);
+
+  useEffect(() => { if (SS && SS.hasPassword) SS.hasPassword().then(setHasPass); }, []);
+
+  if (!acc) {
+    return (
+      <div className="page" style={{maxWidth:560}}>
+        <div className="card" style={{padding:26, textAlign:'center'}}>
+          <div style={{fontSize:40}}>🧒</div>
+          <div style={{fontWeight:800, marginTop:6}}>Noch nicht angemeldet</div>
+          <div className="muted" style={{fontSize:13.5, margin:'6px 0 14px'}}>
+            Melde dich mit deinem Namen an — mehr braucht es nicht.
+          </div>
+          <button className="btn btn-primary btn-lg" onClick={() => ctx.openModal('auth')}>Anmelden</button>
+        </div>
+      </div>
+    );
+  }
+
+  const stateTxt = st.state === 'syncing' ? '⏳ Wird gerade abgeglichen …'
+    : st.state === 'lokal' ? '📱 Nur auf diesem Gerät — verbindet sich automatisch, sobald der Server da ist.'
+    : st.state === 'offline' ? '📴 Offline — der Abgleich läuft automatisch nach.'
+    : st.state === 'error' ? '⚠️ ' + (st.error || 'Abgleich fehlgeschlagen')
+    : st.lastSync ? '✅ Gesichert (zuletzt ' + new Date(st.lastSync).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}) + ' Uhr)'
+    : '🔄 Erster Abgleich läuft gleich …';
+
+  const savePass = async () => {
+    setErr(''); setMsg(''); setBusy(true);
+    const r = await SS.setPassword(oldPass, newPass);
+    setBusy(false);
+    if (r.ok) {
+      setHasPass(!!r.hasPass); setOldPass(''); setNewPass('');
+      setMsg(r.hasPass ? 'Geheimwort gespeichert ✅' : 'Geheimwort entfernt ✅ — du meldest dich jetzt wieder nur mit dem Namen an.');
+      setTimeout(() => setMsg(''), 4000);
+    } else setErr(r.error || 'Das hat nicht geklappt.');
+  };
+
+  const removeAccount = async () => {
+    if (!window.confirm('Konto wirklich löschen? Dein Fortschritt wird vom Server entfernt. Das lässt sich nicht rückgängig machen.')) return;
+    setBusy(true);
+    const r = await SS.deleteAccount(oldPass);
+    setBusy(false);
+    if (r.ok) { ctx.go('home'); }
+    else setErr(r.error || 'Löschen fehlgeschlagen.');
+  };
+
+  return (
+    <div className="page" style={{maxWidth:600}}>
+      <div className="row" style={{justifyContent:'space-between', alignItems:'center'}}>
+        <button className="icon-btn" onClick={() => ctx.go('settings')}><Icon.Back/></button>
+        <h1 style={{fontSize:22, margin:0}}>Konto &amp; Sicherheit</h1>
+        <div style={{width:40}}/>
+      </div>
+
+      <div className="card" style={{padding:18, marginTop:12}}>
+        <div style={{fontWeight:800, marginBottom:8}}>Kontoinformationen</div>
+        <div className="col" style={{gap:6, fontSize:14}}>
+          <div className="row"><span className="muted" style={{flex:'0 0 46%'}}>Name</span><b>{acc.name}</b></div>
+          <div className="row"><span className="muted" style={{flex:'0 0 46%'}}>Rolle</span><b>{acc.role === 'teacher' ? 'Lehrkraft' : 'Schüler:in'}</b></div>
+          <div className="row"><span className="muted" style={{flex:'0 0 46%'}}>Gruppe</span><b>{acc.classCode || 'ALLE'}</b></div>
+          <div className="row"><span className="muted" style={{flex:'0 0 46%'}}>Geheimwort</span><b>{hasPass === null ? '…' : hasPass ? 'gesetzt' : 'keins (nur Name)'}</b></div>
+          <div className="row"><span className="muted" style={{flex:'0 0 46%'}}>Abgleich</span><span style={{fontWeight:700}}>{stateTxt}</span></div>
+        </div>
+        <div className="row" style={{gap:10, marginTop:14, flexWrap:'wrap'}}>
+          <button className="btn btn-ghost" onClick={() => { SS.syncNow(); force(x => x + 1); }}>🔄 Jetzt abgleichen</button>
+          <button className="btn btn-ghost" onClick={() => ctx.openModal('servercheck')}>🔧 Verbindung prüfen</button>
+        </div>
+      </div>
+
+      <div className="card" style={{padding:18, marginTop:12}}>
+        <div style={{fontWeight:800}}>🔒 Geheimwort</div>
+        <div className="muted" style={{fontSize:13, margin:'4px 0 10px', lineHeight:1.5}}>
+          Ein Geheimwort brauchst du nur, wenn zwei Kinder gleich heißen oder du sichergehen willst,
+          dass niemand sonst deinen Namen benutzt. Ohne Geheimwort reicht der Name.
+        </div>
+        {hasPass && (
+          <input type="password" value={oldPass} onChange={e => setOldPass(e.target.value)}
+                 placeholder="Bisheriges Geheimwort"
+                 style={{width:'100%', padding:'12px 14px', borderRadius:12, border:'1px solid var(--line)', background:'var(--surface)', font:'inherit', boxSizing:'border-box', marginBottom:8}}/>
+        )}
+        <input type="password" value={newPass} onChange={e => setNewPass(e.target.value)}
+               placeholder={hasPass ? 'Neues Geheimwort (leer = entfernen)' : 'Neues Geheimwort (mindestens 4 Zeichen)'}
+               style={{width:'100%', padding:'12px 14px', borderRadius:12, border:'1px solid var(--line)', background:'var(--surface)', font:'inherit', boxSizing:'border-box'}}/>
+        <button className="btn btn-primary" style={{marginTop:10}} disabled={busy} onClick={savePass}>
+          {busy ? 'Einen Moment…' : hasPass ? 'Geheimwort ändern' : 'Geheimwort setzen'}
+        </button>
+        {!!msg && <div style={{color:'var(--success, #1B8A5A)', fontWeight:800, marginTop:10}}>{msg}</div>}
+        {!!err && <div style={{color:'var(--rose, #D64545)', fontWeight:800, marginTop:10}}>{err}</div>}
+      </div>
+
+      <div className="card" style={{padding:18, marginTop:12}}>
+        <div style={{fontWeight:800}}>Abmelden &amp; löschen</div>
+        <div className="muted" style={{fontSize:13, margin:'4px 0 10px', lineHeight:1.5}}>
+          <b>Abmelden</b> lässt alles stehen — mit demselben Namen bist du sofort wieder da.
+          <b> Löschen</b> entfernt dein Konto und deinen Fortschritt endgültig vom Server.
+        </div>
+        <div className="row" style={{gap:10, flexWrap:'wrap'}}>
+          <button className="btn btn-ghost" onClick={() => { if (window.confirm('Wirklich abmelden? Dein Fortschritt bleibt gespeichert.')) { SS.logout(); ctx.go('home'); } }}>Abmelden</button>
+          <button className="btn btn-ghost" style={{color:'var(--rose, #D64545)'}} disabled={busy} onClick={removeAccount}>Konto löschen</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ==============================================================
+   HILFE, KONTAKT & SPRACHE — echte Inhalte statt toter Zeilen.
+   ============================================================== */
+function HelpScreen({ ctx }) {
+  const SS = window.SimpleSync;
+  const isTeacher = SS && SS.isTeacher && SS.isTeacher();
+  const Q = ({ q, children }) => (
+    <div className="card" style={{padding:16, marginTop:10}}>
+      <div style={{fontWeight:800, marginBottom:4}}>{q}</div>
+      <div className="muted" style={{fontSize:13.5, lineHeight:1.6}}>{children}</div>
+    </div>
+  );
+  return (
+    <div className="page" style={{maxWidth:700}}>
+      <div className="row" style={{justifyContent:'space-between', alignItems:'center'}}>
+        <button className="icon-btn" onClick={() => ctx.go('settings')}><Icon.Back/></button>
+        <h1 style={{fontSize:22, margin:0}}>Hilfe</h1>
+        <div style={{width:40}}/>
+      </div>
+
+      <Q q="Wie melde ich mich an?">
+        Oben rechts auf <b>Anmelden</b> tippen, deinen <b>Namen</b> eintragen, fertig.
+        Kein Code, kein Passwort. Wer schon einmal da war, tippt seinen Namen in der Liste an.
+        Auf einem zweiten Gerät denselben Namen eingeben — der Fortschritt ist automatisch da.
+      </Q>
+      <Q q="Wie lerne ich?">
+        Startseite → <b>▶️ Weiterlernen</b>. Jeder neue Buchstabe wird dir zuerst gezeigt und
+        vorgesprochen, danach kommen die Fragen. Mit 🔊 hörst du ihn nochmal, mit 🐢 langsam.
+        Der grüne Kreis füllt sich, je sicherer ein Buchstabe sitzt.
+      </Q>
+      <Q q="Wie spiele ich gegen einen Freund?">
+        Startseite → <b>⚔️ Duell starten</b> (am Handy der Tab „Duell"). Lektion wählen,
+        Mitschüler antippen — bei ihm erscheint die Einladung. Wer schneller richtig ist, bekommt mehr Punkte.
+      </Q>
+      <Q q="Wie installiere ich die App aufs Handy?">
+        <b>Android:</b> blaues Banner auf der Startseite → „Installieren", oder Browser-Menü ⋮ → „App installieren".<br/>
+        <b>iPhone/iPad:</b> in Safari das Teilen-Symbol → „Zum Home-Bildschirm".
+      </Q>
+      <Q q="Ich höre keinen Ton">
+        Prüfe zuerst, ob das Handy stummgeschaltet ist. Danach in den Einstellungen den Schalter
+        <b> Sounds</b> ansehen. Bleibt es still, sag deiner Lehrkraft Bescheid — sie kann unter
+        „Klassenzimmer → Ton prüfen" nachsehen und die Aussprache selbst einsprechen.
+      </Q>
+      <Q q="Etwas sieht alt aus oder klemmt">
+        Einstellungen → <b>Konto &amp; Sicherheit</b> → „🔧 Verbindung prüfen". Dort steht in Klartext,
+        ob alles läuft, und es gibt einen Knopf, der den Zwischenspeicher leert. Der Lernfortschritt bleibt dabei erhalten.
+      </Q>
+
+      <div className="card" style={{padding:16, marginTop:16, borderLeft:'5px solid var(--accent, #2A6BE0)'}}>
+        <div style={{fontWeight:800, marginBottom:4}}>💬 Kontakt</div>
+        <div className="muted" style={{fontSize:13.5, lineHeight:1.6}}>
+          Diese App gehört deiner Lehrkraft — bei Fragen, falschen Buchstaben oder einer
+          Aussprache, die nicht stimmt, sprich sie einfach an. Sie kann jeden Buchstaben
+          selbst ändern und neu einsprechen.
+          {isTeacher && <><br/><br/><b>Für dich als Lehrkraft:</b> Klassenzimmer → „✏️ Buchstaben &amp; Silben bearbeiten"
+          und „🎙️ Aussprache-Studio". Die komplette Anleitung liegt als <b>EINRICHTUNG.md</b> im App-Ordner.</>}
+        </div>
+      </div>
+
+      <div className="card" style={{padding:16, marginTop:12}}>
+        <div style={{fontWeight:800, marginBottom:4}}>🌍 Sprache</div>
+        <div className="muted" style={{fontSize:13.5, lineHeight:1.6}}>
+          Die App ist auf <b>Deutsch</b>. Die Buchstabennamen folgen dem türkischen Elifba
+          (Elif, Be, Te, Se …), weil der Kurs darauf aufbaut. Passt ein Name oder eine
+          Umschrift nicht, kann die Lehrkraft ihn jederzeit ändern — die Änderung gilt dann überall.
+          {isTeacher && (
+            <div style={{marginTop:10}}>
+              <button className="btn btn-primary" onClick={() => ctx.go('cardedit')}>✏️ Buchstaben bearbeiten</button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="muted" style={{textAlign:'center', fontSize:12, marginTop:16, opacity:.75}}>
+        🌙 Elif &amp; Ba — {window.APP_VERSION || ''}
       </div>
     </div>
   );
@@ -3772,6 +3984,131 @@ function AudioStudio() {
    aufnehmen. Eine Änderung gilt SOFORT überall, wo der Buchstabe
    vorkommt — der Lernfortschritt der Kinder bleibt erhalten.
    ============================================================== */
+/* ==============================================================
+   🔊 TON PRÜFEN & BUCHSTABEN-TÖNE IN DIE APP HOLEN (09.08.2026)
+
+   Bisher kamen die Buchstaben-Aufnahmen bei JEDEM Abspielen von einem
+   fremden Server (jsDelivr). Ist der gesperrt — Schul-WLAN, Werbefilter,
+   kein Netz — bleibt die App still, ohne es zu sagen. Mit einem Klick
+   holt die Lehrkraft alle Tondateien EINMAL herüber und legt sie auf dem
+   eigenen Server ab. Danach spielt die App sie von dort: unabhängig,
+   offline-fähig und für jedes Kind gleich. Eigene Aufnahmen aus dem
+   Studio werden dabei NIE überschrieben.
+   ============================================================== */
+function SoundCheck({ ctx }) {
+  const QA = window.QuranAudio, QV = window.QuranVoice;
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [prog, setProg] = useState(null);   // {done, total, fail}
+  const [msg, setMsg] = useState('');
+  const [, force] = useState(0);
+  useEffect(() => QV && QV.onChange && QV.onChange(() => force(x => x + 1)), []);
+
+  const letters = useMemo(() => {
+    const t = (window.QURAN_TOPICS || [])[0];
+    const out = [];
+    ((t && t.blocks) || []).forEach(b => (b.cards || []).forEach(c => {
+      if (c && c.q) out.push({ ch: c.q, name: c.a });
+    }));
+    return out;
+  }, []);
+  if (!QA || !QV || !letters.length) return null;
+
+  const info = letters.map(l => Object.assign({}, l, QA.sourceFor(l.ch)));
+  const own = info.filter(x => x.src === 'eigen').length;
+  const ready = info.filter(x => x.src === 'eigen' || x.src === 'app').length;
+
+  const grab = async () => {
+    setBusy(true); setMsg(''); setProg({ done: 0, total: letters.length, fail: 0 });
+    let done = 0, fail = 0, skipped = 0;
+    const files = QA.letterFiles();
+    for (const l of letters) {
+      const bare = String(l.ch).replace(/[ً-ْٰـ]/g, '');
+      const name = files[bare];
+      if (QV.has(l.ch)) { skipped++; done++; setProg({ done, total: letters.length, fail }); continue; }
+      if (!name) { fail++; done++; setProg({ done, total: letters.length, fail }); continue; }
+      try {
+        const res = await fetch(QA.cdnUrl(name), { mode: 'cors' });
+        if (!res.ok) throw new Error(String(res.status));
+        const blob = await res.blob();
+        if (blob.size < 800) throw new Error('leer');
+        const r = await QV.put(l.ch, blob);
+        if (!r.ok) throw new Error(r.error || 'Upload');
+      } catch (e) { fail++; }
+      done++;
+      setProg({ done, total: letters.length, fail });
+    }
+    setBusy(false);
+    setMsg(fail
+      ? (letters.length - fail) + ' von ' + letters.length + ' Buchstaben geholt · ' + fail + ' nicht erreichbar (Netz oder Filter). Die fehlenden kannst du im Studio selbst einsprechen.'
+      : 'Fertig ✅ — alle ' + letters.length + ' Buchstaben liegen jetzt auf deinem eigenen Server' + (skipped ? ' (' + skipped + ' eigene Aufnahmen blieben unangetastet)' : '') + '.');
+    force(x => x + 1);
+  };
+
+  const badge = (x) => {
+    const m = {
+      eigen:    ['eigene Aufnahme', 'var(--success-soft, #E7F7EE)'],
+      app:      ['in der App', 'var(--success-soft, #E7F7EE)'],
+      internet: ['aus dem Internet', undefined],
+      fehler:   ['nicht ladbar', 'var(--rose-soft, #FDECEC)'],
+      stimme:   ['Systemstimme', 'var(--rose-soft, #FDECEC)'],
+      keine:    ['—', undefined],
+    }[x.src] || ['—', undefined];
+    return <span className="pill" style={{ background: m[1], fontSize: 11.5 }}>{m[0]}</span>;
+  };
+
+  return (
+    <div className="card" style={{padding: 16, marginTop: 12}}>
+      <div className="row" style={{justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap'}}>
+        <div style={{flex: '1 1 220px'}}>
+          <div style={{fontWeight: 800}}>🔊 Ton prüfen</div>
+          <div className="muted" style={{fontSize: 13, marginTop: 2}}>
+            Alle Buchstaben-Aufnahmen sind fest in der App enthalten — sie laufen offline
+            und ohne fremden Server. Hier siehst du für jeden Buchstaben, woher der Ton
+            gerade kommt, und kannst ihn anhören.
+          </div>
+        </div>
+        <div className="row" style={{gap: 8, alignItems: 'center'}}>
+          <span className="pill" style={ready >= letters.length ? {background:'var(--success-soft, #E7F7EE)', fontWeight:800} : {fontWeight:700}}>
+            {ready} / {letters.length} mit Ton{own ? ' · ' + own + '× deine Stimme' : ''}
+          </span>
+          <button className="btn btn-primary" onClick={() => setOpen(o => !o)}>{open ? 'Schließen' : 'Prüfen'}</button>
+        </div>
+      </div>
+
+      {open && (
+        <div style={{marginTop: 12}}>
+          <div className="card flat tinted" style={{padding: 12}}>
+            <div className="muted" style={{fontSize: 12.5, lineHeight: 1.55}}>
+              Die 30 Buchstaben-Aufnahmen liegen als eine Datei in der App
+              (<b>assets/letters.mp3</b>), auf gleiche Lautstärke gebracht. Du musst dafür
+              nichts einrichten. Gefällt dir eine Aussprache nicht, sprich sie im
+              <b> 🎙️ Aussprache-Studio</b> selbst ein — deine Aufnahme hat immer Vorrang.
+            </div>
+            <button className="btn btn-ghost btn-full" style={{marginTop: 8}} disabled={busy} onClick={grab}>
+              {busy ? '⏳ Hole Töne … ' + (prog ? prog.done + '/' + prog.total : '')
+                    : '⬇️ Zusätzlich auf den eigenen Server legen (optional)'}
+            </button>
+          </div>
+          {!!msg && <div style={{fontWeight: 800, marginTop: 10, fontSize: 13.5}}>{msg}</div>}
+
+          <div className="col" style={{gap: 4, marginTop: 12, maxHeight: 420, overflowY: 'auto'}}>
+            {info.map(x => (
+              <div key={x.ch} className="row" style={{alignItems: 'center', gap: 10, padding: '6px 4px', borderBottom: '1px solid var(--line)'}}>
+                <span dir="rtl" style={{fontSize: 24, minWidth: 40, textAlign: 'center', fontFamily: '"Amiri Quran", "Scheherazade New", serif'}}>{x.ch}</span>
+                <span style={{flex: 1, fontWeight: 700, fontSize: 13.5}}>{x.name}</span>
+                {badge(x)}
+                <button className="btn btn-ghost" style={{padding: '5px 10px', fontSize: 13}}
+                        onClick={() => QA.speakText(x.ch, true)}>▶️</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function CardEditor({ ctx }) {
   const CE = window.CardEdits;
   const QV = window.QuranVoice;
@@ -4146,6 +4483,8 @@ function TeacherCorner({ ctx }) {
           <button className="btn btn-primary" onClick={() => ctx.go('cardedit')}>✏️ Bearbeiten</button>
         </div>
       </div>
+
+      <SoundCheck ctx={ctx}/>
 
       <AudioStudio/>
 

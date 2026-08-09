@@ -16,7 +16,7 @@
      Einzige Ausnahme: die Aussprache-Aufnahmen (Route "media"), damit sie
      offline hörbar bleiben.
 */
-const CACHE = 'elifba-7-4';
+const CACHE = 'elifba-7-5';
 
 const PRECACHE = [
   './',
@@ -31,6 +31,7 @@ const PRECACHE = [
   'vendor/babel.min.js',
   'vendor/supabase.js',
   'vendor/qrcode.min.js',
+  'assets/letters.mp3',
   'assets/sounds/correct.mp3',
   'assets/sounds/wrong.mp3',
   'assets/sounds/combo.mp3',

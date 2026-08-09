@@ -32,16 +32,95 @@ window.QuranAudio = (function () {
      Lautstärke, KEIN Verstärker und keine Umwege über WebAudio. Die
      wahrgenommene Präsenz kommt jetzt allein daher, dass der Feedback-Ton
      leise ist und die Stimme fast sofort (60 ms) startet. */
-  function playFile(name, opts) {
+  /* (09.08.2026) Fehler werden nicht mehr verschluckt: Lädt die Datei nicht
+     (CDN gesperrt, Repo weg, kein Netz), fällt die App hörbar auf die
+     Systemstimme zurück statt still zu bleiben. Zusätzlich merkt sich die App,
+     welche Buchstaben nicht geladen werden konnten — die Lehrkraft sieht das
+     im Klassenzimmer unter „Ton prüfen". */
+  /* ---------- Buchstaben-Töne AUS DER APP (09.08.2026) ----------
+     Alle 30 Aufnahmen liegen gebündelt in assets/letters.mp3; wir springen
+     an die passende Stelle und stoppen nach der Länge des Buchstabens.
+     Dadurch braucht die App für die Buchstaben KEINEN fremden Server mehr:
+     sie klingt im Schul-WLAN, im Flugmodus und auf jedem Gerät gleich. */
+  let sprite = null, spriteReady = null, spriteTimer = null, spriteBroken = false;
+  function spriteEl() {
+    if (sprite) return sprite;
+    const S = window.LETTER_SPRITE;
+    if (!S) return null;
+    sprite = new Audio(S.file);
+    sprite.preload = 'auto';
+    if ('preservesPitch' in sprite) sprite.preservesPitch = true;
+    spriteReady = new Promise(function (res) {
+      const done = function () { res(true); };
+      sprite.addEventListener('canplaythrough', done, { once: true });
+      sprite.addEventListener('loadeddata', done, { once: true });
+      sprite.addEventListener('error', function () { spriteBroken = true; res(false); }, { once: true });
+      setTimeout(function () { res(sprite.readyState >= 2); }, 6000);
+    });
+    try { sprite.load(); } catch (e) {}
+    return sprite;
+  }
+  // Beim Start still vorladen, damit der erste Buchstabe sofort kommt
+  setTimeout(function () { try { spriteEl(); } catch (e) {} }, 1200);
+
+  function playSprite(name, opts, fallbackText) {
     opts = opts || {};
+    const S = window.LETTER_SPRITE;
+    if (!S || !S.at || !S.at[name] || spriteBroken) return false;
+    const el = spriteEl();
+    if (!el) return false;
+    const at = S.at[name];
+    const rate = opts.slow ? 0.7 : 1;
+    const target = at[0] / 1000;
+    const startAt = function (tries) {
+      try {
+        if (spriteTimer) { clearTimeout(spriteTimer); spriteTimer = null; }
+        el.playbackRate = rate;
+        el.volume = 1;
+        el.currentTime = target;
+        // Konnte nicht gesprungen werden (Datei noch nicht weit genug geladen),
+        // einmal auf "canplaythrough" warten und erneut versuchen.
+        if (Math.abs(el.currentTime - target) > 0.15 && tries > 0) {
+          el.addEventListener('canplaythrough', function () { startAt(tries - 1); }, { once: true });
+          try { el.load(); } catch (e) {}
+          return;
+        }
+        const p = el.play();
+        spriteTimer = setTimeout(function () { try { el.pause(); } catch (e) {} }, (at[1] + 90) / rate);
+        if (p && p.catch) p.catch(function () { if (fallbackText) tts(fallbackText, opts); });
+      } catch (e) { if (fallbackText) tts(fallbackText, opts); }
+    };
+    spriteReady.then(function (ok) {
+      if (!ok) { if (fallbackText) tts(fallbackText, opts); return; }
+      startAt(1);
+    });
+    return true;
+  }
+
+  const failed = {};
+  function playFile(name, opts, fallbackText) {
+    opts = opts || {};
+    if (failed[name]) { if (fallbackText) tts(fallbackText, opts); return; }
     let a = cache[name];
-    if (!a) { a = new Audio(CDN + name + '.mp3'); cache[name] = a; }
+    if (!a) {
+      a = new Audio(CDN + name + '.mp3');
+      a.addEventListener('error', function () {
+        failed[name] = true;
+        delete cache[name];
+        try { window.dispatchEvent(new CustomEvent('quran-audio-failed', { detail: { name: name } })); } catch (e) {}
+        if (fallbackText) tts(fallbackText, opts);
+      });
+      cache[name] = a;
+    }
     try {
       if ('preservesPitch' in a) a.preservesPitch = true;
       a.playbackRate = opts.slow ? 0.7 : 1.0; // 🐢 langsam ohne Tonhöhen-Änderung
       a.volume = 1; a.currentTime = 0;
-      a.play().catch(function(){});
-    } catch (e) {}
+      a.play().catch(function () {
+        // Autoplay-Sperre oder Ladefehler → wenigstens die Systemstimme
+        if (fallbackText) tts(fallbackText, opts);
+      });
+    } catch (e) { if (fallbackText) tts(fallbackText, opts); }
   }
   function tts(text, opts) {
     opts = opts || {};
@@ -73,9 +152,14 @@ window.QuranAudio = (function () {
     const bare = ar.replace(/[\u064B-\u0652\u0670\u0640]/g, '').replace(/\s+/g, '');
     if (!hasHarakat) {
       // 2) echte Buchstaben-Tonaufnahme (Soundboard)
-      if (FILES[bare]) { playFile(FILES[bare], opts); return; }          // einzelner Buchstabe / لا
-      const uniq = Array.from(new Set(bare.split('')));
-      if (uniq.length === 1 && FILES[uniq[0]]) { playFile(FILES[uniq[0]], opts); return; } // Formen-Reihe
+      const uniq0 = Array.from(new Set(bare.split('')));
+      const name = FILES[bare] || (uniq0.length === 1 ? FILES[uniq0[0]] : null);
+      if (name) {
+        // 2) mitgelieferte Aufnahme aus der App (kein fremder Server nötig)
+        if (playSprite(name, opts, ar)) return;
+        // 3) Notnagel: dieselbe Aufnahme aus dem Internet
+        playFile(name, opts, ar); return;
+      }
     }
     tts(ar, opts); // 3) Silben & Wörter ohne Aufnahme: arabische Systemstimme
   }
@@ -85,5 +169,29 @@ window.QuranAudio = (function () {
     if (delayMs) { setTimeout(function () { speakText(card && card.q); }, delayMs); return; }
     speakText(card && card.q);
   }
-  return { speakForCard: speakForCard, speakText: speakText };
+  /* Welche Quelle würde für diesen Text benutzt? (für „Ton prüfen") */
+  function sourceFor(text) {
+    const ar = String(text || '').replace(/[^\u0600-\u06FF\s]/g, ' ').trim();
+    if (!ar) return { src: 'keine', label: 'kein arabischer Text' };
+    if (window.QuranVoice && window.QuranVoice.has(ar)) return { src: 'eigen', label: 'eigene Aufnahme' };
+    const hasHarakat = /[\u064B-\u0652]/.test(ar);
+    const bare = ar.replace(/[\u064B-\u0652\u0670\u0640]/g, '').replace(/\s+/g, '');
+    if (!hasHarakat) {
+      const uniq = Array.from(new Set(bare.split('')));
+      const name = FILES[bare] || (uniq.length === 1 ? FILES[uniq[0]] : null);
+      if (name) {
+        const S = window.LETTER_SPRITE;
+        if (S && S.at && S.at[name] && !spriteBroken) return { src: 'app', label: 'in der App enthalten', file: name };
+        return failed[name] ? { src: 'fehler', label: 'Tondatei nicht ladbar', file: name }
+                            : { src: 'internet', label: 'Tondatei aus dem Internet', file: name };
+      }
+    }
+    return { src: 'stimme', label: 'Systemstimme (kann fehlen)' };
+  }
+  function letterFiles() { return Object.assign({}, FILES); }
+  function cdnUrl(name) { return CDN + name + '.mp3'; }
+
+  return { speakForCard: speakForCard, speakText: speakText,
+           sourceFor: sourceFor, letterFiles: letterFiles, cdnUrl: cdnUrl,
+           failedFiles: function () { return Object.keys(failed); } };
 })();

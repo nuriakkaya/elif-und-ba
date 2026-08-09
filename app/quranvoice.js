@@ -17,9 +17,15 @@
   const IDX_KEY = 'lern_audio_index_v1';
   const REV_KEY = 'lern_audio_rev_v1';
 
-  // Stabiler Schlüssel für einen arabischen Text (Doppel-Hash, kollisionsarm)
-  function hashKey(text) {
-    const s = String(text || '').trim().replace(/\s+/g, ' ');
+  /* Stabiler Schlüssel für einen arabischen Text (Doppel-Hash, kollisionsarm).
+     WICHTIG (09.08.2026): Der Text wird VORHER genauso normalisiert wie beim
+     Abspielen — nur arabische Zeichen, Rest zu Leerzeichen, mehrfach zu einfach.
+     Vorher konnten Aufnahme und Wiedergabe unterschiedliche Schlüssel bilden
+     (z. B. bei Karten mit „·" dazwischen), dann war die Aufnahme unauffindbar. */
+  function normalize(text) {
+    return String(text || '').replace(/[^\u0600-\u06FF\s]/g, ' ').trim().replace(/\s+/g, ' ');
+  }
+  function rawHash(s) {
     let h1 = 5381, h2 = 52711;
     for (let i = 0; i < s.length; i++) {
       const c = s.charCodeAt(i);
@@ -27,6 +33,16 @@
       h2 = ((h2 * 31) ^ c) >>> 0;
     }
     return h1.toString(16) + h2.toString(16);
+  }
+  function hashKey(text) { return rawHash(normalize(text)); }
+  // Alte Aufnahmen (vor der Normalisierung) bleiben auffindbar
+  function legacyKey(text) { return rawHash(String(text || '').trim().replace(/\s+/g, ' ')); }
+  function keyFor(text) {
+    const k = hashKey(text);
+    if (idx && idx.has(k)) return k;
+    const l = legacyKey(text);
+    if (idx && idx.has(l)) return l;
+    return k;
   }
 
   /* Adresse des Mini-Servers: nutzt die Autoerkennung aus simplesync.js,
@@ -89,12 +105,12 @@
   }
 
   const pool = {};
-  function has(text) { return !!(idx && idx.has(hashKey(text))); }
+  function has(text) { return !!(idx && (idx.has(hashKey(text)) || idx.has(legacyKey(text)))); }
   function stopAll() { Object.values(pool).forEach(a => { try { a.pause(); } catch (e) {} }); }
   function play(text, opts) {
     opts = opts || {};
     if (!has(text)) return false;
-    const k = hashKey(text);
+    const k = keyFor(text);
     const url = mediaUrl(k, revOf(k));
     let a = pool[k];
     if (!a || a.src.indexOf('v=' + revOf(k)) < 0) { a = new Audio(url); pool[k] = a; }
@@ -145,7 +161,7 @@
   }
 
   window.QuranVoice = {
-    hashKey, has, play, refresh, put, del, stopAll,
+    hashKey, normalize, has, play, refresh, put, del, stopAll,
     count: function () { return idx ? idx.size : 0; },
     onChange: function (fn) { listeners.push(fn); return function () { const i = listeners.indexOf(fn); if (i >= 0) listeners.splice(i, 1); }; },
   };

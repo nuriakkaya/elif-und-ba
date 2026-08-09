@@ -29,7 +29,7 @@ import { pbkdf2Sync, randomBytes, timingSafeEqual } from "node:crypto";
 import { gunzipSync } from "node:zlib";
 import { Buffer } from "node:buffer";
 
-const VERSION = "7.4";
+const VERSION = "7.5";
 const TEACHER_PW = "1907";          // Lehrer-Passwort — hier zentral änderbar
 const DEFAULT_CLASS = "ALLE";       // Klasse, in die JEDES Kind automatisch kommt
 const STORE = "site:elifba-sync";   // Blobs-Store (Präfix "site:" = siteweit)
@@ -301,6 +301,46 @@ export default async (req) => {
       if (body.action === "check") {
         const rec = await bGet(ukey);
         return json({ ok: true, exists: !!rec, hasPass: !!(rec && rec.hash) });
+      }
+
+      /* Geheimwort setzen / ändern / entfernen */
+      if (body.action === "setpass") {
+        const rec = await bGet(ukey);
+        if (!rec) return json({ error: "Konto nicht gefunden" }, 404);
+        if (rec.hash) {                                  // altes Geheimwort prüfen
+          const old = String(body.oldPass || "");
+          const a = Buffer.from(hashOf(old, rec.salt), "hex");
+          const b = Buffer.from(rec.hash, "hex");
+          if (!old || a.length !== b.length || !timingSafeEqual(a, b))
+            return json({ error: "Das bisherige Geheimwort stimmt nicht" }, 401);
+        }
+        const np = String(body.newPass || "");
+        if (np && np.length < 4) return json({ error: "Geheimwort zu kurz (mindestens 4 Zeichen)" }, 400);
+        rec.hash = np ? hashOf(np, rec.salt) : "";
+        await bSet(ukey, rec);
+        return json({ ok: true, hasPass: !!rec.hash });
+      }
+
+      /* Eigenes Konto löschen (Kind) — Lehrkraft nutzt dafür das Klassenzimmer */
+      if (body.action === "delete") {
+        const rec = await bGet(ukey);
+        if (!rec) return json({ ok: true, removed: true });
+        if (rec.hash) {
+          const pw = String(body.pass || "");
+          const a = Buffer.from(hashOf(pw, rec.salt), "hex");
+          const b = Buffer.from(rec.hash, "hex");
+          if (!pw || a.length !== b.length || !timingSafeEqual(a, b))
+            return json({ error: "Geheimwort erforderlich" }, 401);
+        }
+        const code = cleanCode(rec.classCode || DEFAULT_CLASS) || DEFAULT_CLASS;
+        try {
+          const reg = (await bGet("class:" + code)) || { students: {} };
+          delete reg.students[rec.name];
+          await bSet("class:" + code, reg);
+        } catch (e) {}
+        try { if (rec.syncKey) await bDel("col:" + rec.syncKey); } catch (e) {}
+        await bDel(ukey);
+        return json({ ok: true, removed: true });
       }
 
       /* "join" = der neue Ein-Klick-Weg: existiert der Name → anmelden,

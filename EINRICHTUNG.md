@@ -1,4 +1,4 @@
-# 🌙 Elif & Ba — Einrichtung & Update (Version 7.4)
+# 🌙 Elif & Ba — Einrichtung & Update (Version 7.5)
 
 **Das Wichtigste in einem Satz:** Ein Kind tippt auf *Anmelden*, schreibt seinen
 **Namen**, drückt einmal — und ist im Kurs. Kein Anmeldecode, kein Passwort,
@@ -139,22 +139,53 @@ anderen. Am Ende gibt es das Siegertreppchen und **🔁 Revanche**.
 Die Aussprache-Aufnahmen und deine geänderten Umschriften gelten im Duell
 genauso wie beim Lernen.
 
-## 🎙️ Aussprache-Studio (sehr empfohlen!)
+## 🔊 Der Ton: nichts einzurichten
 
-Die wichtigste Zutat ist die richtige Aussprache — und die kommt am besten von
-DIR statt von einer Computerstimme:
+**Alle 30 Buchstaben-Aufnahmen sind fest in der App enthalten** — als eine Datei
+(`assets/letters.mp3`, 496 KB), alle auf dieselbe Lautstärke gebracht und ohne
+Rauschen am Anfang. Kein fremder Server, kein Nachladen: Der Ton läuft im
+Schul-WLAN, im Flugmodus und auf jedem Gerät gleich.
 
-1. **Klassenzimmer** → Karte **„🎙️ Aussprache-Studio“** → „Öffnen“.
+Die Reihenfolge, in der die App eine Aussprache sucht:
+
+1. **Deine eigene Aufnahme** (Aussprache-Studio) — hat immer Vorrang.
+2. **Die mitgelieferte Aufnahme** aus der App.
+3. **Die Systemstimme** des Handys — nur für Silben und Wörter, für die es
+   keine Aufnahme gibt.
+
+Unter **Klassenzimmer → „🔊 Ton prüfen"** siehst du für jeden Buchstaben, woher
+der Ton gerade kommt, und kannst ihn direkt anhören. Dort steht auch, wie viele
+Buchstaben du bereits mit deiner eigenen Stimme belegt hast.
+
+## 🎙️ Aussprache-Studio (wenn du es selbst sprechen willst)
+
+Die mitgelieferten Aufnahmen decken die **Buchstaben** ab. Für **Silben und
+Wörter** (بَ، رَزَقَ) gibt es keine fertigen Aufnahmen — die spricht sonst die
+Systemstimme, und die klingt nicht immer schön. Genau dafür ist das Studio da:
+
+1. **Klassenzimmer** → Karte **„🎙️ Aussprache-Studio"** → „Öffnen".
 2. Beim ersten 🎙️ fragt der Browser nach dem **Mikrofon** → erlauben.
 3. Für jede Silbe: **🎙️ drücken → deutlich sprechen → ⏹ Stopp.** Die Aufnahme
    lädt automatisch hoch. Mit ▶️ probehören, mit 🎙️ überschreiben.
 4. Ab sofort hören **alle Kinder auf allen Geräten deine Aufnahme** — beim
-   Lernen, beim Aufdecken und über die 🔊/🐢-Knöpfe (🐢 = langsam, ohne dass
-   sich die Stimme verändert).
+   Lernen, beim Aufdecken, im Duell und über die 🔊/🐢-Knöpfe.
 5. Reihenfolge-Tipp: erst die Silben-Lektionen (Üstün/Esre/Ötre), dann Wörter —
-   die 29 Buchstaben haben bereits echte Aufnahmen.
+   die Buchstaben sind ja schon fertig.
+
+Einen einzelnen Buchstaben neu einsprechen geht am schnellsten über
+**„✏️ Buchstaben & Silben bearbeiten"** → Karte suchen → 🎙️.
 
 Einmal gehört, bleibt jede Aufnahme auf dem Gerät (offline nutzbar).
+
+## ⚙️ Einstellungen, Hilfe & Konto (neu in 7.5)
+
+- **Hilfe** und **Kontakt** sind jetzt echte Seiten mit Antworten auf die
+  häufigsten Fragen (Anmelden, Lernen, Duell, Installieren, kein Ton).
+- **Konto & Sicherheit**: zeigt Name, Rolle, Gruppe und Abgleich-Zustand.
+  Dort kannst du ein **Geheimwort setzen, ändern oder entfernen** und dein
+  Konto endgültig löschen. Vorher stand dort „bitte anmelden", obwohl man
+  angemeldet war — das lag an Resten der alten Supabase-Anmeldung.
+- **Freunde einladen** teilt jetzt einfach die Adresse der App.
 
 ## 📲 Als App installieren
 
@@ -198,7 +229,7 @@ unter **Site settings → Environment variables** als `GEMINI_API_KEY` eintragen
 
 - **„Es hat sich nichts geändert“** → fast immer läuft noch die alte Version:
   Profil → Anmelde-/Konto-Fenster → ganz unten muss
-  **„Version 7.4 · 09.08.2026“** stehen. Sonst „🔄 App aktualisieren“ drücken.
+  **„Version 7.5 · 09.08.2026“** stehen. Sonst „🔄 App aktualisieren“ drücken.
 - **Klassenzimmer bleibt leer** → auf „🔧 Verbindung prüfen“ tippen. Steht dort
   grün „Alles in Ordnung“, hat sich schlicht noch kein Kind angemeldet.
 - **„Speicher nur vorübergehend“** in der Prüfung → der Server läuft, kann aber
