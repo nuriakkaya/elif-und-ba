@@ -2207,6 +2207,13 @@ header.topbar { padding-top: max(12px, env(safe-area-inset-top)); }
 .hz-err { background: #FDE3E8; color: #B3123A; border-radius: 10px; padding: 10px 12px; font-size: 13px; font-weight: 600; margin-top: 10px; line-height: 1.5; }
 .hz-audio { width: 100%; max-width: 320px; margin: 10px auto 6px; display: block; }
 
+.hz-onlyar { font-size: 12px; font-weight: 700; color: #8C99A5; margin-top: 8px; }
+.hz-tempo-hint { font-size: 12.5px; color: var(--muted, #66717b); margin-top: 8px; }
+.hz-tempo { display: flex; align-items: center; gap: 8px; margin: 10px auto 0; max-width: 280px; font-weight: 800; font-size: 13px; color: #2364A5; }
+.hz-tempo-bar { flex: 1; height: 8px; border-radius: 999px; background: #ECEBE6; overflow: hidden; }
+.hz-tempo-bar div { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #4FC3A1, #2E77C6); transition: width .1s linear; }
+.hz-tempo.is-over { color: #B3123A; }
+.hz-tempo.is-over .hz-tempo-bar div { background: #F02048; }
 /* Ergebnis */
 .hz-result { border-radius: 14px; padding: 14px 16px; margin-top: 14px; }
 .hz-result.is-gut { background: #DFF5E8; }
@@ -2263,64 +2270,64 @@ header.topbar { padding-top: max(12px, env(safe-area-inset-top)); }
 
 <div id="root"></div>
 
-<script src="vendor/react.development.js?v=8.0"></script>
-<script src="vendor/react-dom.development.js?v=8.0"></script>
-<script src="vendor/babel.min.js?v=8.0"></script>
-<script src="vendor/supabase.js?v=8.0"></script>
-<script src="vendor/qrcode.min.js?v=8.0"></script>
+<script src="vendor/react.development.js?v=8.1"></script>
+<script src="vendor/react-dom.development.js?v=8.1"></script>
+<script src="vendor/babel.min.js?v=8.1"></script>
+<script src="vendor/supabase.js?v=8.1"></script>
+<script src="vendor/qrcode.min.js?v=8.1"></script>
 
-<script src="app/data.js?v=8.0"></script>
-<script src="app/quran.js?v=8.0"></script>
-<script src="app/quranvoice.js?v=8.0"></script>
-<script src="app/lettersprite.js?v=8.0"></script>
-<script src="app/quranaudio.js?v=8.0"></script>
-<script src="app/recite.js?v=8.0"></script>
-<script src="app/quranforms.js?v=8.0"></script>
-<script src="app/surahdata.js?v=8.0"></script>
-<script src="app/hifzdata.js?v=8.0"></script>
-<script src="app/quranvocab.js?v=8.0"></script>
-<script src="app/cardedits.js?v=8.0"></script>
-<script src="app/config.js?v=8.0"></script>
-<script src="app/supabase.js?v=8.0"></script>
-<script src="app/srs.js?v=8.0"></script>
-<script src="app/replay.js?v=8.0"></script>
-<script src="app/classroom.js?v=8.0"></script>
-<script src="app/simplesync.js?v=8.0"></script>
-<script src="app/customtopics.js?v=8.0"></script>
-<script src="app/history.js?v=8.0"></script>
-<script src="app/engine.js?v=8.0"></script>
-<script src="app/xp.js?v=8.0"></script>
-<script src="app/monsters.js?v=8.0"></script>
-<script src="app/hearts.js?v=8.0"></script>
-<script src="app/referral.js?v=8.0"></script>
-<script src="app/library.js?v=8.0"></script>
-<script src="app/sharedstacks.js?v=8.0"></script>
-<script src="app/presence.js?v=8.0"></script>
-<script src="app/notifications.js?v=8.0"></script>
-<script src="app/friendstreaks.js?v=8.0"></script>
-<script src="app/sound.js?v=8.0"></script>
-<script src="app/celebrate.js?v=8.0"></script>
-<script src="app/tutor.js?v=8.0"></script>
-<script src="app/tweaks.js?v=8.0"></script>
-<script src="app/aigen.js?v=8.0"></script>
-<script type="text/babel" src="app/icons.js?v=8.0"></script>
-<script type="text/babel" src="app/tutorui.js?v=8.0"></script>
-<script type="text/babel" src="app/auth.js?v=8.0"></script>
-<script type="text/babel" src="app/friends.js?v=8.0"></script>
-<script type="text/babel" src="app/follows.js?v=8.0"></script>
-<script type="text/babel" src="app/livequiz.js?v=8.0"></script>
-<script type="text/babel" src="app/groups.js?v=8.0"></script>
-<script type="text/babel" src="app/league.js?v=8.0"></script>
-<script type="text/babel" src="app/lesson.js?v=8.0"></script>
-<script type="text/babel" src="app/surahs.js?v=8.0"></script>
-<script type="text/babel" src="app/hifz.js?v=8.0"></script>
-<script type="text/babel" src="app/echo.js?v=8.0"></script>
-<script type="text/babel" src="app/classboard.js?v=8.0"></script>
-<script type="text/babel" src="app/infinity.js?v=8.0"></script>
-<script type="text/babel" src="app/quranintro.js?v=8.0"></script>
-<script type="text/babel" src="app/quiz.js?v=8.0"></script>
-<script type="text/babel" src="app/duel.js?v=8.0"></script>
-<script type="text/babel" src="app/main.js?v=8.0"></script>
+<script src="app/data.js?v=8.1"></script>
+<script src="app/quran.js?v=8.1"></script>
+<script src="app/quranvoice.js?v=8.1"></script>
+<script src="app/lettersprite.js?v=8.1"></script>
+<script src="app/quranaudio.js?v=8.1"></script>
+<script src="app/recite.js?v=8.1"></script>
+<script src="app/quranforms.js?v=8.1"></script>
+<script src="app/surahdata.js?v=8.1"></script>
+<script src="app/hifzdata.js?v=8.1"></script>
+<script src="app/quranvocab.js?v=8.1"></script>
+<script src="app/cardedits.js?v=8.1"></script>
+<script src="app/config.js?v=8.1"></script>
+<script src="app/supabase.js?v=8.1"></script>
+<script src="app/srs.js?v=8.1"></script>
+<script src="app/replay.js?v=8.1"></script>
+<script src="app/classroom.js?v=8.1"></script>
+<script src="app/simplesync.js?v=8.1"></script>
+<script src="app/customtopics.js?v=8.1"></script>
+<script src="app/history.js?v=8.1"></script>
+<script src="app/engine.js?v=8.1"></script>
+<script src="app/xp.js?v=8.1"></script>
+<script src="app/monsters.js?v=8.1"></script>
+<script src="app/hearts.js?v=8.1"></script>
+<script src="app/referral.js?v=8.1"></script>
+<script src="app/library.js?v=8.1"></script>
+<script src="app/sharedstacks.js?v=8.1"></script>
+<script src="app/presence.js?v=8.1"></script>
+<script src="app/notifications.js?v=8.1"></script>
+<script src="app/friendstreaks.js?v=8.1"></script>
+<script src="app/sound.js?v=8.1"></script>
+<script src="app/celebrate.js?v=8.1"></script>
+<script src="app/tutor.js?v=8.1"></script>
+<script src="app/tweaks.js?v=8.1"></script>
+<script src="app/aigen.js?v=8.1"></script>
+<script type="text/babel" src="app/icons.js?v=8.1"></script>
+<script type="text/babel" src="app/tutorui.js?v=8.1"></script>
+<script type="text/babel" src="app/auth.js?v=8.1"></script>
+<script type="text/babel" src="app/friends.js?v=8.1"></script>
+<script type="text/babel" src="app/follows.js?v=8.1"></script>
+<script type="text/babel" src="app/livequiz.js?v=8.1"></script>
+<script type="text/babel" src="app/groups.js?v=8.1"></script>
+<script type="text/babel" src="app/league.js?v=8.1"></script>
+<script type="text/babel" src="app/lesson.js?v=8.1"></script>
+<script type="text/babel" src="app/surahs.js?v=8.1"></script>
+<script type="text/babel" src="app/hifz.js?v=8.1"></script>
+<script type="text/babel" src="app/echo.js?v=8.1"></script>
+<script type="text/babel" src="app/classboard.js?v=8.1"></script>
+<script type="text/babel" src="app/infinity.js?v=8.1"></script>
+<script type="text/babel" src="app/quranintro.js?v=8.1"></script>
+<script type="text/babel" src="app/quiz.js?v=8.1"></script>
+<script type="text/babel" src="app/duel.js?v=8.1"></script>
+<script type="text/babel" src="app/main.js?v=8.1"></script>
 <script type="text/babel">
 ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(window.App));
 </script>

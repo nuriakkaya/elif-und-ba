@@ -3510,6 +3510,19 @@ function HelpScreen({ ctx }) {
         Beim <b>Auswendiglernen</b> der Suren sprichst du dagegen ganze Verse — dort hört der
         Browser auf Arabisch mit.
       </Q>
+      <Q q="Ich höre beim Auswendiglernen nichts">
+        Der Ton startet nur, wenn du ihn antippst („🔊 Vers anhören") — Handys blockieren Ton, der
+        von allein losgeht. Kommt dann immer noch nichts, sagt dir die App warum. Am sichersten ist
+        es, wenn deine Lehrkraft die Sure im <b>Aussprache-Studio</b> selbst einspricht: Dann hörst
+        du sie überall, sogar ohne Internet.
+      </Q>
+      <Q q="Warum bekomme ich nur die halbe Punktzahl?">
+        Volle Punkte gibt es für alles, was die App wirklich prüfen kann: flüssig ins Mikrofon
+        aufgesagt, Wort-Puzzle gelöst, Verse richtig geordnet. Nur die Hälfte gibt es, wenn du
+        <b> zu langsam</b> warst (dann hast du gelesen statt aufgesagt), wenn du dir die
+        <b> Umschrift</b> eingeblendet hast oder wenn du ohne Mikrofon nur selbst bestätigst.
+        Wie viel Zeit du hast, steht vor jeder Aufnahme — und ein Balken läuft mit.
+      </Q>
       <Q q="Muss ich ins Mikrofon sprechen?">
         Nein — es geht immer auch ohne. Wenn dein Browser Arabisch versteht (Chrome, Safari),
         hört er beim Nachsprechen mit und zeigt dir Wort für Wort, was schon gut war. Kann er das
@@ -4042,6 +4055,16 @@ function AudioStudio() {
       seen.add(ar);
       out.push({ ar, label: String(c.a || '').slice(0, 60), lesson: String(t.name || '').replace(/^\d+\.\s*/, '') });
     })));
+    /* (11.08.2026) Auch die Suren und Gebete zum Auswendiglernen stehen hier —
+       damit die Aussprache NICHT vom Internet abhängt. Sprichst du sie einmal
+       selbst ein, hören die Kinder ab sofort DICH, auf jedem Gerät und offline. */
+    (window.HIFZ_ITEMS || []).forEach(it => (it.parts || []).forEach((prt, i) => {
+      const ar = String(prt.ar || '').replace(/[^\u0600-\u06FF\s]/g, ' ').trim().replace(/\s+/g, ' ');
+      if (!ar || seen.has(ar)) return;
+      seen.add(ar);
+      out.push({ ar, label: (it.kind === 'sure' ? 'Vers ' : 'Teil ') + (i + 1) + ' · ' + (prt.tr || '').slice(0, 40),
+                 lesson: '🕌 ' + it.name });
+    }));
     return out;
   }, []);
   const QV = window.QuranVoice;

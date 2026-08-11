@@ -1,5 +1,5 @@
 /* ==============================================================
-   🕌 AUSWENDIG LERNEN (Hifz) — Version 8.0, 11.08.2026
+   🕌 AUSWENDIG LERNEN (Hifz) — Version 8.1, 11.08.2026
 
    Warum ein EIGENES System (Nutzerwunsch wörtlich): „ein System, das
    ein bisschen anders ist als das Buchstaben-Lernen — einfach, dass
@@ -52,6 +52,15 @@
   const XP_DONE_STEP = 100;
   const XP_REFRESH = 50;
   const REP_DAYS = [1, 3, 7, 14, 30];
+  /* Zeitfenster fürs Aufsagen (11.08.2026, Nutzerwunsch „das muss in einem
+     bestimmten Tempo passieren, geschenkt gibt es nichts"). Grundlage: eine
+     ruhige Kinder-Rezitation liegt bei gut 1,5 Sekunden je Wort. Mit 2,2
+     Sekunden je Wort plus 3 Sekunden Anlauf ist das großzügig — wer aber Wort
+     für Wort entziffert, statt aus dem Kopf zu sprechen, reißt es sicher. */
+  function tempoLimit(text) {
+    const n = (window.Recite ? window.Recite.words(text) : String(text || '').split(/\s+/)).length || 1;
+    return Math.max(6, Math.min(75, Math.round(n * 2.2 + 3)));
+  }
   const DAY = 86400000;
 
   const RANKS = [
@@ -126,7 +135,12 @@
     if (stage <= before) return { xp: 0, already: true };
     let xp = 0;
     for (let s = before + 1; s <= stage; s++) xp += XP_STAGE[s] || 0;
-    if (opts.half) xp = Math.round(xp * 0.6);
+    /* Halbe Portion, wenn nachgebessert, zu langsam, mit Umschrift-Hilfe oder
+       nur selbst bestätigt (11.08.2026, „geschenkt gibt es nichts"). Die Regel
+       dahinter ist einfach und fair: VOLLE Punkte gibt es für alles, was die App
+       wirklich prüfen kann (Mikrofon flüssig, Puzzle, Verse ordnen) — halbe für
+       alles, wo das Kind sich selbst bewertet oder eine Hilfe genutzt hat. */
+    if (opts.half || opts.self) xp = Math.round(xp * 0.5);
     writeItem(id, function (it) {
       it.p[i] = stage;
       if (opts.self) it.self = (it.self || 0) + 1;
@@ -147,11 +161,11 @@
     return { xp: award(XP_LISTEN_ALL, id), already: false };
   }
 
-  function reachChain(id, k) {
+  function reachChain(id, k, half) {
     const it = itemState(id);
     if (k <= (it.chain || 0)) return { xp: 0, already: true };
     writeItem(id, function (x) { x.chain = k; });
-    return { xp: award(XP_CHAIN, id), already: false };
+    return { xp: award(half ? Math.round(XP_CHAIN * 0.5) : XP_CHAIN, id), already: false, half: !!half };
   }
 
   function doneCount() {
@@ -170,7 +184,7 @@
   }
 
   /* Ganze Sure geschafft: Krone, großer Bonus, Auffrischungs-Uhr startet. */
-  function finishItem(id, pct) {
+  function finishItem(id, pct, half) {
     const it = itemState(id);
     const now = Date.now();
     if (it.done) {                       // schon gekonnt -> das ist eine Auffrischung
@@ -178,9 +192,9 @@
         x.rn = (x.rn || 0) + 1; x.rlast = now;
         if (pct > (x.best || 0)) x.best = pct;
       });
-      return { xp: award(XP_REFRESH, id), refresh: true };
+      return { xp: award(half ? Math.round(XP_REFRESH * 0.5) : XP_REFRESH, id), refresh: true, half: !!half };
     }
-    const bonus = completionBonus();
+    const bonus = half ? Math.round(completionBonus() * 0.5) : completionBonus();
     writeItem(id, function (x) {
       x.done = 1; x.doneAt = now; x.rlast = now; x.rn = 0;
       x.chain = Math.max(x.chain || 0, 99);
@@ -189,7 +203,7 @@
       if (item) item.parts.forEach(function (p, i) { if (!(x.p[i] >= 4)) x.p[i] = 4; });
     });
     award(bonus, id);
-    return { xp: bonus, refresh: false, rank: rank() };
+    return { xp: bonus, refresh: false, rank: rank(), half: !!half };
   }
 
   function nextRepAt(it) {
@@ -289,6 +303,7 @@
     load: load, itemState: itemState, stageOf: stageOf, reachStage: reachStage, reachChain: reachChain,
     finishItem: finishItem, nextStep: nextStep, progressPct: progressPct, summary: summary, rank: rank,
     repDue: repDue, nextRepAt: nextRepAt, freshness: freshness, completionBonus: completionBonus, maxXp: maxXp,
+    tempoLimit: tempoLimit,
     teacherSnapshot: teacherSnapshot, onChange: onChange, resetAll: resetAll, award: award,
     markHeard: markHeard,
     XP_STAGE: XP_STAGE, XP_CHAIN: XP_CHAIN, XP_REFRESH: XP_REFRESH, XP_LISTEN_ALL: XP_LISTEN_ALL, KEY: KEY,
@@ -304,7 +319,8 @@
   function useAudio(item) {
     const [playing, setPlaying] = useState(-1);
     const [all, setAll] = useState(false);
-    const [failed, setFailed] = useState(false);
+    const [failed, setFailed] = useState('');     // Klartext, warum kein Ton kam
+    const [source, setSource] = useState('');     // eigen | internet | stimme
     const ref = useRef(null);
     const queue = useRef(false);
 
@@ -312,37 +328,75 @@
       queue.current = false;
       setAll(false); setPlaying(-1);
       if (ref.current) { try { ref.current.pause(); } catch (e) {} ref.current = null; }
+      try { if (window.QuranVoice) window.QuranVoice.stopAll(); } catch (e) {}
       try { if (window.speechSynthesis) window.speechSynthesis.cancel(); } catch (e) {}
     }, []);
     useEffect(function () { return stop; }, [stop]);
 
+    /* Reihenfolge (11.08.2026, nach „man hört nichts"):
+         1. die Aufnahme der LEHRKRAFT  — liegt auf dem eigenen Server, geht offline
+         2. die Rezitation aus dem Internet (Alafasy)
+         3. die Systemstimme des Geräts
+       Klappt gar nichts, sagen wir das offen statt still zu bleiben. Und es wird
+       NICHTS von allein abgespielt: Handys blockieren Ton ohne Fingertipp — genau
+       daran lag die Stille. Jeder Ton startet jetzt durch Antippen. */
     const play = useCallback(function (i, opts, onEnd) {
       opts = opts || {};
       if (ref.current) { try { ref.current.pause(); } catch (e) {} ref.current = null; }
+      try { if (window.QuranVoice) window.QuranVoice.stopAll(); } catch (e) {}
       const part = item.parts[i];
       if (!part) return;
-      setPlaying(i);
+      setPlaying(i); setFailed('');
+
+      // 1) eigene Aufnahme
+      try {
+        if (window.QuranVoice && window.QuranVoice.has(part.ar)) {
+          const ok = window.QuranVoice.play(part.ar, {
+            slow: opts.slow,
+            onEnd: function (good) {
+              setPlaying(-1);
+              if (!good) { setFailed('Die eigene Aufnahme ließ sich nicht abspielen.'); }
+              if (onEnd) onEnd(good);
+            },
+          });
+          if (ok) { setSource('eigen'); return; }
+        }
+      } catch (e) {}
+
+      // 2) Rezitation aus dem Internet
       if (item.audioStart) {
         const a = new Audio(AUDIO_BASE + (item.audioStart + i) + '.mp3');
         ref.current = a;
         if ('preservesPitch' in a) a.preservesPitch = true;
         a.playbackRate = opts.slow ? 0.75 : 1;
-        a.onended = function () { setPlaying(-1); if (onEnd) onEnd(true); };
-        a.onerror = function () { setFailed(true); setPlaying(-1); speakFallback(part, opts, onEnd); };
-        a.play().catch(function () { setFailed(true); setPlaying(-1); speakFallback(part, opts, onEnd); });
-      } else {
-        speakFallback(part, opts, onEnd);
+        a.onended = function () { setSource('internet'); setPlaying(-1); if (onEnd) onEnd(true); };
+        a.onerror = function () { speakFallback(part, opts, onEnd, true); };
+        const pr = a.play();
+        if (pr && pr.catch) pr.catch(function () { speakFallback(part, opts, onEnd, true); });
+        return;
       }
+
+      // 3) Systemstimme
+      speakFallback(part, opts, onEnd, false);
     }, [item]);
 
-    function speakFallback(part, opts, onEnd) {
+    function speakFallback(part, opts, onEnd, warEsInternet) {
       let spoke = false;
       try {
-        if (window.QuranAudio) { window.QuranAudio.speakText(part.ar, true, opts); spoke = true; }
+        if (window.QuranAudio && window.QuranAudio.speakText) { window.QuranAudio.speakText(part.ar, true, opts); spoke = true; }
       } catch (e) {}
+      const hatStimme = (function () {
+        try { return !!(window.speechSynthesis && (window.speechSynthesis.getVoices() || []).some(function (v) { return /^ar/i.test(v.lang || ''); })); }
+        catch (e) { return false; }
+      })();
+      if (!spoke || !hatStimme) {
+        setFailed(warEsInternet
+          ? 'Die Rezitation aus dem Internet kam nicht durch, und dein Gerät hat keine arabische Stimme. Bitte deine Lehrkraft, die Sure im Aussprache-Studio einzusprechen — dann hörst du sie immer.'
+          : 'Für dieses Gebet gibt es noch keine Aufnahme. Deine Lehrkraft kann es im Aussprache-Studio einsprechen.');
+      } else setSource('stimme');
       // Die Systemstimme meldet kein sauberes Ende — grob nach Textlänge schätzen.
       const ms = Math.min(14000, 900 + part.ar.length * (opts && opts.slow ? 150 : 95));
-      setTimeout(function () { setPlaying(-1); if (onEnd) onEnd(spoke); }, spoke ? ms : 400);
+      setTimeout(function () { setPlaying(-1); if (onEnd) onEnd(spoke && hatStimme); }, (spoke && hatStimme) ? ms : 500);
     }
 
     const playAll = useCallback(function (from) {
@@ -351,12 +405,12 @@
       const step = function (i) {
         if (!queue.current) return;
         if (i >= item.parts.length) { stop(); return; }
-        play(i, {}, function () { if (queue.current) setTimeout(function () { step(i + 1); }, 260); });
+        play(i, {}, function () { if (queue.current) setTimeout(function () { step(i + 1); }, 300); });
       };
       step(from || 0);
     }, [item, play, stop]);
 
-    return { playing: playing, all: all, failed: failed, play: play, playAll: playAll, stop: stop };
+    return { playing: playing, all: all, failed: failed, source: source, play: play, playAll: playAll, stop: stop };
   }
 
   /* ==============================================================
@@ -369,40 +423,62 @@
   }
 
   /* Der große runde Mikrofon-Knopf mit allen Zuständen. */
-  function MicButton({ expected, onResult, onSelf, passAt, hint }) {
+  function MicButton({ expected, onResult, onSelf, passAt, hint, limitS }) {
     const [phase, setPhase] = useState('idle');    // idle | listening | thinking | error
     const [partial, setPartial] = useState('');
     const [err, setErr] = useState('');
     const [blobUrl, setBlobUrl] = useState('');
+    const [left, setLeft] = useState(0);           // Restsekunden im Zeitfenster
     const ctrl = useRef(null);
+    const t0 = useRef(0);
+    const tick = useRef(null);
     const mode = window.Recite ? window.Recite.mode() : 'none';
+    const limit = limitS || 0;
+    useEffect(function () { return function () { if (tick.current) clearInterval(tick.current); }; }, []);
+    function startClock() {
+      t0.current = Date.now();
+      if (!limit) return;
+      setLeft(limit);
+      if (tick.current) clearInterval(tick.current);
+      tick.current = setInterval(function () {
+        const rest = limit - (Date.now() - t0.current) / 1000;
+        setLeft(rest > 0 ? rest : 0);
+      }, 100);
+    }
+    function stopClock() { if (tick.current) { clearInterval(tick.current); tick.current = null; } return (Date.now() - t0.current) / 1000; }
 
     useEffect(function () { return function () { if (ctrl.current && ctrl.current.abort) ctrl.current.abort(); }; }, []);
 
     function startSpeech() {
       setPhase('listening'); setPartial(''); setErr('');
+      startClock();
       ctrl.current = window.Recite.listen({
         expected: expected,
+        maxMs: limit ? Math.round(limit * 1000 + 5000) : 15000,
         onPartial: function (t) { setPartial(t); },
         onDone: function (text) {
+          const dauer = stopClock();
           setPhase('thinking');
           const g = window.Recite.grade(expected, text, { passAt: passAt || 85 });
+          g.seconds = Math.round(dauer * 10) / 10;
+          g.slow = !!(limit && dauer > limit);
           setTimeout(function () { setPhase('idle'); onResult(g, text); }, 250);
         },
         onError: function (code) {
+          stopClock();
           setPhase('error');
           setErr(window.Recite.errorText(code));
         },
       });
     }
     function startRecord() {
-      setPhase('listening'); setErr(''); setBlobUrl('');
+      setPhase('listening'); setErr(''); setBlobUrl(''); startClock();
       ctrl.current = window.Recite.record({
         onDone: function (blob, url) { setPhase('idle'); setBlobUrl(url); },
         onError: function (code) { setPhase('error'); setErr(window.Recite.errorText(code)); },
       });
     }
-    function stopNow() { if (ctrl.current) { if (ctrl.current.stop) ctrl.current.stop(); } }
+    function stopNow() { if (ctrl.current && ctrl.current.stop) ctrl.current.stop(); }
 
     if (mode === 'none') {
       return <div className="hz-note">🔇 Mikrofon ist aus — dieser Schritt läuft als Puzzle.</div>;
@@ -445,6 +521,15 @@
         <div className="hz-mic-label">
           {phase === 'listening' ? 'Ich höre dich…' : phase === 'thinking' ? 'Einen Moment…' : (hint || 'Antippen und aufsagen')}
         </div>
+        {limit > 0 && phase !== 'listening' && (
+          <div className="hz-tempo-hint">⏱ Du hast {limit} Sekunden — sag es flüssig, nicht buchstabierend.</div>
+        )}
+        {limit > 0 && phase === 'listening' && (
+          <div className={'hz-tempo' + (left <= 0 ? ' is-over' : '')}>
+            <div className="hz-tempo-bar"><div style={{ width: Math.max(0, Math.min(100, 100 * left / limit)) + '%' }}/></div>
+            <span>{left > 0 ? Math.ceil(left) + ' s' : 'zu langsam'}</span>
+          </div>
+        )}
         {phase === 'listening' && partial && <div className="hz-partial" dir="rtl">{partial}</div>}
         {err && (
           <div className="hz-err">
@@ -570,6 +655,7 @@
     const [tries, setTries] = useState(0);
     const [heardOnce, setHeardOnce] = useState(false);
     const [peek, setPeek] = useState(false);
+    const [helped, setHelped] = useState(false);  // Umschrift eingeblendet -> halbe Punkte
     const [reward, setReward] = useState(null);
     const autoPlayed = useRef(false);
 
@@ -581,31 +667,17 @@
     const expected = isVerse ? part.ar : chainParts.map(function (p) { return p.ar; }).join(' ');
     const stage = isVerse ? step.stage : 4;
 
-    /* Stufe 1 spielt den Vers gleich einmal von selbst ab, der Zuhör-Schritt
-       die ganze Sure. Nach spätestens 8 Sekunden ist der Weiter-Knopf frei —
-       falls der Ton mal gar nicht kommt, steht kein Kind fest. */
-    useEffect(function () {
-      if (isVerse && stage === 1 && !autoPlayed.current) {
-        autoPlayed.current = true;
-        const t = setTimeout(function () { audio.play(step.i, {}, function () { setHeardOnce(true); }); }, 420);
-        // Sicherheitsnetz: spätestens nach 10 Sekunden geht es auch weiter,
-        // falls gar kein Ton kommt (kein Netz, stummes Gerät, blockierte Aufnahme).
-        const t2 = setTimeout(function () { setHeardOnce(true); }, 10000);
-        return function () { clearTimeout(t); clearTimeout(t2); };
-      }
-      if (isListen && !autoPlayed.current) {
-        autoPlayed.current = true;
-        const t = setTimeout(function () { audio.playAll(0); }, 420);
-        const t2 = setTimeout(function () { setHeardOnce(true); }, 8000);
-        return function () { clearTimeout(t); clearTimeout(t2); };
-      }
-      return undefined;
-    }, [isVerse, isListen, stage, step.i]);
-
-    /* Ist die Warteschlange durchgelaufen, ist „zugehört" erfüllt. */
-    useEffect(function () {
-      if (isListen && autoPlayed.current && !audio.all) setHeardOnce(true);
-    }, [isListen, audio.all]);
+    /* KEIN Auto-Abspielen mehr (11.08.2026, „man hört nichts"): Handys und
+       iPads blockieren jeden Ton, der nicht direkt aus einem Fingertipp kommt —
+       die App wirkte deshalb stumm. Jeder Ton startet jetzt per Knopf; erst nach
+       einem echten Abspielversuch geht es weiter. */
+    function hoeren(opts) {
+      autoPlayed.current = true;
+      if (isListen) { audio.playAll(0); setTimeout(function () { setHeardOnce(true); }, 1200); return; }
+      audio.play(step.i, opts || {}, function () { setHeardOnce(true); });
+      setTimeout(function () { setHeardOnce(true); }, 2500);   // auch bei stummem Gerät nicht feststecken
+    }
+    useEffect(function () { if (isListen && autoPlayed.current && !audio.all) setHeardOnce(true); }, [isListen, audio.all]);
 
     function finish(xpInfo, extra) {
       setReward(Object.assign({ xp: 0 }, xpInfo, extra || {}));
@@ -618,14 +690,14 @@
       if (stage >= 4) { try { if (window.Celebrate) window.Celebrate.burst(); } catch (e) {} }
       finish(r);
     }
-    function doneChain() {
-      const r = window.Hifz.reachChain(item.id, step.k);
+    function doneChain(half) {
+      const r = window.Hifz.reachChain(item.id, step.k, half);
       try { if (window.Sound) window.Sound.roundEnd(); } catch (e) {}
       try { if (window.Celebrate) window.Celebrate.burst(); } catch (e) {}
       finish(r, { chain: step.k });
     }
-    function doneWhole(pct) {
-      const r = window.Hifz.finishItem(item.id, pct || 0);
+    function doneWhole(pct, half) {
+      const r = window.Hifz.finishItem(item.id, pct || 0, half);
       try { if (window.Sound && window.Sound.stackMastered) window.Sound.stackMastered(); } catch (e) {}
       try { if (window.Celebrate) window.Celebrate.bigCelebration({ count: r.refresh ? 40 : 110 }); } catch (e) {}
       finish(r, { whole: true, refresh: r.refresh });
@@ -636,24 +708,26 @@
       setTries(function (t) { return t + 1; });
       const pass = step.kind === 'verse' ? 85 : 80;
       if (g.pct >= pass || (tries >= 1 && g.pct >= 60)) {
-        const half = g.pct < pass;
+        // Halbe Punkte, wenn nur knapp getroffen, wenn zu langsam gesprochen
+        // (das war Lesen, nicht Aufsagen) oder wenn die Umschrift eingeblendet war.
+        const half = g.pct < pass || !!g.slow || helped;
         try { if (window.Sound) window.Sound.correct(); } catch (e) {}
         setTimeout(function () {
           if (step.kind === 'verse') {
             const r = window.Hifz.reachStage(item.id, step.i, stage, { half: half, mic: true });
             if (stage >= 4) { try { if (window.Celebrate) window.Celebrate.burst(); } catch (e) {} }
-            finish(r, { pct: g.pct });
-          } else if (step.kind === 'chain') doneChain();
-          else doneWhole(g.pct);
-        }, 1400);
+            finish(r, { pct: g.pct, slow: g.slow, helped: helped });
+          } else if (step.kind === 'chain') doneChain(g.slow || helped);
+          else doneWhole(g.pct, g.slow || helped);
+        }, g.slow ? 2400 : 1400);
       } else {
         try { if (window.Sound) window.Sound.wrong(); } catch (e) {}
       }
     }
     function handleSelf() {
       if (step.kind === 'verse') { const r = window.Hifz.reachStage(item.id, step.i, stage, { self: true }); finish(r, { self: true }); }
-      else if (step.kind === 'chain') doneChain();
-      else doneWhole(0);
+      else if (step.kind === 'chain') doneChain(true);
+      else doneWhole(0, true);
     }
 
     /* ---- Belohnungs-Bildschirm ---- */
@@ -677,7 +751,9 @@
               <span className="muted">Die nächste Sure bringt dir sogar {window.Hifz.completionBonus()} XP.</span>
             </div>
           )}
-          {reward.self && <div className="muted" style={{ marginTop: 6 }}>Selbst bestätigt — deine Lehrkraft sieht das.</div>}
+          {reward.self && <div className="muted" style={{ marginTop: 6 }}>Selbst bestätigt (ohne Mikrofon) — dafür gibt es die halbe Punktzahl, und deine Lehrkraft sieht es.</div>}
+          {reward.slow && <div className="muted" style={{ marginTop: 6 }}>🐌 Zu langsam gesprochen — halbe Punktzahl. Flüssig aufgesagt zählt voll!</div>}
+          {reward.helped && !reward.slow && <div className="muted" style={{ marginTop: 6 }}>👀 Mit Umschrift-Hilfe — halbe Punktzahl.</div>}
           <div className="hz-row" style={{ marginTop: 18 }}>
             {nxt && <button className="qp-btn" onClick={function () { onFinish(true); }}>▶️ Weiter</button>}
             <button className="btn btn-ghost" onClick={function () { onFinish(false); }}>Zur Übersicht</button>
@@ -714,7 +790,9 @@
           </div>
           <div className="hz-prac-sub">{sub}</div>
           <div className="hz-row">
-            <button className="qp-btn" onClick={function () { audio.playAll(0); }}>{audio.all ? '⏹ Stopp' : '🔊 Anhören'}</button>
+            <button className="qp-btn" onClick={function () { audio.all ? audio.stop() : hoeren(); }}>
+              {audio.all ? '⏹ Stopp' : '🔊 Jetzt anhören'}
+            </button>
           </div>
           <div style={{ marginTop: 12 }}>
             {item.kind === 'sure' && item.n !== 1 && <div className="sur-basmala" dir="rtl">{window.SURAH_BASMALA}</div>}
@@ -728,7 +806,7 @@
               );
             })}
           </div>
-          {audio.failed && <div className="hz-note">🌐 Die Aufnahme kam nicht durch — die App liest jetzt mit der eingebauten Stimme vor.</div>}
+          {audio.failed && <div className="hz-err">🔇 {audio.failed}</div>}
           <button className="qp-btn hz-primary" disabled={!heardOnce}
                   onClick={function () { const r = window.Hifz.markHeard(item.id); try { if (window.Sound) window.Sound.correct(); } catch (e) {} finish(r); }}>
             {heardOnce ? '✅ Ich habe zugehört — los geht’s!' : '⏳ Hör erst einmal zu …'}
@@ -751,11 +829,16 @@
         <div className="hz-prac-sub">{sub}</div>
 
         {/* --- Der Text --- */}
+        {/* Beim NACHSPRECHEN steht nur noch das Arabische da (Nutzerwunsch
+            11.08.2026): Wer die Umschrift mitliest, liest — er sagt nicht auf.
+            Umschrift und Deutsch gibt es in der Hör-Stufe, und auf Knopfdruck
+            als Hilfe — dann aber nur die halbe Punktzahl. */}
         {isVerse ? (
           <div className={'hz-verse' + (hidden ? ' is-hidden' : '')}>
             <div className="hz-ar" dir="rtl">{hidden ? item.parts[step.i].w[0][0] + ' …' : part.ar}</div>
-            {!hidden && <div className="hz-tr">{part.tr}</div>}
-            {!hidden && stage <= 2 && <div className="hz-de">{part.de}</div>}
+            {!hidden && (stage === 1 || helped) && <div className="hz-tr">{part.tr}</div>}
+            {!hidden && stage === 1 && <div className="hz-de">{part.de}</div>}
+            {!hidden && stage === 2 && !helped && <div className="hz-onlyar">Nur Arabisch — genau darum geht es.</div>}
             {hidden && <div className="hz-note">Nur das erste Wort steht da — der Rest kommt aus deinem Kopf.</div>}
           </div>
         ) : (
@@ -770,14 +853,14 @@
         {isVerse && stage === 1 && (
           <>
             <div className="hz-row">
-              <button className="qp-btn" onClick={function () { audio.play(step.i, {}, function () { setHeardOnce(true); }); }}>
-                {audio.playing === step.i ? '🔊 läuft …' : '🔊 Nochmal hören'}
+              <button className="qp-btn" onClick={function () { hoeren(); }}>
+                {audio.playing === step.i ? '🔊 läuft …' : autoPlayed.current ? '🔊 Nochmal hören' : '🔊 Vers anhören'}
               </button>
-              <button className="btn btn-ghost" onClick={function () { audio.play(step.i, { slow: true }, function () { setHeardOnce(true); }); }}>🐢 Langsam</button>
+              <button className="btn btn-ghost" onClick={function () { hoeren({ slow: true }); }}>🐢 Langsam</button>
             </div>
-            {audio.failed && <div className="hz-note">🌐 Die Aufnahme kam nicht durch — die App liest jetzt mit der eingebauten Stimme vor.</div>}
+            {audio.failed && <div className="hz-err">🔇 {audio.failed}</div>}
             <button className="qp-btn hz-primary" disabled={!heardOnce} onClick={function () { doneStage(); }}>
-              {heardOnce ? '✅ Ich habe gut zugehört' : '⏳ Hör erst einmal zu …'}
+              {heardOnce ? '✅ Ich habe gut zugehört' : '⏳ Tippe erst auf „Vers anhören"'}
             </button>
           </>
         )}
@@ -787,13 +870,16 @@
             <div className="hz-row">
               <button className="qp-btn" onClick={function () { audio.play(step.i); }}>🔊 Vormachen</button>
               <button className="btn btn-ghost" onClick={function () { audio.play(step.i, { slow: true }); }}>🐢 Langsam</button>
+              {!helped && <button className="btn btn-ghost" onClick={function () { setHelped(true); }}>👀 Umschrift (halbe Punkte)</button>}
             </div>
+            {audio.failed && <div className="hz-err">🔇 {audio.failed}</div>}
             {mode === 'none'
               ? <>
-                  <div className="hz-note">Sag den Vers laut mit — deine Lehrkraft hat das Mikrofon ausgeschaltet.</div>
+                  <div className="hz-note">Sag den Vers laut mit — deine Lehrkraft hat das Mikrofon ausgeschaltet. Selbst bestätigt gibt es die halbe Punktzahl.</div>
                   <button className="qp-btn hz-primary" onClick={function () { doneStage({ self: true }); }}>✅ Ich habe ihn laut nachgesprochen</button>
                 </>
-              : <MicButton expected={expected} passAt={85} hint="Antippen und den Vers nachsprechen"
+              : <MicButton expected={expected} passAt={85} limitS={window.Hifz.tempoLimit(expected)}
+                           hint="Antippen und den Vers nachsprechen"
                            onResult={handleSpeech} onSelf={handleSelf}/>}
           </>
         )}
@@ -812,19 +898,20 @@
           <>
             {mode === 'speech' || mode === 'record'
               ? <>
-                  <MicButton expected={expected} passAt={85} hint="Antippen und frei aufsagen"
+                  <MicButton expected={expected} passAt={85} limitS={window.Hifz.tempoLimit(expected)}
+                             hint="Antippen und frei aufsagen"
                              onResult={handleSpeech} onSelf={handleSelf}/>
                   {!peek && <button className="btn btn-ghost" style={{ marginTop: 6 }} onClick={function () { setPeek(true); }}>👀 Kurz spicken</button>}
                 </>
               : <>
-                  <div className="hz-note">🧩 Blind-Puzzle: Setz den Vers zusammen, ohne ihn vorher zu sehen.</div>
+                  <div className="hz-note">🧩 Blind-Puzzle: Setz den Vers zusammen, ohne ihn vorher zu sehen. Das prüft die App wirklich — deshalb gibt es volle Punkte.</div>
                   <WordPuzzle words={part.w}
                               distractors={(function () {
                                 const other = [];
                                 item.parts.forEach(function (p, k) { if (k !== step.i) p.w.forEach(function (w) { other.push(w[0]); }); });
                                 return shuffle(other).slice(0, Math.min(3, other.length));
                               })()}
-                              onDone={function () { doneStage({ self: true }); }}/>
+                              onDone={function () { doneStage(); }}/>
                 </>}
           </>
         )}
@@ -832,11 +919,12 @@
         {!isVerse && (
           mode === 'none'
             ? <>
-                <div className="hz-note">🧩 Ohne Mikrofon: Bring die Verse in die richtige Reihenfolge.</div>
-                <OrderVerses parts={chainParts} onDone={function () { if (step.kind === 'chain') doneChain(); else doneWhole(0); }}/>
+                <div className="hz-note">🧩 Ohne Mikrofon: Bring die Verse in die richtige Reihenfolge. Auch das prüft die App — volle Punkte.</div>
+                <OrderVerses parts={chainParts} onDone={function () { if (step.kind === 'chain') doneChain(false); else doneWhole(0, false); }}/>
               </>
             : <>
-                <MicButton expected={expected} passAt={80} hint={step.kind === 'chain' ? 'Antippen und Vers 1 bis ' + step.k + ' aufsagen' : 'Antippen und alles am Stück aufsagen'}
+                <MicButton expected={expected} passAt={80} limitS={window.Hifz.tempoLimit(expected)}
+                           hint={step.kind === 'chain' ? 'Antippen und Vers 1 bis ' + step.k + ' aufsagen' : 'Antippen und alles am Stück aufsagen'}
                            onResult={handleSpeech} onSelf={handleSelf}/>
                 {!peek && <button className="btn btn-ghost" style={{ marginTop: 6 }} onClick={function () { setPeek(true); }}>👀 Kurz spicken</button>}
               </>
@@ -846,10 +934,16 @@
         {result && (
           <div className={'hz-result is-' + result.level}>
             <div className="hz-result-head">
-              <b>{result.level === 'gut' ? '🎉 Sehr gut!' : result.level === 'fast' ? '🙂 Fast!' : '💪 Nochmal!'}</b>
-              <span>{result.pct}% richtig</span>
+              <b>{result.level === 'gut' ? (result.slow ? '🐌 Richtig — aber zu langsam' : '🎉 Sehr gut!') : result.level === 'fast' ? '🙂 Fast!' : '💪 Nochmal!'}</b>
+              <span>{result.pct}% richtig{result.seconds ? ' · ' + result.seconds + ' s' : ''}</span>
             </div>
             <WordFeedback marks={result.marks}/>
+            {result.level === 'gut' && result.slow && (
+              <div className="hz-result-tip">
+                Das war eher Lesen als Aufsagen — deshalb gibt es nur die halbe Punktzahl.
+                Hör dir den Vers nochmal an und sprich ihn flüssig am Stück, dann zählt er voll.
+              </div>
+            )}
             {result.level !== 'gut' && (
               <div className="hz-result-tip">
                 {result.level === 'fast'

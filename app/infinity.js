@@ -1,5 +1,5 @@
 /* ==============================================================
-   ♾️ UNENDLICH-XP — Version 8.0, 11.08.2026
+   ♾️ UNENDLICH-XP — Version 8.1, 11.08.2026
 
    Nutzerwunsch wörtlich: „Ein Modus, wo alles abgefragt wird, alles
    gleichzeitig, vor allem von den Buchstaben — kreuz und quer. Und

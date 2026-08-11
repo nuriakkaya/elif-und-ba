@@ -1,4 +1,4 @@
-# 🌙 Elif & Ba — Einrichtung & Update (Version 8.0)
+# 🌙 Elif & Ba — Einrichtung & Update (Version 8.1)
 
 **Das Wichtigste in einem Satz:** Ein Kind tippt auf *Anmelden*, schreibt seinen
 **Namen**, drückt einmal — und ist im Kurs. Kein Anmeldecode, kein Passwort,
@@ -251,6 +251,41 @@ verboten sein. Aber sie wirft nicht endlos Punkte ab:
 Oben im Quiz steht dann in Klartext „🔁 Wiederholung — halbe Punkte" bzw.
 „🔁 Nur zum Üben — keine Punkte mehr". Verbraucht wird eine Wiederholung erst
 am **Ende** einer Runde; wer abbricht, verliert seine halbe Portion nicht.
+
+### Ton, „nur Arabisch" und Tempo (nachgebessert am 11.08.2026)
+
+Drei Dinge sind nach deinem Hinweis anders:
+
+**1. Der Ton startet jetzt immer per Fingertipp.** Vorher spielte die App den
+Vers von selbst an — und genau das blockieren Handys und iPads still, wenn kein
+Fingertipp davor liegt. Es kam schlicht nichts. Jetzt steht dort ein Knopf
+(„🔊 Vers anhören"), und die Reihenfolge der Tonquellen ist:
+
+1. **deine eigene Aufnahme** aus dem Aussprache-Studio (liegt auf deinem Server, läuft offline),
+2. die Rezitation aus dem Internet (Alafasy),
+3. die Systemstimme des Geräts.
+
+Klappt nichts davon, sagt die App das im Klartext, statt still zu bleiben —
+inklusive Hinweis, dass du die Sure im Studio einsprechen kannst. **Genau dafür
+stehen jetzt alle 75 Suren- und Gebetsteile im Aussprache-Studio.** Sprichst du
+sie einmal ein, hören die Kinder ab dann dich — auf jedem Gerät, auch ohne
+Internet.
+
+**2. Beim Nachsprechen steht nur noch das Arabische da.** Umschrift und
+Übersetzung gibt es in der Hör-Stufe. Wer sie beim Aufsagen braucht, kann sie mit
+„👀 Umschrift" einblenden — dann zählt der Schritt aber nur halb. Wer mitliest,
+liest; er sagt nicht auf.
+
+**3. Es gibt ein Zeitfenster.** Jede Mikrofon-Aufgabe bekommt eine Zeit nach
+Wortzahl (rund 2,2 Sekunden pro Wort plus 3 Sekunden Anlauf — großzügig, aber
+Buchstabieren reißt es sicher). Während des Sprechens läuft ein Balken mit. Wer
+richtig, aber zu langsam ist, liest: „🐌 Richtig — aber zu langsam. Das war eher
+Lesen als Aufsagen" und bekommt **die halbe Punktzahl**.
+
+Dieselbe Regel gilt jetzt überall im Auswendig-Bereich: **Volle Punkte für alles,
+was die App wirklich prüfen kann** — flüssig ins Mikrofon gesprochen, Wort-Puzzle
+gelöst, Verse richtig geordnet. **Halbe Punkte für alles, wo das Kind sich selbst
+bewertet** oder eine Hilfe genutzt hat. Geschenkt gibt es nichts mehr.
 
 **🎤 Nachsprech-Bonus — nur in Lektion 1:** Nach jeder Karte in
 „1. Die Buchstaben" taucht ein kleiner Knopf auf: *„Sag ‚Elif‘ laut"*. Wer den

@@ -35,7 +35,7 @@ Diesen Ordner offen lassen.
 2. Im entpackten Ordner **alles markieren** (Strg+A bzw. Cmd+A) — also alle
    Dateien **und** die Ordner `app`, `vendor`, `netlify`, `assets`, `fonts`.
 3. Alles in das große Feld im Browser ziehen. Warten, bis die Liste vollständig
-   ist (97 Dateien).
+   ist (98 Dateien).
 4. Unten auf **Commit changes** klicken.
 
 > Wichtig: Nicht den äußeren Ordner ziehen, sondern **seinen Inhalt**.
@@ -58,7 +58,7 @@ Diesen Ordner offen lassen.
 Die neue Adresse öffnen (z. B. `zufallsname-1234.netlify.app`) und dahinter
 **`/check.html`** anhängen. Dort muss oben grün stehen:
 
-> ✅ Alles in Ordnung — Der Klassen-Server läuft (Version 8.0), Speicher: dauerhaft ✓
+> ✅ Alles in Ordnung — Der Klassen-Server läuft (Version 8.1), Speicher: dauerhaft ✓
 
 Dann: zurück zur App, **Anmelden**, Namen eintippen — fertig. Im Klassenzimmer
 (Lehrer-Passwort `1907`) erscheint jedes Kind automatisch.
@@ -86,5 +86,5 @@ online; die App holt sie sich beim nächsten Öffnen von selbst.
 - **`/check.html` bleibt rot** → Screenshot davon schicken. Dort steht jede
   geprüfte Adresse mit Statuscode.
 - **GitHub lädt nicht alle Dateien hoch** → die Weboberfläche schafft 100
-  Dateien pro Vorgang; dieses Paket hat bewusst nur 97. Falls doch etwas fehlt,
+  Dateien pro Vorgang; dieses Paket hat bewusst nur 98. Falls doch etwas fehlt,
   einfach nochmal **Add file → Upload files** für den fehlenden Ordner.

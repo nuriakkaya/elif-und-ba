@@ -120,8 +120,12 @@
       a.playbackRate = opts.slow ? 0.65 : 1;
       a.volume = 1;
       a.currentTime = 0;
+      // (11.08.2026) Ende melden — das Auswendiglern-Modul braucht das, um zu
+      // wissen, wann ein Vers durchgelaufen ist.
+      a.onended = function () { if (opts.onEnd) opts.onEnd(true); };
+      a.onerror = function () { if (opts.onEnd) opts.onEnd(false); };
       const p = a.play();
-      if (p && p.catch) p.catch(function () {});
+      if (p && p.catch) p.catch(function () { if (opts.onEnd) opts.onEnd(false); });
       return true;
     } catch (e) { return false; }
   }

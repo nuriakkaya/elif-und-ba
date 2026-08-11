@@ -189,6 +189,7 @@ function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor }) {
   const [timerLeft, setTimerLeft] = useState(item.blitzSecs || 0);
   const timerRef = useRef(null);
   const doneRef = useRef(false);
+  const lastRes = useRef(null);
   const revealedRef = useRef(false);
   useEffect(() => { revealedRef.current = revealed; }, [revealed]);
   useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current); }, []);
@@ -209,6 +210,7 @@ function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor }) {
     doneRef.current = true;
     if (timerRef.current) clearInterval(timerRef.current);
     const res = { correct: false, wasWrong, usedReveal: helpUsed.reveal, usedExplain: false, timeout: timedOut, blitz: isBlitz, ...extra };
+    lastRes.current = res;
     // Timing-Fix (05.08.2026, Nutzerkritik "Töne stören / zu spät"): Feedback-Ton
     // und Aussprache feuern SOFORT bei der Auflösung — vorher liefen sie erst
     // nach der Übergangs-Wartezeit (bis zu 1,2 s später) in advance(). Reihenfolge
@@ -221,8 +223,25 @@ function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor }) {
     // (06.08.2026) Aussprache kommt jetzt FAST sofort (60 ms statt 160 ms) —
     // der Feedback-Ton ist leiser abgemischt, die Stimme liegt klar darüber.
     if (window.QuranAudio && !res.teach) window.QuranAudio.speakForCard(topicId, { q: gen.arabicOptions ? gen.a : (gen.say || gen.q) }, 60);
+    /* 🎤 Nachsprech-Bonus (app/echo.js): In Lektion 1 hält die Karte kurz an,
+       damit das Kind den Buchstabennamen laut sagen kann. Sonst würde die Karte
+       nach dem Antworten sofort weiterspringen und der Bonus wäre nie sichtbar.
+       Nur dort, nur bei richtiger Antwort, nur wenn das Mikrofon wirklich prüfen
+       kann — überall sonst bleibt der Ablauf unverändert schnell. */
+    if (res.correct && !res.teach && !res.blitz && echoMoeglich()) { setNeedWeiter(true); return; }
     setTimeout(() => onDone(res), delay || 0);
   };
+  function echoMoeglich() {
+    try {
+      const tid = (item && item.card && item.card._topicId) || topicId;
+      const info = window.EchoBonusInfo;
+      if (!info || !window.EchoBonus || !window.Recite) return false;
+      if (info.ECHO_TOPICS.indexOf(String(tid)) < 0) return false;
+      if (window.Recite.mode() !== 'speech') return false;
+      const name = String((item && item.card && item.card.a) || '').trim();
+      return !!(name && info.acceptedFor(name).length);
+    } catch (e) { return false; }
+  }
 
   /* ---- Blitz-Timer ---- */
   const startClock = () => {
@@ -409,6 +428,9 @@ function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor }) {
     setTutorOpen(true);
   };
   const weiter = () => {
+    // Kam der Weiter-Knopf nach einer RICHTIGEN Antwort (Nachsprech-Bonus in
+    // Lektion 1), darf er die Wertung nicht nachträglich auf „falsch" drehen.
+    if (doneRef.current) { onDone(lastRes.current || { correct: true }); return; }
     finish({ correct: false, usedExplain: helpUsed.explain, usedReveal: helpUsed.reveal }, 0);
   };
 
