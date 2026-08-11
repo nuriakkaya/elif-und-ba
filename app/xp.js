@@ -115,12 +115,16 @@
   // Meilenstein bei 3, 5 und danach jedem 5er-Schritt.
   // Ausgerüstetes Monster (app/monsters.js, Phase 11) gibt einen passiven
   // XP-Bonus obendrauf — bei Gizmo live beobachtet ("Phönix = +50% XP").
-  function award(combo) {
+  /* factor (11.08.2026): Punktfaktor für Wiederholungen — 1 = voll,
+     0.5 = zweiter kompletter Durchgang, 0 = nur noch üben.
+     Siehe app/replay.js. Ohne Angabe bleibt alles wie bisher. */
+  function award(combo, factor) {
+    const f = (factor == null) ? 1 : Math.max(0, Math.min(1, Number(factor) || 0));
     const m = mult(combo);
     const monsterBonus = (window.Monsters && window.Monsters.equippedBonus()) || 0;
-    const xp = Math.round(BASE * m * (1 + monsterBonus));
+    const xp = Math.round(BASE * m * (1 + monsterBonus) * f);
     const milestone = combo === 3 || combo === 5 || (combo > 5 && combo % 5 === 0);
-    const coins = milestone ? 1 : 0;
+    const coins = (milestone && f > 0) ? 1 : 0;
     const st = state();
     st.total += xp;
     st.coins += coins;
@@ -142,7 +146,10 @@
     schedulePush();
     return xp;
   }
-  function endRound() { return addBonus(ROUND_BONUS); }
+  function endRound(factor) {
+    const f = (factor == null) ? 1 : Math.max(0, Math.min(1, Number(factor) || 0));
+    return addBonus(Math.round(ROUND_BONUS * f));
+  }
 
   // XP einem Thema gutschreiben (fürs Deck-Leaderboard). Wird zusätzlich zu total/days
   // aufgerufen, nie stattdessen — topics ist eine reine Aufschlüsselung nach Stapel.

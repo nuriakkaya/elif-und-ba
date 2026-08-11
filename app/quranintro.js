@@ -89,11 +89,7 @@
       title: 'Das Wort „Allah“ lesen', sub: 'Lafzatullah',
       teach: ['Das schönste Wort zum Schluss: اَللّٰهُ', 'Die Regel aus dem Buch: Nach Üstün oder Ötre liest man das L DUNKEL und voll („Allah“), nach Esre HELL („billâhi“). Sprich es immer mit Liebe und Respekt aus!'],
     },
-    'quran-suren': {
-      title: 'Suren-Wissen', sub: 'Tebrikler!',
-      teach: ['Maschallah – du bist beim letzten Schritt! Hier festigst du dein Wissen über die kurzen Suren.', 'Und im Bereich „Suren lesen & hören“ kannst du sie jetzt mit Ton Vers für Vers richtig lesen und auswendig lernen. 💛'],
-    },
-  };
+      };
 
   const SEEN_KEY = 'quran_intro_seen_v1';
   function seenMap() { try { return JSON.parse(localStorage.getItem(SEEN_KEY) || '{}'); } catch (e) { return {}; } }

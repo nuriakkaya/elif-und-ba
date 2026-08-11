@@ -1,4 +1,4 @@
-# 🌙 Elif & Ba — Einrichtung & Update (Version 7.6)
+# 🌙 Elif & Ba — Einrichtung & Update (Version 8.0)
 
 **Das Wichtigste in einem Satz:** Ein Kind tippt auf *Anmelden*, schreibt seinen
 **Namen**, drückt einmal — und ist im Kurs. Kein Anmeldecode, kein Passwort,
@@ -176,6 +176,178 @@ Einen einzelnen Buchstaben neu einsprechen geht am schnellsten über
 **„✏️ Buchstaben & Silben bearbeiten"** → Karte suchen → 🎙️.
 
 Einmal gehört, bleibt jede Aufnahme auf dem Gerät (offline nutzbar).
+
+## 🕌 Auswendig lernen — das neue Herzstück (neu in 8.0)
+
+Der Weg dorthin: **Startseite → 🕌 Auswendig lernen** (oder *Meine Stapel →
+„🕌 Auswendig lernen"*). Dahinter steckt bewusst ein **anderes System als die
+Karteikarten**: Kinder lernen hier eine ganze Sure, nicht eine einzelne Karte.
+
+**Die Leiter je Vers** — vier Stufen, immer in dieser Reihenfolge:
+
+| Stufe | Was das Kind tut | Punkte |
+|---|---|---|
+| 👂 Hören & Mitlesen | zuhören, mitlesen, den Klang aufnehmen | +10 |
+| 🎤 Nachsprechen | laut nachsprechen, Text darf dabei zu sehen sein | +25 |
+| 🧩 Wort-Puzzle | die Wörter in die richtige Reihenfolge tippen | +25 |
+| 🌟 Aus dem Kopf | Text verdeckt, frei aufsagen | +60 |
+
+**Danach die Kette** (die klassische Hafız-Methode): Vers 1+2 am Stück, dann
+1+2+3 … je neue Kettenstufe +40. Zum Schluss die **ganze Sure am Stück** — dafür
+gibt es die 🏆 Krone und den großen Bonus.
+
+**Der Bonus wächst mit jeder Sure:** die erste fertige Sure bringt 200,
+die zweite 300, die dritte 400 … die zehnte 1100 Punkte. Genau das war der
+Wunsch „umso mehr die Kinder auswendig lernen, umso mehr Punkte". Damit ist
+Auswendiglernen die punktestärkste Tätigkeit der ganzen App — eine komplette
+Fâtiha bringt mit allen Stufen über 1000 Punkte.
+
+**Auffrischung statt Vergessen:** Nach 1, 3, 7, 14 und dann alle 30 Tage fragt
+die App: „Kannst du sie noch?" Einmal aufsagen genügt (+50). Wird eine Sure
+überfällig, blasst ihre Kachel sanft aus — die Krone bleibt aber **immer**.
+
+**Enthalten sind 18 Suren und Gebete**, in dieser Reihenfolge empfohlen:
+Sübhâneke, Fâtiha, Kevser, İhlâs (die vier für den Namaz), dann Felak, Nâs,
+Asr, Nasr, Kâfirûn, Fîl, Kureyş, Tebbet, Mâûn sowie Ettehiyyâtü, Allâhümme
+salli, Allâhümme bârik und die beiden Rabbenâ-Duas. Jede hat einen Satz
+„wofür brauchst du sie" und einen Merk-Tipp fürs Auswendiglernen.
+
+## 🎤 Das Mikrofon — und was mit dem Ton passiert (neu in 8.0)
+
+Beim Nachsprechen hört der Browser mit und vergleicht Wort für Wort. Er ist
+dabei absichtlich großzügig: Zeichen über den Buchstaben, der Artikel „ال" und
+kleine Abweichungen zählen nicht als Fehler. Ab **85 %** gibt es die vollen
+Punkte, zwischen 60 und 85 % heißt es „fast — nochmal", darunter „hör nochmal
+zu". Nach dem Sprechen sieht das Kind jedes Wort grün, gelb oder rot.
+
+**Es geht immer auch ohne Mikrofon.** Firefox kennt die Spracherkennung nicht,
+manche Kinder dürfen das Mikrofon nicht freigeben, und ohne Internet geht sie
+auch nicht. Dann schaltet die App von selbst um:
+
+- Statt „Nachsprechen" heißt es *laut mitlesen und bestätigen*.
+- Statt „Aus dem Kopf" kommt das **Blind-Puzzle** (Wörter zusammensetzen, ohne
+  den Vers vorher zu sehen — samt ein paar falscher Wörter zum Verwechseln).
+- Statt der Kette werden die **Verse in die richtige Reihenfolge** gebracht.
+
+Punkte gibt es dabei genauso viele. In der Klassenliste steht bei diesen
+Kindern „🤝 selbst bestätigt" — dann weißt du, dass du einmal persönlich
+abhören solltest.
+
+**Datenschutz, ehrlich gesagt:** Die Spracherkennung ist die des Browsers.
+Chrome schickt den Ton kurz zu Google, Safari zu Apple. Es wird nichts
+gespeichert und **nichts an unseren Server geschickt**. Willst du das nicht,
+schalte es ab: **Klassenzimmer → „🎤 Mikrofon beim Auswendiglernen" → Aus.**
+Dann benutzt die App auf diesem Gerät nur noch die Puzzles.
+
+## 🔁 Wiederholen: halbe, dann keine Punkte (neu in 8.0)
+
+Eine Lektion, die auf 100 % steht, bleibt **für immer spielbar** — Üben soll nie
+verboten sein. Aber sie wirft nicht endlos Punkte ab:
+
+1. solange die Lektion noch nicht fertig ist → **volle** Punkte,
+2. der erste komplette Durchgang danach → **halbe** Punkte,
+3. jeder weitere Durchgang → **keine** Punkte.
+
+Oben im Quiz steht dann in Klartext „🔁 Wiederholung — halbe Punkte" bzw.
+„🔁 Nur zum Üben — keine Punkte mehr". Verbraucht wird eine Wiederholung erst
+am **Ende** einer Runde; wer abbricht, verliert seine halbe Portion nicht.
+
+**🎤 Nachsprech-Bonus — nur in Lektion 1:** Nach jeder Karte in
+„1. Die Buchstaben" taucht ein kleiner Knopf auf: *„Sag ‚Elif‘ laut"*. Wer den
+Namen des Buchstabens richtig sagt, bekommt +8 Punkte obendrauf. Freiwillig —
+wer nicht mag, tippt einfach „Weiter".
+
+Warum nur dort? Weil nur dort verlässlich prüfbar ist, was das Kind sagt: In
+Lektion 1 nennt es den **Namen** des Buchstabens, also ein richtiges türkisches
+Wort, das jede Spracherkennung sauber versteht (sie hört hier auf Türkisch zu,
+nicht auf Arabisch). Ab Lektion 2 geht es um einzelne Silben wie بَ — die
+erkennt keine Spracherkennung zuverlässig, und ein Bonus, der mal klappt und
+mal nicht, ärgert Kinder mehr, als er sie anspornt. Der Vergleich ist bewusst
+streng: „Be" und „Te" trennt genau ein Buchstabe, deshalb zählt nur der richtige
+Name (plus ein paar übliche Schreibweisen wie „alif" für Elif) — und nie der
+Name eines anderen Buchstabens.
+
+## ♾️ Unendlich-XP: der letzte Modus (neu in 8.0)
+
+Ganz am Ende der App wartet ein Modus, in dem **alles gleichzeitig** abgefragt
+wird — kreuz und quer aus allen 17 Lektionen, mal wird das Zeichen gefragt, mal
+der Name. Er heißt **Unendlich-XP**, weil hier die Punkte nie ausgehen: Fertige
+Lektionen geben irgendwann nur noch die Hälfte und dann gar nichts mehr, dieser
+Modus immer.
+
+**Freigeschaltet wird er erst zum Schluss.** Jede der 17 Lektionen muss einmal
+auf 100 % stehen **und** danach noch einen kompletten Durchgang gehabt haben —
+also mindestens zweimal durchgespielt. Solange es noch nicht so weit ist, sieht
+das Kind kein stummes Schloss, sondern genau, was noch fehlt: „5 von 17
+Lektionen sind zweimal durch" und darunter die Liste. Einmal offen, bleibt es
+offen. Du als Lehrkraft siehst den Modus immer (zum Vorführen).
+
+**Wellen statt Runden.** Eine Welle sind 12 Fragen aus dem gesamten Stoff.
+Wählbar ist vorher, woraus gemischt wird: *Alles* (432 Karten), *Nur Buchstaben*
+(138) oder *Nur Wörter* (294).
+
+**Nachsitzen — das ist der Kern.** Jede falsch beantwortete Karte wandert in
+einen Korb. Ist die Welle durch, geht es **nicht** weiter, bevor der Korb leer
+ist: Jede Karte darin muss noch einmal richtig kommen, wer wieder danebenliegt,
+sieht sie später erneut. Erst wenn alles sitzt, startet die nächste Welle. Nach
+jeder falschen Antwort steht die richtige Lösung da, und die Aussprache wird
+abgespielt — es ist also lernbar, nicht bloß eine Strafe.
+
+**Punkte:**
+
+| | |
+|---|---|
+| richtige Antwort | 12 XP × Wellenfaktor |
+| Wellenfaktor | +10 % je abgeschlossener Welle, bis 2× |
+| 5er-Serie | +25 XP |
+| Welle ganz ohne Fehler | +60 XP |
+| Welle mit Nachsitzen | +25 XP |
+| richtig im Nachsitzen | 4 XP |
+
+Bewusst weniger als die 17 XP einer normalen Lernfrage: **Neues zu lernen soll
+sich mehr lohnen als zu trainieren** — dafür hört es hier nie auf.
+
+**Der Karteikasten bleibt unberührt.** Dieser Modus ist eine Trainingshalle; er
+verändert den Lernstand der Lektionen weder zum Guten noch zum Schlechten. Du
+siehst die Trainingszahlen trotzdem: Im Klassenzimmer steht pro Kind, wie viele
+Wellen es geschafft hat, die Trefferquote, die beste Serie — und die fünf
+Karten, die **auch nach allem** noch am häufigsten danebengehen. Das ist die
+ehrlichste Fehlerliste, die die App hat.
+
+## 🤝 „Unsere Klasse": sich gegenseitig anspornen (neu in 8.0)
+
+Auf der Seite **Fortschritt** steht ab sofort eine Klassen-Karte. Die Kinder
+sehen dort einander — aber nur das, was anspornt, nichts Persönliches.
+
+**1. Das gemeinsame Ziel steht oben.** „🏆 5 von 10 Suren auswendig" und
+„🔥 1740 von 2000 XP diese Woche", jeweils mit Balken für die ganze Klasse. In
+einer Koranklasse soll nicht der Beste gewinnen, sondern jeder weiterkommen —
+deshalb zuerst das, was alle zusammen schaffen.
+
+**2. Die Wochen-Tafel zählt nur die letzten 7 Tage**, nicht die Gesamtpunkte.
+Wer neu dazukommt oder eine Woche gefehlt hat, kann sofort wieder vorne
+mitspielen; niemand ist dauerhaft abgehängt. Daneben gibt es die Tafel
+**🏆 Auswendig** — wer wie viele Suren kann.
+
+**3. Ein persönlicher Anstupser.** Direkt über der Tafel steht, wer unmittelbar
+vor dem Kind liegt: *„👀 Deniz ist diese Woche nur 140 XP vor dir — eine Runde,
+und du bist vorbei!"* Das ist erfahrungsgemäß der stärkste Motivator, weil das
+Ziel immer erreichbar ist. Wer führt, sieht stattdessen, wer ihm im Nacken sitzt.
+
+**4. Anfeuern.** Neben jedem Mitschüler steht ein 💪-Knopf. Antippen, eins von
+vier Zeichen wählen — **💪 Du schaffst das! · 👏 Maschallah! · 🔥 Stark! ·
+🤲 Ich bete für dich** — fertig. Der andere sieht es beim nächsten Öffnen auf
+der Startseite („Ayla und Cemre feuern dich an!").
+
+Bewusst gibt es **keinen freien Text**: Es sind nur diese vier Zeichen möglich,
+also kann hier niemand etwas Gemeines schreiben. Und pro Mitschüler und Tag sind
+drei Zurufe erlaubt, damit es Ansporn bleibt und nicht Spam wird.
+
+**Was die Kinder NICHT voneinander sehen:** keine Fehler, keine
+Schwachstellen-Liste, keine Lektionsdetails, keine „zuletzt gesehen"-Zeiten. Der
+Server liefert an Kinder nur Name, Punkte, Level, Serie, Gesamtfortschritt und
+die Zahl der auswendig gelernten Suren. Alles Weitere bekommt weiterhin
+ausschließlich das Klassenzimmer mit dem Lehrer-Passwort.
 
 ## ⚙️ Einstellungen, Hilfe & Konto (neu in 7.5)
 

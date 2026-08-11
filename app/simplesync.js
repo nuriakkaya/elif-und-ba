@@ -37,6 +37,7 @@
     's34a_monsters_v1', 's34a_lesson_v1', 's34a_custom_topics_v1', 's34a_tweaks_v1',
     's34a_history_v1', 'quran_intro_seen_v1', 'quran_forms_taught_v1',
     'quran_surah_done_v1', 's34a_blitz_off', 'eb_student_name_v1',
+    'eb_hifz_v1', 'eb_replay_v1', 'eb_inf_v1',
   ];
   const PREFIXES = ['s34a_mastered_'];
   const isSyncedKey = (k) => KEYS.indexOf(k) >= 0 || PREFIXES.some((p) => String(k).indexOf(p) === 0);
@@ -211,6 +212,12 @@
         return JSON.stringify(out.slice(0, 200));
       }
       if (key === 's34a_xp_v1' || key === 's34a_lesson_v1') return JSON.stringify(deepNumMax(r, l));
+      // Auswendiglern-Stand (app/hifz.js) und Wiederholungs-Zähler (app/replay.js)
+      // bestehen absichtlich NUR aus Zahlen, bei denen „weiter" immer „größer"
+      // heißt. Deshalb ist „die größere Zahl gewinnt" hier die richtige und
+      // verlustfreie Zusammenführung: Wer auf dem Tablet Vers 3 geschafft hat und
+      // auf dem Handy Vers 5, hat danach auf beiden Geräten beide.
+      if (key === 'eb_hifz_v1' || key === 'eb_replay_v1' || key === 'eb_inf_v1') return JSON.stringify(deepNumMax(r, l));
       if (key === 's34a_custom_topics_v1' && Array.isArray(r) && Array.isArray(l)) {
         const byId = {};
         r.concat(l).forEach((t) => { if (t && t.id) byId[t.id] = (byId[t.id] && (byId[t.id].updatedAt || 0) > (t.updatedAt || 0)) ? byId[t.id] : t; });
@@ -373,6 +380,42 @@
       return { error: e.offline ? 'Keine Verbindung' : 'Mini-Server nicht gefunden', missing: !!e.missing };
     }
   }
+  /* ---- Klassen-Rangliste für die KINDER (11.08.2026) ----
+     Bewusst eine eigene, abgespeckte Abfrage: Kein Lehrer-Passwort im Spiel,
+     und der Server liefert nur die Motivations-Zahlen (Punkte, Level, Serie,
+     auswendig gelernte Suren). Wer nicht angemeldet ist, bekommt gar nichts —
+     dann zeigt die App einfach ihre eigene Seite ohne Rangliste. */
+  async function fetchBoard() {
+    const acc = account();
+    if (!acc || !acc.name) return { error: 'nicht angemeldet' };
+    const code = String(acc.classCode || '').toUpperCase();
+    try {
+      const r = await req('class', { query: { code: code === DEFAULT_CLASS ? '' : code, me: acc.name } });
+      if (r.body && Array.isArray(r.body.board)) return { ok: true, board: r.body.board, me: acc.name };
+      return { error: (r.body && r.body.error) || 'Klasse nicht gefunden' };
+    } catch (e) {
+      return { error: e.offline ? 'Keine Verbindung' : 'Mini-Server nicht gefunden', missing: !!e.missing };
+    }
+  }
+  /* Jemanden anfeuern (💪 👏 🔥 🤲). Kein freier Text — nur ein Zeichen. */
+  async function sendCheer(to, kind) {
+    const acc = account();
+    if (!acc || !acc.name) return { error: 'nicht angemeldet' };
+    try {
+      const r = await req('cheer', { method: 'POST', body: JSON.stringify({ to: to, from: acc.name, kind: kind || '💪' }) });
+      return r.body || {};
+    } catch (e) { return { error: 'Server nicht erreichbar' }; }
+  }
+  /* Eigene Zurufe abholen. clear=true holt sie ab UND leert den Briefkasten. */
+  async function fetchCheers(clear) {
+    const acc = account();
+    if (!acc || !acc.name) return { cheers: [] };
+    try {
+      const r = await req('cheer', { query: { name: acc.name, clear: clear ? 1 : undefined } });
+      return { cheers: (r.body && r.body.cheers) || [] };
+    } catch (e) { return { cheers: [], error: 'offline' }; }
+  }
+
   async function removeStudentRemote(name, codeOverride) {
     const code = String(codeOverride || (account() || {}).classCode || DEFAULT_CLASS).toUpperCase();
     try {
@@ -516,8 +559,11 @@
     join, smartLogin, check, logout, syncNow, setClassCode,
     setPassword, hasPassword, deleteAccount,
     fetchClass, removeStudentRemote, postClassSummary, listNames,
+    fetchBoard, sendCheer, fetchCheers,
     isTeacher, setTeacherMode,
     ping, diagnose, localLogin, url, req,
     TEACHER_PW, DEFAULT_CLASS,
+    // nur fürs Prüfen/Diagnostizieren nach außen gereicht
+    _mergeKey: mergeKey, _keys: () => KEYS.slice(),
   };
 })();

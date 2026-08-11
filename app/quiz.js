@@ -161,7 +161,7 @@ function tintAr(s) {
 }
 
 /* ============== EINZELNE KARTE (ein Auftritt) ============== */
-function CardPlayer({ item, topicId, onDone, onDisableBlitz }) {
+function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor }) {
   const { card, mode, gen } = item;
   const kind = gen.kind;
   const isBlitz = mode === 'blitz';
@@ -772,6 +772,15 @@ function CardPlayer({ item, topicId, onDone, onDisableBlitz }) {
         </div>
       )}
 
+      {/* 🎤 Nachsprech-Bonus (app/echo.js): freiwillig, nach der Antwort.
+          Das Modul entscheidet selbst, ob es sich zeigt — es tut das NUR in
+          Lektion 1, wo das Kind den Buchstabennamen sagt („Elif", „Be"). */}
+      {needWeiter && window.EchoBonus && kind !== 'teach' && (
+        <window.EchoBonus answer={item && item.card ? (item.card.a || '') : ''}
+                          topicId={(item && item.card && item.card._topicId) || topicId}
+                          factor={xpFactor == null ? 1 : xpFactor}
+                          seq={item && item.card ? (item.card.q || '') : ''}/>
+      )}
       {needWeiter && (
         isQuranCard
           ? <button className="qp-btn" onClick={weiter}>Weiter</button>
@@ -793,6 +802,16 @@ function QuizScreen({ go, stackName, questionStyle, questions, topicId, roundSiz
     /^quran-/.test(String(topicId || '')) && window.QuranIntro &&
     window.QuranIntro.has(topicId) && !window.QuranIntro.seen(topicId));
   const [round, setRound] = useState(1);
+  /* 🔁 Wiederholungs-Punkte (11.08.2026, siehe app/replay.js): Der Faktor wird
+     EINMAL beim Betreten der Lektion bestimmt und gilt für die ganze Sitzung.
+     Sonst würde genau die Antwort, die die Lektion auf 100 % bringt, sich
+     selbst noch halbieren — das wäre für Kinder nicht nachvollziehbar. */
+  const replay = useRef(null);
+  if (replay.current === null) {
+    const wasDone = window.Replay ? window.Replay.isDone(topicId, data) : false;
+    replay.current = { wasDone, factor: window.Replay ? window.Replay.factor(topicId, data) : 1, counted: false };
+  }
+  const xpFactor = replay.current.factor;
   const [queue, setQueue] = useState(() => buildQueue(data, topicId, roundSize ? { size: roundSize } : {}));
   const [idx, setIdx] = useState(0);
   const [playSeq, setPlaySeq] = useState(0);
@@ -880,11 +899,16 @@ function QuizScreen({ go, stackName, questionStyle, questions, topicId, roundSiz
     } else {
       // Rundenende: +8 XP Bonus (wie im Original auf dem Ende-Screen ausgewiesen)
       if (window.XP) {
-        const bonusXp = window.XP.endRound();
+        const bonusXp = window.XP.endRound(xpFactor);
         window.XP.bumpTopic(topicId, bonusXp);
+        setRoundXp(x => x + bonusXp);
       }
       window.Sound && window.Sound.roundEnd();
-      setRoundXp(x => x + (window.XP ? window.XP.ROUND_BONUS : 8));
+      // Eine Wiederholung ist erst am RUNDENENDE verbraucht (Abbrechen zählt nicht).
+      if (window.Replay && replay.current.wasDone && !replay.current.counted) {
+        replay.current.counted = true;
+        window.Replay.finishRound(topicId, true);
+      }
       setQueue(q2);
       setPhase('roundEnd');
       // Klassenzimmer sofort auffrischen: die Lehrkraft sieht den neuen Stand
@@ -923,7 +947,7 @@ function QuizScreen({ go, stackName, questionStyle, questions, topicId, roundSiz
       const nc = combo + 1;
       setCombo(nc);
       const levelBefore = window.XP.levelInfo().level;
-      const r = window.XP.award(nc);
+      const r = window.XP.award(nc, xpFactor);
       window.XP.bumpTopic(topicId, r.xp);
       setRoundXp(x => x + r.xp);
       setRoundCoins(c => c + r.coins);
@@ -974,9 +998,8 @@ function QuizScreen({ go, stackName, questionStyle, questions, topicId, roundSiz
     // aktuelle Blitzkarte auch überspringen
     if (idx + 1 < q2.length) { setQueue(q2); setIdx(idx + 1); setPlaySeq(s => s + 1); }
     else {
-      if (window.XP) { const bonusXp = window.XP.endRound(); window.XP.bumpTopic(topicId, bonusXp); }
+      if (window.XP) { const bonusXp = window.XP.endRound(xpFactor); window.XP.bumpTopic(topicId, bonusXp); setRoundXp(x => x + bonusXp); }
       window.Sound && window.Sound.roundEnd();
-      setRoundXp(x => x + (window.XP ? window.XP.ROUND_BONUS : 8));
       setPhase('roundEnd');
     }
   };
@@ -1083,6 +1106,11 @@ function QuizScreen({ go, stackName, questionStyle, questions, topicId, roundSiz
         {floats.map(f => <span key={f.id} className={'xp-float' + (f.big ? ' xp-float-big' : '')}>{f.text}</span>)}
       </div>
       <div className="quiz-progress"><div className="bar" style={{ width: `${progress}%` }} /></div>
+      {xpFactor < 1 && (
+        <div className={'replay-note' + (xpFactor > 0 ? '' : ' is-none')} title={window.Replay ? window.Replay.note(xpFactor) : ''}>
+          {window.Replay ? window.Replay.label(xpFactor) : ''}
+        </div>
+      )}
       {/* Topbar-Neufassung 06.08.2026 (Handy-Screenshot: "Runde 1" brach um,
           alles gequetscht): EINE Zeile, Titel mit Ellipsis, Runde+Schlüssel
           nur auf breiten Screens (CSS .hide-sm), Rest icon-kompakt. */}
@@ -1108,7 +1136,7 @@ function QuizScreen({ go, stackName, questionStyle, questions, topicId, roundSiz
       </div>
 
       <div className="quiz-stage">
-        <CardPlayer key={playSeq} item={item} topicId={topicId} onDone={onDone} onDisableBlitz={onDisableBlitz} />
+        <CardPlayer key={playSeq} item={item} topicId={topicId} onDone={onDone} onDisableBlitz={onDisableBlitz} xpFactor={xpFactor} />
       </div>
 
       {popup && (
@@ -1282,6 +1310,11 @@ function RoundEnd({ go, stackName, topicId, data, log, roundXp, roundCoins, onNe
             <span className="pill" style={{ background: 'var(--success-soft, #E7F7EE)', color: 'var(--success, #1B8A5A)', fontWeight: 800 }}>+{roundXp} XP</span>
             <span className="pill">+{roundCoins} 🪙</span>
           </div>
+          {window.Replay && window.Replay.factor(topicId, data) < 1 && (
+            <div className="muted" style={{ textAlign: 'center', fontSize: 13, maxWidth: 420, lineHeight: 1.55 }}>
+              {window.Replay.note(window.Replay.factor(topicId, data))}
+            </div>
+          )}
 
           <div className="card flat" style={{ padding: 20, textAlign: 'center' }}>
             <div style={{ fontWeight: 800, marginBottom: 12 }}>{stackName}</div>

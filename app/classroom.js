@@ -87,9 +87,19 @@ window.Classroom = (function () {
     try { const li = window.XP.levelInfo ? window.XP.levelInfo() : null; if (li && li.level) lvl = li.level; } catch (e) {}
     try { const ss = window.XP.streakStatus ? window.XP.streakStatus() : null; if (ss) streak = ss.days != null ? ss.days : (ss.streak != null ? ss.streak : (ss.current || 0)); } catch (e) {}
     try { d7 = (window.XP.recentDays(7) || []).map(function (x) { return x.xp || 0; }); } catch (e) {}
+    /* Auswendiglernen (app/hifz.js) — die Lehrkraft soll auf einen Blick sehen,
+       welche Sure ein Kind schon komplett kann, wie viele Verse sitzen und ob
+       eine Auffrischung überfällig ist. Fehlt das Modul, bleibt hz einfach weg. */
+    let hz = null;
+    try { if (window.Hifz && window.Hifz.teacherSnapshot) hz = window.Hifz.teacherSnapshot(); } catch (e) {}
+    /* Unendlich-XP (app/infinity.js): Wellen, Trefferquote und die Karten, die
+       auch nach allem noch am häufigsten danebengehen — das ist für die
+       Lehrkraft die ehrlichste Fehlerliste, die es gibt. */
+    let inf = null;
+    try { if (window.InfinityMode && window.InfinityMode.teacherSnapshot) inf = window.InfinityMode.teacherSnapshot(); } catch (e) {}
     return { v: 1, n: String(name || '').trim().slice(0, 24) || 'Ohne Namen', d: new Date().toISOString().slice(0, 10),
              xp: xp, lvl: lvl, streak: streak, all: n ? Math.round(sum / n) : 0, tp: tp,
-             cur: cur, wk: weak, mc: mc, tc: tc, lc: lc, d7: d7 };
+             cur: cur, wk: weak, mc: mc, tc: tc, lc: lc, d7: d7, hz: hz, inf: inf };
   }
   function encode(name) {
     const json = JSON.stringify(snapshot(name));

@@ -399,6 +399,86 @@ function DuelCard({ ctx }) {
   );
 }
 
+/* 🕌 Auswendig-Karte auf der Startseite (11.08.2026).
+   Zeigt Rang + Krone, den nächsten sinnvollen Schritt und — ganz wichtig
+   für die Motivation — was die nächste fertige Sure einbringt. Ist eine
+   Auffrischung fällig, wird die Karte zur Erinnerung. */
+function HifzCard({ ctx }) {
+  const [, force] = useState(0);
+  useEffect(() => (window.Hifz ? window.Hifz.onChange(() => force((x) => x + 1)) : undefined), []);
+  if (!window.Hifz || !(window.HIFZ_ITEMS || []).length) return null;
+  const s = window.Hifz.summary();
+  const due = (window.HIFZ_ITEMS || []).filter((it) => window.Hifz.repDue(it.id));
+  const started = (window.HIFZ_ITEMS || []).find((it) => !window.Hifz.itemState(it.id).done && window.Hifz.progressPct(it.id) > 0);
+  const nextItem = started || (window.HIFZ_ITEMS || []).find((it) => it.stern && !window.Hifz.itemState(it.id).done)
+                 || (window.HIFZ_ITEMS || []).find((it) => !window.Hifz.itemState(it.id).done);
+  return (
+    <div className="card" style={{padding: 16, marginTop: 14,
+         borderLeft: due.length ? '5px solid #F0C33C' : undefined}}>
+      <div className="row" style={{gap: 12, alignItems: 'center', flexWrap: 'wrap'}}>
+        <div style={{fontSize: 30}}>{s.done > 0 ? s.rank.icon : '🕌'}</div>
+        <div style={{flex: '1 1 200px'}}>
+          <div style={{fontWeight: 800, fontSize: 16}}>
+            {due.length ? '🔁 ' + due[0].name + ' auffrischen' : s.done > 0 ? s.rank.title + ' · ' + s.done + ' auswendig' : 'Suren auswendig lernen'}
+          </div>
+          <div className="muted" style={{fontSize: 13, marginTop: 2}}>
+            {due.length
+              ? 'Einmal aufsagen genügt, dann sitzt es wieder — und es gibt +' + window.Hifz.XP_REFRESH + ' XP.'
+              : nextItem
+                ? 'Als Nächstes: ' + nextItem.name + ' — die höchsten Punkte der App (+' + window.Hifz.completionBonus() + ' XP für die nächste fertige Sure).'
+                : 'Alles auswendig — maschallah! Halte es mit den Auffrischungen wach.'}
+          </div>
+        </div>
+        <button className="btn btn-primary" onClick={() => ctx.go('hifz')}>
+          {due.length ? 'Auffrischen' : s.done > 0 ? 'Weitermachen' : 'Loslegen'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ♾️ Der Knopf zum Unendlich-XP-Modus (11.08.2026).
+   Vor der Freischaltung zeigt er ehrlich, wie weit es noch ist — ein
+   Schloss ohne Erklärung frustriert Kinder nur. */
+/* Startseiten-Karte für den Unendlich-Modus — erscheint erst, wenn er
+   freigeschaltet ist. Vorher wäre sie nur eine Dauer-Enttäuschung. */
+function InfinityCard({ ctx }) {
+  if (!window.InfinityMode) return null;
+  const info = window.InfinityMode.unlockInfo();
+  if (!info.open) return null;
+  const st = window.InfinityMode.load();
+  return (
+    <div className="card" style={{padding: 16, marginTop: 14, borderLeft: '5px solid #4B2E83'}}>
+      <div className="row" style={{gap: 12, alignItems: 'center', flexWrap: 'wrap'}}>
+        <div style={{fontSize: 30}}>♾️</div>
+        <div style={{flex: '1 1 200px'}}>
+          <div style={{fontWeight: 800, fontSize: 16}}>Unendlich-XP</div>
+          <div className="muted" style={{fontSize: 13, marginTop: 2}}>
+            {st.waves > 0
+              ? st.waves + ' Wellen geschafft · ' + st.xp + ' XP hier verdient · beste Serie ' + st.best
+              : 'Alles kreuz und quer abgefragt — und die Punkte gehen nie aus.'}
+          </div>
+        </div>
+        <button className="btn" style={{background:'#4B2E83', color:'#fff'}} onClick={() => ctx.go('infinity')}>Welle starten</button>
+      </div>
+    </div>
+  );
+}
+
+function InfinityButton({ ctx }) {
+  if (!window.InfinityMode) return null;
+  const info = window.InfinityMode.unlockInfo();
+  if (info.open) {
+    return <button className="btn" style={{background:'#4B2E83', color:'#fff'}} onClick={() => ctx.go('infinity')}>♾️ Unendlich-XP</button>;
+  }
+  return (
+    <button className="btn btn-ghost" title={'Noch ' + (info.total - info.done) + ' Lektionen zweimal durchspielen'}
+            onClick={() => ctx.go('infinity')}>
+      🔒 ♾️ Unendlich-XP · {info.done}/{info.total}
+    </button>
+  );
+}
+
 function ClassroomCard({ ctx }) {
   const CR = window.Classroom;
   const [name, setName] = useState(() => (CR ? CR.getName() : ''));
@@ -666,6 +746,8 @@ function Routes({ ctx }) {
     case 'decks':    return <DecksGrid ctx={ctx}/>;
     case 'quranletters': return <QuranLetters ctx={ctx}/>;
     case 'surah': return window.SurahModule ? <window.SurahModule.Screen ctx={ctx}/> : <Home ctx={ctx}/>;
+    case 'hifz': return window.HifzScreen ? <window.HifzScreen ctx={ctx}/> : <Home ctx={ctx}/>;
+    case 'infinity': return window.InfinityScreen ? <window.InfinityScreen ctx={ctx}/> : <Home ctx={ctx}/>;
     case 'public':   return <PublicDecks ctx={ctx}/>;
     case 'deck':     return <DeckDetail ctx={ctx}/>;
     case 'profile':  return <Profile ctx={ctx}/>;
@@ -720,6 +802,9 @@ function Home({ ctx }) {
           </button>
         )}
         <InstallBanner/>
+        {window.ClassBoard && <window.ClassBoard.CheerBanner ctx={ctx}/>}
+        <InfinityCard ctx={ctx}/>
+        <HifzCard ctx={ctx}/>
         <DuelCard ctx={ctx}/>
         <ClassroomCard ctx={ctx}/>
       </div>
@@ -858,6 +943,7 @@ function QuranProgressCard({ ctx }) {
     try { return Object.keys(JSON.parse(localStorage.getItem('quran_surah_done_v1') || '{}')).length; } catch (e) { return 0; }
   })();
   const surahTotal = (window.SURAHS_DATA || []).length || 12;
+  const hz = (window.Hifz && (window.HIFZ_ITEMS || []).length) ? window.Hifz.summary() : null;
   const extras = (window.QURAN_EXTRA_TOPICS || []).map(function (t) {
     const qs = flatQuiz(t);
     const pct = (window.SRS && window.SRS.progressPct) ? window.SRS.progressPct(t.id, qs)
@@ -881,8 +967,21 @@ function QuranProgressCard({ ctx }) {
           );
         })}
       </div>
+      {hz && (
+        <>
+          <div className="row" style={{ justifyContent: 'space-between', marginTop: 12, flexWrap: 'wrap', gap: 6 }}>
+            <span style={{ fontWeight: 700 }}>🕌 Auswendig gelernt · {hz.rank.icon} {hz.rank.title}</span>
+            <span className="muted">{hz.done} / {hz.total} 🏆 · {hz.verses}/{hz.versesTotal} Verse</span>
+          </div>
+          <div className="xp-bar" style={{ marginTop: 6 }}><div className="fill" style={{ width: (hz.total ? Math.round(hz.done / hz.total * 100) : 0) + '%' }}/></div>
+          <div className="muted" style={{ fontSize: 12.5, marginTop: 4 }}>
+            {hz.xp > 0 ? hz.xp + ' XP mit Auswendiglernen verdient' : 'Noch nicht begonnen — hier gibt es die meisten Punkte der App.'}
+            {hz.due > 0 ? ' · 🔁 ' + hz.due + ' Auffrischung' + (hz.due === 1 ? '' : 'en') + ' fällig' : ''}
+          </div>
+        </>
+      )}
       <div className="row" style={{ justifyContent: 'space-between', marginTop: 12, flexWrap: 'wrap', gap: 6 }}>
-        <span style={{ fontWeight: 700 }}>📖 Suren auswendig</span>
+        <span style={{ fontWeight: 700 }}>📖 Suren gelesen &amp; gehört</span>
         <span className="muted">{surahDone} / {surahTotal} 🏆</span>
       </div>
       <div className="xp-bar" style={{ marginTop: 6 }}><div className="fill" style={{ width: (surahTotal ? Math.round(surahDone / surahTotal * 100) : 0) + '%' }}/></div>
@@ -938,6 +1037,10 @@ function Progress({ ctx }) {
 
       {/* 🌙 Koran-Weg (Nachtausbau P4): alle 18 Lektionen + Suren + Extras auf einen Blick */}
       <QuranProgressCard ctx={ctx}/>
+
+      {/* 🤝 Unsere Klasse (11.08.2026): gemeinsames Ziel, Wochen-Tafel,
+          Auswendig-Tafel und „Anfeuern" — siehe app/classboard.js. */}
+      {window.ClassBoard && <window.ClassBoard.ClassCard ctx={ctx}/>}
 
       <div className="card streak-card">
         <div className="streak-head">
@@ -1183,7 +1286,9 @@ function DecksGrid({ ctx }) {
                 : <span className="muted" style={{fontWeight:500, fontSize:13}}>Lektionen schalten sich Schritt für Schritt frei</span>}
             </div>
             <div className="row" style={{gap:8, flexWrap:'wrap'}}>
-              <button className="btn btn-primary" onClick={() => go('surah')}>📖 Suren lesen &amp; hören</button>
+              <button className="btn btn-primary" onClick={() => go('hifz')}>🕌 Auswendig lernen</button>
+              <InfinityButton ctx={ctx}/>
+              <button className="btn btn-ghost" onClick={() => go('surah')}>📖 Suren lesen &amp; hören</button>
               <button className="btn btn-ghost" onClick={() => go('quranletters')}>🔤 Buchstaben-Übersicht</button>
             </div>
           </div>
@@ -3388,6 +3493,62 @@ function HelpScreen({ ctx }) {
         vorgesprochen, danach kommen die Fragen. Mit 🔊 hörst du ihn nochmal, mit 🐢 langsam.
         Der grüne Kreis füllt sich, je sicherer ein Buchstabe sitzt.
       </Q>
+      <Q q="Wie lerne ich eine Sure auswendig?">
+        Startseite → <b>🕌 Auswendig lernen</b> (oder Meine Stapel → „🕌 Auswendig lernen").
+        Such dir eine Sure aus — Sübhâneke, Fâtiha, Kevser und İhlâs brauchst du für den Namaz zuerst.
+        Dann führt dich die App Vers für Vers durch vier Stufen: <b>👂 hören</b>, <b>🎤 nachsprechen</b>,
+        <b>🧩 die Wörter puzzeln</b> und <b>🌟 frei aufsagen</b>. Danach hängst du die Verse zur
+        <b>Kette</b> zusammen (1+2, dann 1+2+3 …) und sagst zum Schluss alles am Stück auf — dafür
+        gibt es die 🏆 Krone. <b>Hier gibt es die meisten Punkte der ganzen App</b>, und je mehr
+        Suren du schon kannst, desto mehr bringt die nächste.
+      </Q>
+      <Q q="Wann muss ich etwas laut sagen?">
+        In <b>Lektion 1 „Die Buchstaben"</b> kommt nach jeder Karte ein kleiner Knopf:
+        <b>„🎤 Sag ‚Elif‘ laut"</b>. Sagst du den Namen richtig, gibt es +8 Punkte extra.
+        Freiwillig — wer nicht mag, tippt einfach „Weiter". In den anderen Lektionen gibt es das
+        nicht: Einzelne Silben wie بَ versteht keine Spracherkennung zuverlässig genug.
+        Beim <b>Auswendiglernen</b> der Suren sprichst du dagegen ganze Verse — dort hört der
+        Browser auf Arabisch mit.
+      </Q>
+      <Q q="Muss ich ins Mikrofon sprechen?">
+        Nein — es geht immer auch ohne. Wenn dein Browser Arabisch versteht (Chrome, Safari),
+        hört er beim Nachsprechen mit und zeigt dir Wort für Wort, was schon gut war. Kann er das
+        nicht, oder hat deine Lehrkraft das Mikrofon abgeschaltet, setzt du den Vers stattdessen aus
+        <b>Wort-Bausteinen</b> zusammen — das gibt genauso viele Punkte.<br/><br/>
+        <b>Datenschutz:</b> Beim Zuhören schickt Chrome den Ton kurz zu Google, Safari zu Apple.
+        Es wird nichts aufbewahrt und nichts an unseren Server geschickt. Deine Lehrkraft kann das
+        Mikrofon im Klassenzimmer für dieses Gerät komplett ausschalten.
+      </Q>
+      <Q q="Was ist der Unendlich-XP-Modus?">
+        Der letzte Modus der App. Dort wird <b>alles gleichzeitig</b> abgefragt — kreuz und quer aus
+        allen Lektionen, mal das Zeichen, mal der Name. Eine Welle sind 12 Fragen. Was du falsch
+        hattest, kommt in den Korb: <b>Bevor die nächste Welle startet, musst du jede Karte aus dem
+        Korb noch einmal richtig haben</b> — so lange, bis alles sitzt.<br/><br/>
+        Er heißt Unendlich-XP, weil hier die Punkte nie ausgehen. Freigeschaltet wird er erst, wenn
+        du <b>jede Lektion zweimal komplett</b> durchgespielt hast — unter „Meine Stapel" siehst du,
+        wie viele es schon sind.
+      </Q>
+      <Q q={'Was ist „Unsere Klasse“?'}>
+        Auf <b>Fortschritt</b> siehst du, wie weit deine Mitschüler sind. Ganz oben steht, was ihr
+        <b>zusammen</b> geschafft habt — wie viele Suren die ganze Klasse auswendig kann und wie viele
+        Punkte ihr diese Woche gesammelt habt. Darunter die Wochen-Tafel: Sie zählt nur die letzten
+        7 Tage, du kannst also jede Woche neu vorne mitspielen.<br/><br/>
+        Neben jedem Namen ist ein 💪-Knopf: Damit feuerst du jemanden an — <b>💪 Du schaffst das!</b>,
+        <b>👏 Maschallah!</b>, <b>🔥 Stark!</b> oder <b>🤲 Ich bete für dich</b>. Er sieht es beim
+        nächsten Öffnen der App. Schreiben kann man nichts, nur diese vier Zeichen schicken, und
+        dreimal am Tag pro Person — so bleibt es ein Ansporn und wird kein Ärger.
+      </Q>
+      <Q q="Was sehen die anderen von mir?">
+        Nur deinen Namen, deine Punkte, dein Level, deine Serie und wie viele Suren du auswendig
+        kannst. <b>Deine Fehler sieht niemand</b> — woran es bei dir gerade hakt und wie weit du in
+        welcher Lektion bist, sieht ausschließlich deine Lehrkraft im Klassenzimmer.
+      </Q>
+      <Q q="Warum gibt eine fertige Lektion weniger Punkte?">
+        Weil du sie schon kannst. Eine Lektion, die auf 100 % steht, kannst du so oft wiederholen,
+        wie du willst — der <b>erste</b> Durchgang danach bringt noch die <b>Hälfte</b> der Punkte,
+        danach ist sie nur noch zum Üben da. Neue Punkte holst du dir in der nächsten Lektion oder
+        beim Auswendiglernen.
+      </Q>
       <Q q="Wie spiele ich gegen einen Freund?">
         Startseite → <b>⚔️ Duell starten</b> (am Handy der Tab „Duell"). Lektion wählen,
         Mitschüler antippen — bei ihm erscheint die Einladung. Wer schneller richtig ist, bekommt mehr Punkte.
@@ -4271,6 +4432,42 @@ function CardEditor({ ctx }) {
   );
 }
 
+/* 🎤 Mikrofon-Schalter fürs Auswendiglernen (11.08.2026).
+   Manche Schulen wollen kein Mikrofon im Unterricht, und in Firefox gibt es
+   die Spracherkennung ohnehin nicht. Ist der Schalter aus, benutzt die App
+   überall das Wort-Puzzle statt des Mikrofons — es bleibt alles lernbar und
+   es gibt genauso viele Punkte. Der Schalter gilt für dieses Gerät. */
+function MicSwitch() {
+  const R = window.Recite;
+  const [on, setOn] = useState(() => (R ? R.micAllowed() : true));
+  if (!R) return null;
+  const mode = R.mode();
+  return (
+    <div className="card" style={{padding: 16, marginTop: 12}}>
+      <div className="row" style={{justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap'}}>
+        <div style={{flex: '1 1 240px'}}>
+          <div style={{fontWeight: 800}}>🎤 Mikrofon beim Auswendiglernen</div>
+          <div className="muted" style={{fontSize: 13, marginTop: 2, lineHeight: 1.5}}>
+            {on
+              ? R.modeLabel() + ' Beim Zuhören schickt Chrome den Ton kurz zu Google, Safari zu Apple — nichts wird gespeichert, nichts geht an unseren Server.'
+              : 'Aus — die Kinder setzen die Verse stattdessen aus Wort-Bausteinen zusammen. Gleiche Punkte, kein Mikrofon.'}
+          </div>
+          {on && mode === 'record' && (
+            <div className="muted" style={{fontSize: 12.5, marginTop: 4}}>
+              Hinweis: Dieser Browser kann Arabisch nicht selbst prüfen. Die Kinder nehmen sich auf, hören sich an
+              und bestätigen selbst — du siehst das in der Klassenliste als „selbst bestätigt".
+            </div>
+          )}
+        </div>
+        <button className={'btn ' + (on ? 'btn-primary' : 'btn-ghost')}
+                onClick={() => { R.setMicAllowed(!on); setOn(!on); }}>
+          {on ? 'An' : 'Aus'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function TeacherCorner({ ctx }) {
   const { teacherUnlocked, setTeacherUnlocked } = ctx;
   const CR = window.Classroom;
@@ -4503,6 +4700,8 @@ function TeacherCorner({ ctx }) {
         </div>
       </div>
 
+      <MicSwitch/>
+
       <SoundCheck ctx={ctx}/>
 
       <AudioStudio/>
@@ -4624,6 +4823,14 @@ function TeacherCorner({ ctx }) {
                     {e.cur.m} von {e.cur.t} Karten sicher · {e.cur.p}%
                   </span>
                 )}
+                {e.inf && e.inf.wv > 0 && (
+                  <span className="pill" title="Hat den Unendlich-XP-Modus freigeschaltet und trainiert dort"
+                        style={{background: '#F3EFFA', color: '#4B2E83'}}>♾️ {e.inf.wv}</span>
+                )}
+                {e.hz && e.hz.d > 0 && (
+                  <span className="pill" title={'Auswendig gelernte Suren/Gebete' + (e.hz.self ? ' · ' + e.hz.self + '× selbst bestätigt' : '')}
+                        style={{background: 'var(--warn-soft, #FDF1E0)'}}>🕌 {e.hz.d} auswendig</span>
+                )}
                 <span className="muted" style={{fontSize: 12.5, marginLeft: 'auto'}}>zuletzt: {fmtSeen(e.ts)}</span>
               </div>
               <div className="row" style={{alignItems: 'center', gap: 10, marginTop: 8}}>
@@ -4665,6 +4872,50 @@ function TeacherCorner({ ctx }) {
                           <span key={i} style={{display: 'inline-block', width: 'calc(100%/7)', textAlign: i === 0 ? 'left' : i === 6 ? 'right' : 'center'}}>{l}</span>
                         ))}
                       </div>
+                    </div>
+                  )}
+                  {e.hz && (e.hz.d > 0 || e.hz.v > 0) && (
+                    <div style={{marginBottom: 12}}>
+                      <div className="muted" style={{fontSize: 12.5, fontWeight: 700, marginBottom: 4}}>
+                        🕌 Auswendig gelernt · {e.hz.r || ''}
+                      </div>
+                      <div className="row" style={{gap: 6, flexWrap: 'wrap', marginBottom: 6}}>
+                        <span className="pill">🏆 {e.hz.d} von {e.hz.t} komplett</span>
+                        <span className="pill">🌟 {e.hz.v} von {e.hz.vt} Versen sitzen</span>
+                        <span className="pill">✨ {e.hz.xp || 0} XP dafür</span>
+                        {e.hz.self > 0 && <span className="pill" title="Ohne Spracherkennung geübt und selbst bestätigt — bitte einmal persönlich abhören.">🤝 {e.hz.self}× selbst bestätigt</span>}
+                      </div>
+                      <div className="row" style={{gap: 6, flexWrap: 'wrap'}}>
+                        {Object.keys(e.hz.per || {}).map(k => {
+                          const x = e.hz.per[k];
+                          return (
+                            <span key={k} className="pill"
+                                  title={x.n + ': ' + x.v + ' von ' + x.t + ' Versen frei aufgesagt' + (x.b ? ' · beste Bewertung ' + x.b + '%' : '')}
+                                  style={{background: x.due ? 'var(--rose-soft, #FDECEC)' : x.d ? 'var(--success-soft, #E7F7EE)' : undefined}}>
+                              {x.d ? '🏆 ' : ''}{x.n} {x.d ? (x.due ? '· auffrischen!' : '') : '· ' + x.v + '/' + x.t}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                  {e.inf && (
+                    <div style={{marginBottom: 12}}>
+                      <div className="muted" style={{fontSize: 12.5, fontWeight: 700, marginBottom: 4}}>♾️ Unendlich-XP (Training)</div>
+                      <div className="row" style={{gap: 6, flexWrap: 'wrap', marginBottom: 6}}>
+                        <span className="pill">🌊 {e.inf.wv} Wellen</span>
+                        <span className="pill">🎯 {e.inf.pct}% richtig ({e.inf.q} Fragen)</span>
+                        <span className="pill">🔥 beste Serie {e.inf.best}</span>
+                        <span className="pill">✨ {e.inf.xp} XP</span>
+                      </div>
+                      {Array.isArray(e.inf.top) && e.inf.top.length > 0 && (
+                        <div className="row" style={{gap: 6, flexWrap: 'wrap'}}>
+                          <span className="muted" style={{fontSize: 12}}>Fällt auch im Training noch schwer:</span>
+                          {e.inf.top.map((w, i) => (
+                            <span key={i} className="pill" style={{background: 'var(--rose-soft, #FDECEC)'}}>{w.c} · {w.n}×</span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
                   {Array.isArray(e.wk) && e.wk.length > 0 && (

@@ -29,7 +29,7 @@ import { pbkdf2Sync, randomBytes, timingSafeEqual } from "node:crypto";
 import { gunzipSync } from "node:zlib";
 import { Buffer } from "node:buffer";
 
-const VERSION = "7.6";
+const VERSION = "8.0";
 const TEACHER_PW = "1907";          // Lehrer-Passwort — hier zentral änderbar
 const DEFAULT_CLASS = "ALLE";       // Klasse, in die JEDES Kind automatisch kommt
 const STORE = "site:elifba-sync";   // Blobs-Store (Präfix "site:" = siteweit)
@@ -440,11 +440,36 @@ export default async (req) => {
     /* ---------- class: Klassenzimmer ---------- */
     if (route === "class") {
       if (req.method === "GET") {
-        if ((url.searchParams.get("tpw") || "") !== TEACHER_PW)
-          return json({ error: "Lehrer-Passwort erforderlich" }, 403);
+        const isTeacher = (url.searchParams.get("tpw") || "") === TEACHER_PW;
+        const me = cleanName(url.searchParams.get("me") || "");
+        /* Kinder-Sicht (11.08.2026, „gegenseitig anspornen"): Ohne Lehrer-Passwort,
+           aber mit dem eigenen Namen, gibt es eine BEWUSST ABGESPECKTE Liste —
+           nur was fürs gegenseitige Anfeuern nötig ist: Name, Punkte, Level,
+           Serie, Gesamtfortschritt, auswendig gelernte Suren und die Punkte der
+           letzten 7 Tage. KEINE Schwachstellen, KEINE Lektionsdetails, KEINE
+           Zeitstempel-Historie — das bleibt Sache der Lehrkraft. */
+        if (!isTeacher && !me) return json({ error: "Lehrer-Passwort erforderlich" }, 403);
         const code = cleanCode(url.searchParams.get("code") || "");
         const students = await rosterFor(code);
-        return json({ ok: true, found: true, students, defaultClass: DEFAULT_CLASS });
+        if (isTeacher) return json({ ok: true, found: true, students, defaultClass: DEFAULT_CLASS });
+        const board = [];
+        for (const nm in students) {
+          const s = students[nm] || {};
+          const d7 = Array.isArray(s.d7) ? s.d7 : [];
+          board.push({
+            n: s.name || nm,
+            xp: Number(s.xp || 0),
+            lvl: Number(s.lvl || 1),
+            streak: Number(s.streak || 0),
+            all: Number(s.all || 0),
+            hzd: Number((s.hz && s.hz.d) || 0),
+            hzv: Number((s.hz && s.hz.v) || 0),
+            w7: d7.reduce((a, b) => a + (Number(b) || 0), 0),
+            teacher: (s.role || "student") === "teacher" ? 1 : 0,
+          });
+        }
+        board.sort((a, b) => b.w7 - a.w7 || b.xp - a.xp);
+        return json({ ok: true, found: true, board, me, defaultClass: DEFAULT_CLASS });
       }
       if (req.method === "POST") {
         const body = await readBody(req);
@@ -467,6 +492,45 @@ export default async (req) => {
         const rec = await bGet(ukey);
         if (rec) { rec.summary = { ...(body.summary || {}), ts: Date.now() }; rec.lastSeen = Date.now(); await bSet(ukey, rec); }
         return json({ ok: true });
+      }
+      return json({ error: "Methode nicht unterstützt" }, 405);
+    }
+
+    /* ---------- cheer: „Ich feuere dich an!" (11.08.2026) ----------
+       Ein Kind tippt ein anderes an und schickt ihm ein Zeichen (💪 👏 🔥 🤲).
+       Der Empfänger sieht es beim nächsten Öffnen der App. Bewusst winzig
+       gehalten: nur Absender, Zeichen und Zeitpunkt — kein freier Text, damit
+       hier niemand etwas Gemeines schreiben kann. Pro Absender und Tag sind
+       drei Zurufe erlaubt, sonst wäre es Spam statt Ansporn. */
+    if (route === "cheer") {
+      const cheerKey = (n) => "cheer:" + Buffer.from(cleanName(n).toLowerCase(), "utf8").toString("hex");
+      const MAXAGE = 3 * 86400000;      // drei Tage
+      const fresh = (list) => (list || []).filter((x) => Date.now() - (x.ts || 0) < MAXAGE);
+
+      if (req.method === "GET") {
+        const name = cleanName(url.searchParams.get("name") || "");
+        if (!name) return json({ error: "Name fehlt" }, 400);
+        const rec = (await bGet(cheerKey(name))) || { list: [] };
+        const list = fresh(rec.list);
+        if (url.searchParams.get("clear")) await bSet(cheerKey(name), { list: [] });
+        return json({ ok: true, cheers: list });
+      }
+      if (req.method === "POST") {
+        const body = await readBody(req);
+        const to = cleanName(body.to || ""), from = cleanName(body.from || "");
+        if (!to || !from) return json({ error: "Name fehlt" }, 400);
+        if (to.toLowerCase() === from.toLowerCase())
+          return json({ error: "Sich selbst anfeuern gilt nicht \uD83D\uDE42" }, 400);
+        const kind = String(body.kind || "\uD83D\uDCAA").slice(0, 8);
+        const rec = (await bGet(cheerKey(to))) || { list: [] };
+        let list = fresh(rec.list);
+        const day = new Date().toISOString().slice(0, 10);
+        if (list.filter((x) => x.from === from && x.d === day).length >= 3)
+          return json({ ok: true, limited: true });
+        list.push({ from, kind, ts: Date.now(), d: day });
+        if (list.length > 40) list = list.slice(-40);
+        await bSet(cheerKey(to), { list });
+        return json({ ok: true, sent: true });
       }
       return json({ error: "Methode nicht unterstützt" }, 405);
     }

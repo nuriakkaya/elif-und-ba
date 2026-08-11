@@ -67,7 +67,13 @@ function LessonCheck({ step, topicId, onDone }) {
     const right = sel.length === cset.size && sel.every(x => cset.has(x));
     setRevealed(true);
     setWasRight(right);
-    if (right && window.XP) { window.XP.addBonus(17); window.XP.bumpTopic(topicId, 17); } // wie eine normale richtige Antwort
+    // Wie eine normale richtige Antwort — inklusive Wiederholungs-Faktor
+    // (app/replay.js): ein drittes Durchspielen bringt keine Punkte mehr.
+    if (right && window.XP) {
+      const f = window.Replay ? window.Replay.factor(topicId) : 1;
+      const n = Math.round(17 * f);
+      if (n > 0) { window.XP.addBonus(n); window.XP.bumpTopic(topicId, n); }
+    }
     window.Sound && (right ? window.Sound.correct() : window.Sound.wrong());
   };
   const pick = (i) => {
