@@ -48,19 +48,25 @@
   function apply() {
     allLists().forEach(({ arr }) => {
       arr.forEach(item => {
-        if (!item || !item.q) return;
-        if (item._a0 === undefined) item._a0 = item.a;   // Original merken
-        const ov = map[item.q];
+        if (!item || (!item.q && !item._q0)) return;
+        if (item._q0 === undefined) item._q0 = item.q;   // Original-Schreibweise merken
+        if (item._a0 === undefined) item._a0 = item.a;   // Original-Umschrift merken
+        const ov = map[item._q0];
+        // (12.08.2026) Auch die SCHREIBWEISE ist überschreibbar. Der Eintrag
+        // hängt IMMER an der Original-Schreibweise (_q0) — dadurch bleibt er
+        // stabil, egal wie oft umgeschrieben wird, und der Karteikasten
+        // (srs.js schlüsselt auf _q0) verliert keinen Fortschritt.
+        item.q = ov && ov.ar ? ov.ar : item._q0;
         item.a = ov && ov.a ? ov.a : item._a0;
       });
     });
   }
 
   /* ---------- wo kommt dieser Buchstabe überall vor? ---------- */
-  function places(q) {
+  function places(key) {
     const names = [];
     allLists().forEach(({ t, arr }) => {
-      if (arr.some(x => x && x.q === q) && names.indexOf(t.name) < 0) names.push(t.name);
+      if (arr.some(x => x && (x._q0 || x.q) === key) && names.indexOf(t.name) < 0) names.push(t.name);
     });
     return names;
   }
@@ -71,14 +77,21 @@
     const out = [];
     allLists().forEach(({ t, arr }) => {
       arr.forEach(item => {
-        if (!item || !item.q || seen[item.q]) return;
-        seen[item.q] = true;
+        if (!item || (!item.q && !item._q0)) return;
+        if (item._q0 === undefined) item._q0 = item.q;
         if (item._a0 === undefined) item._a0 = item.a;
+        if (seen[item._q0]) return;
+        seen[item._q0] = true;
+        const ov = map[item._q0] || null;
         out.push({
-          q: item.q,
-          a: item.a,
-          orig: item._a0,
-          changed: !!map[item.q],
+          key: item._q0,                 // stabiler Schlüssel (Original-Schreibweise)
+          q: item.q,                     // aktuelle Schreibweise
+          a: item.a,                     // aktuelle Umschrift
+          origQ: item._q0,
+          origA: item._a0,
+          changed: !!ov,
+          changedQ: !!(ov && ov.ar),
+          changedA: !!(ov && ov.a),
           topic: t.name,
           topicId: t.id,
         });
@@ -105,15 +118,22 @@
   }
 
   /* ---------- ändern / zurücksetzen (nur Lehrkraft) ---------- */
-  async function set(q, a) {
+  /* set(key, {a, ar}) — nur die tatsächlich geänderten Felder mitgeben.
+     a = neue Umschrift, ar = neue Schreibweise. Beides leer -> reset(). */
+  async function set(key, ov) {
     const SS = window.SimpleSync;
+    const a = String((ov && ov.a) || '').trim();
+    const ar = String((ov && ov.ar) || '').trim();
+    if (!a && !ar) return reset(key);
     try {
       const r = await SS.req('cards', {
         method: 'POST',
-        body: JSON.stringify({ tpw: SS.TEACHER_PW, q: q, a: a }),
+        body: JSON.stringify({ tpw: SS.TEACHER_PW, q: key, a: a || undefined, ar: ar || undefined }),
       });
       if (r.body && r.body.ok) {
-        map[q] = { a: a, ts: Date.now() };
+        map[key] = { ts: Date.now() };
+        if (a) map[key].a = a;
+        if (ar) map[key].ar = ar;
         try { localStorage.setItem(KEY, JSON.stringify({ cards: map, ts: Date.now() })); } catch (e) {}
         apply(); emit();
         return { ok: true };
@@ -121,15 +141,15 @@
       return { error: (r.body && r.body.error) || 'Speichern fehlgeschlagen' };
     } catch (e) { return { error: 'Server nicht erreichbar' }; }
   }
-  async function reset(q) {
+  async function reset(key) {
     const SS = window.SimpleSync;
     try {
       const r = await SS.req('cards', {
         method: 'POST',
-        body: JSON.stringify({ tpw: SS.TEACHER_PW, q: q, del: true }),
+        body: JSON.stringify({ tpw: SS.TEACHER_PW, q: key, del: true }),
       });
       if (r.body && r.body.ok) {
-        delete map[q];
+        delete map[key];
         try { localStorage.setItem(KEY, JSON.stringify({ cards: map, ts: Date.now() })); } catch (e) {}
         apply(); emit();
         return { ok: true };
@@ -150,7 +170,7 @@
 
   window.CardEdits = {
     apply, refresh, set, reset, places, catalog,
-    get: (q) => map[q],
+    get: (key) => map[key],
     count: () => Object.keys(map).length,
     onChange: (fn) => { listeners.push(fn); return () => { const i = listeners.indexOf(fn); if (i >= 0) listeners.splice(i, 1); }; },
   };

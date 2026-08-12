@@ -146,8 +146,9 @@ window.QuranAudio = (function () {
     last = { t: str, at: now };
     const ar = str.replace(/[^\u0600-\u06FF\s]/g, ' ').trim();
     if (!ar) return;
-    // 1) Lehrer-Aufnahme (Aussprache-Studio) — die beste Quelle, wenn vorhanden
-    if (window.QuranVoice && window.QuranVoice.play(ar, opts)) return;
+    // 1) Lehrer-Aufnahme (Aussprache-Studio) — die beste Quelle, wenn vorhanden.
+    //    opts.skipOwn übergeht sie absichtlich (Werkstatt: „Standardstimme anhören").
+    if (!opts.skipOwn && window.QuranVoice && window.QuranVoice.play(ar, opts)) return;
     const hasHarakat = /[\u064B-\u0652]/.test(ar);
     const bare = ar.replace(/[\u064B-\u0652\u0670\u0640]/g, '').replace(/\s+/g, '');
     if (!hasHarakat) {

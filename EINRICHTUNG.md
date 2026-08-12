@@ -1,4 +1,4 @@
-# 🌙 Elif & Ba — Einrichtung & Update (Version 8.1)
+# 🌙 Elif & Ba — Einrichtung & Update (Version 8.3)
 
 **Das Wichtigste in einem Satz:** Ein Kind tippt auf *Anmelden*, schreibt seinen
 **Namen**, drückt einmal — und ist im Kurs. Kein Anmeldecode, kein Passwort,
@@ -91,6 +91,31 @@ Ein Klick auf ein Kind öffnet die Einzelheiten:
    Gruppennamen eintragen (z. B. `KLASSE4A`) und denselben den Kindern unter
    „▾ Mehr“ eintragen lassen. Ohne Gruppe sind alle in einer Sammelliste.
 
+## ✏️ Die Buchstaben-Werkstatt (ausgebaut am 12.08.2026)
+
+Klassenzimmer → **„✏️ Buchstaben-Werkstatt"**. Jede der ~430 Karten gehört dir —
+mit voller Kontrolle und ohne dass irgendetwas endgültig wäre:
+
+**Texte:** Du kannst die **Schreibweise (arabisch)** UND die **Umschrift**
+ändern. Beides gilt sofort überall (Lektionen, Antwortauswahlen,
+Buchstaben-Übersicht, Unendlich-XP). Der Fortschritt der Kinder bleibt dabei
+erhalten — die App merkt sich Karten intern an der Original-Schreibweise.
+„↩︎ Original wiederherstellen" bringt jederzeit den Auslieferungszustand zurück.
+
+**Ton — mit Probehören:**
+
+- Ein Chip zeigt, **was gerade gilt**: 🎙️ deine Aufnahme, 🔊 App-Aufnahme oder 🗣 Systemstimme.
+- **▶️ So klingt es jetzt** spielt genau das ab, was die Kinder hören.
+- **🎙️ Selbst einsprechen** nimmt bis zu 10 Sekunden auf — danach hörst du die
+  **Probeaufnahme erst an** und entscheidest: ✅ Übernehmen, 🔁 Nochmal oder
+  🗑️ Verwerfen. Nichts geht ungehört online.
+- **🗑️ Aufnahme löschen → Standardstimme**: Deine Aufnahme verschwindet, und es
+  gilt automatisch wieder die Standardstimme. Mit **🔊 Standardstimme anhören**
+  kannst du vorher vergleichen, wie es dann klänge.
+
+Die Filter oben („✏️ Geändert", „🎙️ Eigene") zeigen dir auf einen Blick, was du
+schon angefasst hast.
+
 ## ✏️ Buchstaben & Silben selbst ändern (neu in 7.4)
 
 Du musst für Korrekturen niemanden mehr fragen. **Klassenzimmer → „✏️ Buchstaben
@@ -179,6 +204,16 @@ Einmal gehört, bleibt jede Aufnahme auf dem Gerät (offline nutzbar).
 
 ## 🕌 Auswendig lernen — das neue Herzstück (neu in 8.0)
 
+**Feinschliff 12.08.2026:** Die kleinen Zwischenschritte (zuhören, nachsprechen,
+puzzeln) unterbrechen nicht mehr mit einer ganzen Belohnungsseite — ein kurzes
+Häkchen mit +XP, und nach einer Sekunde geht es von selbst beim nächsten Schritt
+weiter. Oben zeigen vier kleine Symbole (👂🎤🧩🌟), auf welcher Stufe des Verses
+das Kind gerade ist. Die große Feier gibt es weiterhin da, wo sie hingehört:
+frei aufgesagt, Kette geschafft, ganze Sure. Außerdem behoben: Auf manchen
+Geräten meldete die App fälschlich „keine arabische Stimme", obwohl eine da war
+(der Browser meldet seine Stimmen erst verspätet) — deshalb wirkte das Zuhören
+kaputt.
+
 Der Weg dorthin: **Startseite → 🕌 Auswendig lernen** (oder *Meine Stapel →
 „🕌 Auswendig lernen"*). Dahinter steckt bewusst ein **anderes System als die
 Karteikarten**: Kinder lernen hier eine ganze Sure, nicht eine einzelne Karte.
@@ -252,6 +287,24 @@ Oben im Quiz steht dann in Klartext „🔁 Wiederholung — halbe Punkte" bzw.
 „🔁 Nur zum Üben — keine Punkte mehr". Verbraucht wird eine Wiederholung erst
 am **Ende** einer Runde; wer abbricht, verliert seine halbe Portion nicht.
 
+### Wann sich der Bereich öffnet (12.08.2026)
+
+Auswendiglernen ist bewusst **die Kür, nicht der Einstieg**: Wer eine Sure
+auswendig lernt, soll sie vorher lesen können. Der Bereich öffnet sich deshalb
+erst, wenn **alle 17 Lektionen einmal auf 100 %** stehen. Vorher sieht das Kind
+kein stummes Schloss, sondern seinen Stand („12 von 17 Lektionen stehen auf
+100 %") und die Liste dessen, was noch fehlt.
+
+Damit gibt es eine klare Leiter durch die App:
+
+| Stufe | Was dafür nötig ist |
+|---|---|
+| Die 17 Lektionen | von Anfang an offen, eine schaltet die nächste frei |
+| 🕌 Auswendig lernen | **alles einmal** auf 100 % |
+| ♾️ Unendlich-XP | **alles zweimal** durchgespielt |
+
+Einmal offen, bleibt offen. Du als Lehrkraft siehst beides jederzeit.
+
 ### Ton, „nur Arabisch" und Tempo (nachgebessert am 11.08.2026)
 
 Drei Dinge sind nach deinem Hinweis anders:
@@ -275,6 +328,22 @@ Internet.
 Übersetzung gibt es in der Hör-Stufe. Wer sie beim Aufsagen braucht, kann sie mit
 „👀 Umschrift" einblenden — dann zählt der Schritt aber nur halb. Wer mitliest,
 liest; er sagt nicht auf.
+
+**Nachgebessert am 12.08.2026 („die KI erkennt es nicht, wenn die Kinder es
+richtig sagen"):** Die Bewertung ist jetzt deutlich näher an dem, was
+Spracherkennungen wirklich liefern.
+
+- **Verschmolzene und geteilte Wörter** werden repariert: „bismillâh" als ein
+  Wort oder „wa bihamdik" als zwei zählen genauso wie richtig getrennt.
+- **Kurze Bindewörter zählen weniger.** Ein verschlucktes „wa", „mâ" oder „rabbi"
+  ist ein Fehler der Erkennung, keine Lücke im Kopf — ein ausgelassenes
+  **Inhaltswort** (ab fünf Buchstaben) dagegen schon: dann heißt es „fast" und
+  das Kind muss nochmal ran.
+- **Die Schwelle richtet sich nach der Verslänge:** bei drei Wörtern 62 %, bei
+  fünf 70 %, bei neun 76 %. Vorher galten starre 85 % — bei einem Drei-Wort-Vers
+  ist ein einziges Wort schon ein Drittel, das war schlicht zu streng.
+- Unter dem Ergebnis steht jetzt **„Verstanden: …"** — so siehst du sofort, ob
+  das Kind falsch gesprochen hat oder ob der Browser es falsch verstanden hat.
 
 **3. Es gibt ein Zeitfenster.** Jede Mikrofon-Aufgabe bekommt eine Zeit nach
 Wortzahl (rund 2,2 Sekunden pro Wort plus 3 Sekunden Anlauf — großzügig, aber
@@ -318,8 +387,13 @@ Lektionen sind zweimal durch" und darunter die Liste. Einmal offen, bleibt es
 offen. Du als Lehrkraft siehst den Modus immer (zum Vorführen).
 
 **Wellen statt Runden.** Eine Welle sind 12 Fragen aus dem gesamten Stoff.
-Wählbar ist vorher, woraus gemischt wird: *Alles* (432 Karten), *Nur Buchstaben*
-(138) oder *Nur Wörter* (294).
+**Das reine Anfangs-Alphabet ist bewusst draußen** (12.08.2026): Lektion 1 „Die
+Buchstaben" und Lektion 2 „Die Formen" sind Buchstaben-Benennen — wer diesen
+Modus überhaupt erreicht hat, kann das längst, und es würde das Training nur
+verwässern. Gefragt wird alles **ab Lektion 3**, also das echte Lesen: Harekeler,
+Cezim, Şedde, Tenvin, die Dehnungen, Hemze und das Wort „Allah" — 374 Karten.
+Wer die Grundlagen trotzdem mitnehmen will, schaltet sie mit einem Tipp dazu
+(dann 432 Karten); alternativ gibt es „Nur Lesestücke" ohne Einzelsilben.
 
 **Nachsitzen — das ist der Kern.** Jede falsch beantwortete Karte wandert in
 einen Korb. Ist die Welle durch, geht es **nicht** weiter, bevor der Korb leer

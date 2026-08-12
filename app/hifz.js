@@ -1,5 +1,5 @@
 /* ==============================================================
-   🕌 AUSWENDIG LERNEN (Hifz) — Version 8.1, 11.08.2026
+   🕌 AUSWENDIG LERNEN (Hifz) — Version 8.2, 12.08.2026
 
    Warum ein EIGENES System (Nutzerwunsch wörtlich): „ein System, das
    ein bisschen anders ist als das Buchstaben-Lernen — einfach, dass
@@ -84,10 +84,11 @@
         o.items = o.items || {};
         // Zähler immer als Zahl — sonst stolpern Anzeige und Abgleich über undefined.
         o.xp = Number(o.xp || 0); o.mic = Number(o.mic || 0); o.self = Number(o.self || 0);
+        o.open = Number(o.open || 0);
         return o;
       }
     } catch (e) {}
-    return { v: 1, items: {}, xp: 0, mic: 0, self: 0 };
+    return { v: 1, items: {}, xp: 0, mic: 0, self: 0, open: 0 };
   }
   function save(st) { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} emit(); }
 
@@ -297,6 +298,31 @@
     return { d: s.done, t: s.total, v: s.verses, vt: s.versesTotal, xp: s.xp, r: s.rank.title, self: s.self, per: per };
   }
 
+  /* ==============================================================
+     FREISCHALTUNG (12.08.2026, Nutzerwunsch)
+     Auswendiglernen ist kein Einstieg, sondern die Kür: Es öffnet sich erst,
+     wenn ALLE 17 Elifba-Lektionen einmal auf 100 % stehen — wer die Verse
+     auswendig lernt, soll sie vorher lesen können. Der Unendlich-XP-Modus
+     (app/infinity.js) verlangt danach noch einen zweiten Durchgang.
+     Einmal offen, bleibt offen. Lehrkräfte sehen es immer.
+     ============================================================== */
+  function courseInfo() {
+    const teacher = !!(window.SimpleSync && window.SimpleSync.isTeacher && window.SimpleSync.isTeacher());
+    const st = load();
+    const list = (window.QuranCourse && window.QuranCourse.ordered()) || [];
+    let ok = 0; const missing = [];
+    list.forEach(function (t) {
+      const qs = [];
+      (t.blocks || []).forEach(function (b) { (b.quiz || []).forEach(function (q) { qs.push(q); }); });
+      const pct = (window.SRS && window.SRS.progressPct) ? window.SRS.progressPct(t.id, qs) : 0;
+      if (pct >= 100) ok++; else missing.push({ name: t.name, pct: pct });
+    });
+    const earned = list.length > 0 && ok === list.length;
+    if (earned && !st.open) { st.open = 1; save(st); }
+    return { open: teacher || !!st.open || earned, teacher: teacher && !st.open && !earned,
+             done: ok, total: list.length, missing: missing };
+  }
+
   function resetAll() { try { localStorage.removeItem(KEY); } catch (e) {} emit(); }
 
   window.Hifz = {
@@ -305,6 +331,7 @@
     repDue: repDue, nextRepAt: nextRepAt, freshness: freshness, completionBonus: completionBonus, maxXp: maxXp,
     tempoLimit: tempoLimit,
     teacherSnapshot: teacherSnapshot, onChange: onChange, resetAll: resetAll, award: award,
+    courseInfo: courseInfo,
     markHeard: markHeard,
     XP_STAGE: XP_STAGE, XP_CHAIN: XP_CHAIN, XP_REFRESH: XP_REFRESH, XP_LISTEN_ALL: XP_LISTEN_ALL, KEY: KEY,
   };
@@ -316,6 +343,26 @@
      Aufnahme der Lehrkraft, sonst die arabische Systemstimme
      (beides über app/quranaudio.js).
      ============================================================== */
+  /* Chrome liefert getVoices() beim ERSTEN Aufruf oft eine leere Liste und
+     füllt sie erst nach dem 'voiceschanged'-Ereignis. Vorher haben wir das
+     als „keine arabische Stimme" gedeutet und fälschlich einen Fehler gezeigt
+     — DAS war der „Zuhören funktioniert nicht"-Eindruck (12.08.2026).
+     Jetzt: solange unbekannt, optimistisch abspielen; die Fehlermeldung kommt
+     nur noch, wenn sicher KEINE arabische Stimme existiert. */
+  let VOICES_AR = null;                        // null = noch unbekannt
+  function checkVoices() {
+    try {
+      const v = (window.speechSynthesis && window.speechSynthesis.getVoices()) || [];
+      if (v.length) VOICES_AR = v.some(function (x) { return /^ar/i.test(x.lang || ''); });
+    } catch (e) {}
+  }
+  checkVoices();
+  try {
+    if (window.speechSynthesis && window.speechSynthesis.addEventListener) {
+      window.speechSynthesis.addEventListener('voiceschanged', checkVoices);
+    }
+  } catch (e) {}
+
   function useAudio(item) {
     const [playing, setPlaying] = useState(-1);
     const [all, setAll] = useState(false);
@@ -385,10 +432,8 @@
       try {
         if (window.QuranAudio && window.QuranAudio.speakText) { window.QuranAudio.speakText(part.ar, true, opts); spoke = true; }
       } catch (e) {}
-      const hatStimme = (function () {
-        try { return !!(window.speechSynthesis && (window.speechSynthesis.getVoices() || []).some(function (v) { return /^ar/i.test(v.lang || ''); })); }
-        catch (e) { return false; }
-      })();
+      checkVoices();
+      const hatStimme = VOICES_AR !== false;    // unbekannt = optimistisch
       if (!spoke || !hatStimme) {
         setFailed(warEsInternet
           ? 'Die Rezitation aus dem Internet kam nicht durch, und dein Gerät hat keine arabische Stimme. Bitte deine Lehrkraft, die Sure im Aussprache-Studio einzusprechen — dann hörst du sie immer.'
@@ -459,7 +504,8 @@
         onDone: function (text) {
           const dauer = stopClock();
           setPhase('thinking');
-          const g = window.Recite.grade(expected, text, { passAt: passAt || 85 });
+          // Ohne feste Schwelle: recite.js entscheidet nach Verslänge (12.08.2026).
+          const g = window.Recite.grade(expected, text, passAt ? { passAt: passAt } : {});
           g.seconds = Math.round(dauer * 10) / 10;
           g.slow = !!(limit && dauer > limit);
           setTimeout(function () { setPhase('idle'); onResult(g, text); }, 250);
@@ -657,7 +703,10 @@
     const [peek, setPeek] = useState(false);
     const [helped, setHelped] = useState(false);  // Umschrift eingeblendet -> halbe Punkte
     const [reward, setReward] = useState(null);
+    const [toast, setToast] = useState(null);     // kleine Zwischenmeldung statt großer Seite
     const autoPlayed = useRef(false);
+    const autoNext = useRef(null);
+    useEffect(function () { return function () { if (autoNext.current) clearTimeout(autoNext.current); }; }, []);
 
     const isVerse = step.kind === 'verse';
     const isListen = step.kind === 'listen';
@@ -680,7 +729,20 @@
     useEffect(function () { if (isListen && autoPlayed.current && !audio.all) setHeardOnce(true); }, [isListen, audio.all]);
 
     function finish(xpInfo, extra) {
-      setReward(Object.assign({ xp: 0 }, xpInfo, extra || {}));
+      const info = Object.assign({ xp: 0 }, xpInfo, extra || {});
+      /* Beta-Gefühl raus (12.08.2026): Die kleinen Zwischenschritte (zuhören,
+         Stufe 1–3 eines Verses) unterbrechen nicht mehr mit einer ganzen
+         Belohnungsseite. Stattdessen: kurzes Häkchen mit +XP, und nach gut
+         einer Sekunde geht es VON SELBST beim nächsten Schritt weiter.
+         Die große Seite mit Feier bleibt für die Momente, die sie verdienen:
+         frei aufgesagt (Stufe 4), Kette, ganze Sure, Auffrischung. */
+      const klein = isListen || (step.kind === 'verse' && stage < 4);
+      if (klein) {
+        setToast(info);
+        autoNext.current = setTimeout(function () { onFinish(true); }, 1150);
+        return;
+      }
+      setReward(info);
     }
 
     /* ---- die einzelnen Stufen ---- */
@@ -706,11 +768,13 @@
     function handleSpeech(g) {
       setResult(g);
       setTries(function (t) { return t + 1; });
-      const pass = step.kind === 'verse' ? 85 : 80;
-      if (g.pct >= pass || (tries >= 1 && g.pct >= 60)) {
+      // „gut" entscheidet die Bewertung selbst (längenabhängig, siehe recite.js).
+      // Beim zweiten Anlauf reicht „fast" — dann aber nur die halbe Punktzahl.
+      const bestanden = g.level === 'gut' || (tries >= 1 && g.level === 'fast');
+      if (bestanden) {
         // Halbe Punkte, wenn nur knapp getroffen, wenn zu langsam gesprochen
         // (das war Lesen, nicht Aufsagen) oder wenn die Umschrift eingeblendet war.
-        const half = g.pct < pass || !!g.slow || helped;
+        const half = g.level !== 'gut' || !!g.slow || helped;
         try { if (window.Sound) window.Sound.correct(); } catch (e) {}
         setTimeout(function () {
           if (step.kind === 'verse') {
@@ -719,7 +783,7 @@
             finish(r, { pct: g.pct, slow: g.slow, helped: helped });
           } else if (step.kind === 'chain') doneChain(g.slow || helped);
           else doneWhole(g.pct, g.slow || helped);
-        }, g.slow ? 2400 : 1400);
+        }, g.slow ? 2000 : 1000);
       } else {
         try { if (window.Sound) window.Sound.wrong(); } catch (e) {}
       }
@@ -728,6 +792,22 @@
       if (step.kind === 'verse') { const r = window.Hifz.reachStage(item.id, step.i, stage, { self: true }); finish(r, { self: true }); }
       else if (step.kind === 'chain') doneChain(true);
       else doneWhole(0, true);
+    }
+
+    /* ---- kleine Zwischenmeldung (Auto-Weiter) ---- */
+    if (toast) {
+      return (
+        <div className="hz-prac">
+          <div className="hz-toast">
+            <div className="hz-toast-ico">✅</div>
+            <div className="hz-toast-txt">
+              {toast.xp > 0 ? <b>+{toast.xp} XP</b> : <b>Geübt!</b>}
+              {toast.half || toast.slow || toast.self ? <em>halbe Punkte</em> : null}
+            </div>
+            <div className="hz-toast-sub">weiter …</div>
+          </div>
+        </div>
+      );
     }
 
     /* ---- Belohnungs-Bildschirm ---- */
@@ -823,6 +903,13 @@
           <div className="hz-prac-title">
             <b>{title}</b>
             <span className="muted">{item.name}{step.kind === 'verse' ? ' · Vers ' + (step.i + 1) + ' von ' + item.parts.length : ''}</span>
+            {isVerse && (
+              <span className="hz-stagechips">
+                {[1, 2, 3, 4].map(function (k) {
+                  return <em key={k} className={k < stage ? 'is-done' : k === stage ? 'is-now' : ''}>{STAGE_INFO[k].ic}</em>;
+                })}
+              </span>
+            )}
           </div>
           <span className="pill">{step.kind === 'verse' ? '+' + (XP_STAGE[stage] || 0) : step.kind === 'chain' ? '+' + XP_CHAIN : step.kind === 'refresh' ? '+' + XP_REFRESH : '+' + window.Hifz.completionBonus()} XP</span>
         </div>
@@ -878,7 +965,7 @@
                   <div className="hz-note">Sag den Vers laut mit — deine Lehrkraft hat das Mikrofon ausgeschaltet. Selbst bestätigt gibt es die halbe Punktzahl.</div>
                   <button className="qp-btn hz-primary" onClick={function () { doneStage({ self: true }); }}>✅ Ich habe ihn laut nachgesprochen</button>
                 </>
-              : <MicButton expected={expected} passAt={85} limitS={window.Hifz.tempoLimit(expected)}
+              : <MicButton expected={expected} limitS={window.Hifz.tempoLimit(expected)}
                            hint="Antippen und den Vers nachsprechen"
                            onResult={handleSpeech} onSelf={handleSelf}/>}
           </>
@@ -898,7 +985,7 @@
           <>
             {mode === 'speech' || mode === 'record'
               ? <>
-                  <MicButton expected={expected} passAt={85} limitS={window.Hifz.tempoLimit(expected)}
+                  <MicButton expected={expected} limitS={window.Hifz.tempoLimit(expected)}
                              hint="Antippen und frei aufsagen"
                              onResult={handleSpeech} onSelf={handleSelf}/>
                   {!peek && <button className="btn btn-ghost" style={{ marginTop: 6 }} onClick={function () { setPeek(true); }}>👀 Kurz spicken</button>}
@@ -923,7 +1010,7 @@
                 <OrderVerses parts={chainParts} onDone={function () { if (step.kind === 'chain') doneChain(false); else doneWhole(0, false); }}/>
               </>
             : <>
-                <MicButton expected={expected} passAt={80} limitS={window.Hifz.tempoLimit(expected)}
+                <MicButton expected={expected} limitS={window.Hifz.tempoLimit(expected)}
                            hint={step.kind === 'chain' ? 'Antippen und Vers 1 bis ' + step.k + ' aufsagen' : 'Antippen und alles am Stück aufsagen'}
                            onResult={handleSpeech} onSelf={handleSelf}/>
                 {!peek && <button className="btn btn-ghost" style={{ marginTop: 6 }} onClick={function () { setPeek(true); }}>👀 Kurz spicken</button>}
@@ -938,6 +1025,11 @@
               <span>{result.pct}% richtig{result.seconds ? ' · ' + result.seconds + ' s' : ''}</span>
             </div>
             <WordFeedback marks={result.marks}/>
+            {result.heard && (
+              <div className="hz-heard">
+                Verstanden: <span dir="rtl">{result.heard}</span>
+              </div>
+            )}
             {result.level === 'gut' && result.slow && (
               <div className="hz-result-tip">
                 Das war eher Lesen als Aufsagen — deshalb gibt es nur die halbe Punktzahl.
@@ -1124,7 +1216,36 @@
     useEffect(function () { return window.Hifz.onChange(function () { force(function (x) { return x + 1; }); }); }, []);
 
     const items = window.HIFZ_ITEMS || [];
+    const frei = window.Hifz.courseInfo();
     const sel = selId ? window.HIFZ_BY_ID[selId] : null;
+    if (!frei.open) {
+      return (
+        <div className="content">
+          <button className="btn btn-ghost" style={{ marginBottom: 10 }} onClick={function () { go('decks'); }}>← Zurück</button>
+          <div className="inf-locked">
+            <div className="inf-lock-ico">🔒</div>
+            <h1 style={{ margin: '6px 0' }}>🕌 Auswendig lernen</h1>
+            <p>
+              Hier lernst du ganze Suren auswendig — <b>Sübhâneke, Fâtiha, Kevser, İhlâs</b> und mehr.
+              Damit das gelingt, musst du sie erst <b>lesen</b> können: Der Bereich öffnet sich, sobald du
+              alle Lektionen des Kurses einmal auf 100 % gebracht hast.
+            </p>
+            <div className="inf-progress">
+              <div className="xp-bar"><div className="fill" style={{ width: (frei.total ? Math.round(100 * frei.done / frei.total) : 0) + '%' }}/></div>
+              <b>{frei.done} von {frei.total} Lektionen stehen auf 100 %</b>
+            </div>
+            <div className="inf-missing">
+              <div className="muted" style={{ fontWeight: 700, marginBottom: 6 }}>Das fehlt noch:</div>
+              {frei.missing.slice(0, 6).map(function (m, i) {
+                return <div key={i} className="inf-miss"><span>{m.name}</span><em>{m.pct}%</em></div>;
+              })}
+              {frei.missing.length > 6 && <div className="muted" style={{ fontSize: 12.5 }}>… und {frei.missing.length - 6} weitere</div>}
+            </div>
+            <button className="qp-btn" style={{ marginTop: 14 }} onClick={function () { go('decks'); }}>Zu den Lektionen</button>
+          </div>
+        </div>
+      );
+    }
     if (sel) return <ItemDetail item={sel} onBack={function () { setSelId(null); }}/>;
 
     const s = window.Hifz.summary();
@@ -1156,6 +1277,7 @@
           </div>
         </div>
 
+        {frei.teacher && <div className="hz-note">🔓 Lehrer-Modus: Du siehst den Bereich, obwohl er für die Kinder noch zu ist.</div>}
         <div className="hz-intro">
           Hier lernst du ganz anders als bei den Buchstaben: Du nimmst dir eine Sure vor und baust sie Vers für Vers
           in deinem Kopf auf — hören, nachsprechen, puzzeln, frei aufsagen. Dann hängst du die Verse zu einer Kette

@@ -72,7 +72,7 @@
     return out;
   }
 
-  function EchoBonus({ answer, topicId, factor, seq }) {
+  function EchoBonus({ answer, topicId, factor, seq, onActive }) {
     const [phase, setPhase] = useState('idle');   // idle | listening | ok | miss | error
     const [tries, setTries] = useState(0);
     const [gotXp, setGotXp] = useState(0);
@@ -90,6 +90,7 @@
     const reward = Math.round(XP_ECHO * f);
 
     function start() {
+      if (onActive) onActive();          // Karte wartet jetzt auf mich
       setPhase('listening'); setHeard('');
       ctrl.current = window.Recite.listen({
         lang: 'tr-TR',

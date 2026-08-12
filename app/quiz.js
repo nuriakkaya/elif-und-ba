@@ -190,9 +190,10 @@ function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor }) {
   const timerRef = useRef(null);
   const doneRef = useRef(false);
   const lastRes = useRef(null);
+  const echoTimer = useRef(null);
   const revealedRef = useRef(false);
   useEffect(() => { revealedRef.current = revealed; }, [revealed]);
-  useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current); }, []);
+  useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current); if (echoTimer.current) clearTimeout(echoTimer.current); }, []);
 
   const badge = srsBadge(topicId, item);
   const correctIdxs = (gen.options || []).map((o, i) => o.c ? i : -1).filter(i => i >= 0);
@@ -223,12 +224,17 @@ function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor }) {
     // (06.08.2026) Aussprache kommt jetzt FAST sofort (60 ms statt 160 ms) —
     // der Feedback-Ton ist leiser abgemischt, die Stimme liegt klar darüber.
     if (window.QuranAudio && !res.teach) window.QuranAudio.speakForCard(topicId, { q: gen.arabicOptions ? gen.a : (gen.say || gen.q) }, 60);
-    /* 🎤 Nachsprech-Bonus (app/echo.js): In Lektion 1 hält die Karte kurz an,
-       damit das Kind den Buchstabennamen laut sagen kann. Sonst würde die Karte
-       nach dem Antworten sofort weiterspringen und der Bonus wäre nie sichtbar.
-       Nur dort, nur bei richtiger Antwort, nur wenn das Mikrofon wirklich prüfen
-       kann — überall sonst bleibt der Ablauf unverändert schnell. */
-    if (res.correct && !res.teach && !res.blitz && echoMoeglich()) { setNeedWeiter(true); return; }
+    /* 🎤 Nachsprech-Bonus (app/echo.js): In Lektion 1 bleibt die Karte kurz
+       stehen, damit das Kind den Buchstabennamen laut sagen kann — sonst
+       springt sie sofort weiter und der Bonus wäre nie sichtbar. Wichtig: Sie
+       BLOCKIERT nicht. Nach 2,5 Sekunden geht es von selbst weiter; erst wenn
+       das Kind das Mikrofon antippt, wartet die Karte auf es. So bleibt der
+       Lernfluss schnell und der Bonus trotzdem erreichbar. */
+    if (res.correct && !res.teach && !res.blitz && echoMoeglich()) {
+      setNeedWeiter(true);
+      echoTimer.current = setTimeout(() => onDone(res), 2500);
+      return;
+    }
     setTimeout(() => onDone(res), delay || 0);
   };
   function echoMoeglich() {
@@ -430,6 +436,7 @@ function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor }) {
   const weiter = () => {
     // Kam der Weiter-Knopf nach einer RICHTIGEN Antwort (Nachsprech-Bonus in
     // Lektion 1), darf er die Wertung nicht nachträglich auf „falsch" drehen.
+    if (echoTimer.current) { clearTimeout(echoTimer.current); echoTimer.current = null; }
     if (doneRef.current) { onDone(lastRes.current || { correct: true }); return; }
     finish({ correct: false, usedExplain: helpUsed.explain, usedReveal: helpUsed.reveal }, 0);
   };
@@ -798,7 +805,8 @@ function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor }) {
           Das Modul entscheidet selbst, ob es sich zeigt — es tut das NUR in
           Lektion 1, wo das Kind den Buchstabennamen sagt („Elif", „Be"). */}
       {needWeiter && window.EchoBonus && kind !== 'teach' && (
-        <window.EchoBonus answer={item && item.card ? (item.card.a || '') : ''}
+        <window.EchoBonus onActive={() => { if (echoTimer.current) { clearTimeout(echoTimer.current); echoTimer.current = null; } }}
+                          answer={item && item.card ? (item.card.a || '') : ''}
                           topicId={(item && item.card && item.card._topicId) || topicId}
                           factor={xpFactor == null ? 1 : xpFactor}
                           seq={item && item.card ? (item.card.q || '') : ''}/>

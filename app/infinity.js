@@ -1,5 +1,5 @@
 /* ==============================================================
-   ♾️ UNENDLICH-XP — Version 8.1, 11.08.2026
+   ♾️ UNENDLICH-XP — Version 8.2, 12.08.2026
 
    Nutzerwunsch wörtlich: „Ein Modus, wo alles abgefragt wird, alles
    gleichzeitig, vor allem von den Buchstaben — kreuz und quer. Und
@@ -99,10 +99,19 @@
     };
   }
 
-  /* ---------------- Kartenpool ---------------- */
+  /* ---------------- Kartenpool ----------------
+     (12.08.2026, Nutzerwunsch) Das ANFANGS-ALPHABET bleibt draußen: Lektion 1
+     („Die Buchstaben") und Lektion 2 („Die Formen") sind reines Buchstaben-
+     Benennen. Wer diesen Modus überhaupt erreicht hat, kann das längst — dann
+     ist es Zeitverschwendung und verwässert das Training. Gefragt wird also
+     alles ab Lektion 3, also das echte Lesen: Harekeler, Cezim, Şedde, Tenvin,
+     die Dehnungen, Hemze und das Wort „Allah". Wer die Grundlagen trotzdem
+     mitnehmen will, kann sie auf dem Startbildschirm dazuschalten. */
+  const GRUNDLAGEN = ['quran-harfler', 'quran-formen'];
   const bare = (s) => String(s || '').replace(/[ً-ْٰـ\s·]/g, '');
-  function buildPool() {
-    const list = (window.QuranCourse && window.QuranCourse.ordered()) || [];
+  function buildPool(mitGrundlagen) {
+    const list = ((window.QuranCourse && window.QuranCourse.ordered()) || [])
+      .filter(function (t) { return mitGrundlagen || GRUNDLAGEN.indexOf(t.id) < 0; });
     const seen = {}, out = [];
     list.forEach(function (t) {
       flatQuiz(t).forEach(function (c) {
@@ -111,21 +120,22 @@
         const k = q + '|' + a;
         if (seen[k]) return;
         seen[k] = 1;
-        out.push({ q: q, a: a, k: k, topicId: t.id, topicName: t.name, letter: bare(q).length <= 2 });
+        out.push({ q: q, a: a, k: k, topicId: t.id, topicName: t.name,
+                   letter: bare(q).length <= 2, grund: GRUNDLAGEN.indexOf(t.id) >= 0 });
       });
     });
     return out;
   }
   const SCOPES = [
-    { id: 'alle', t: 'Alles gemischt', d: 'Buchstaben, Silben und Wörter aus allen 17 Lektionen' },
-    { id: 'harf', t: 'Nur Buchstaben', d: 'Einzelne Zeichen und Silben' },
-    { id: 'wort', t: 'Nur Wörter', d: 'Die längeren Lesestücke' },
+    { id: 'alle', t: 'Alles gemischt', d: 'Silben, Wörter und Lesestücke ab Lektion 3 — kreuz und quer' },
+    { id: 'wort', t: 'Nur Lesestücke', d: 'Die längeren Wörter, keine Einzelsilben' },
+    { id: 'grund', t: 'Mit Grundlagen', d: 'Zusätzlich das Buchstaben-Alphabet aus Lektion 1 und 2' },
   ];
   function scoped(pool, scope) {
-    if (scope === 'harf') return pool.filter(function (c) { return c.letter; });
     if (scope === 'wort') return pool.filter(function (c) { return !c.letter; });
     return pool;
   }
+  function poolFor(scope) { return scoped(buildPool(scope === 'grund'), scope); }
 
   /* ---------------- Fragen bauen (kreuz und quer) ---------------- */
   function shuffle(a) {
@@ -165,6 +175,7 @@
   window.InfinityMode = {
     load: load, save: save, unlockInfo: unlockInfo, buildPool: buildPool, scoped: scoped,
     makeQuestion: makeQuestion, teacherSnapshot: teacherSnapshot, SCOPES: SCOPES,
+    poolFor: poolFor, GRUNDLAGEN: GRUNDLAGEN,
     WAVE: WAVE, XP_BASE: XP_BASE, KEY: KEY,
     reset: function () { try { localStorage.removeItem(KEY); } catch (e) {} },
   };
@@ -177,8 +188,7 @@
     const info = unlockInfo();
     const [phase, setPhase] = useState('intro');    // intro | play | wave
     const [scope, setScope] = useState('alle');
-    const pool = useMemo(buildPool, []);
-    const cards = useMemo(function () { return scoped(pool, scope); }, [pool, scope]);
+    const cards = useMemo(function () { return poolFor(scope); }, [scope]);
 
     /* Warteschlange, Korb und Zähler liegen in refs, NICHT im State.
        Grund: Nach einer Antwort läuft der Wechsel zur nächsten Frage in einem
@@ -337,13 +347,13 @@
           </div>
           {info.teacher && <div className="hz-note">🔓 Lehrer-Modus: Du siehst den Modus, obwohl er für die Kinder noch zu ist.</div>}
           <div className="inf-rules">
-            <div><b>12 Fragen</b> pro Welle, gemischt aus allen Lektionen — mal wird das Zeichen gefragt, mal der Name.</div>
+            <div><b>12 Fragen</b> pro Welle, gemischt aus dem ganzen Kurs — mal wird das Zeichen gefragt, mal die Lesung. Das reine Buchstaben-Alphabet ist raus: das kannst du längst.</div>
             <div><b>Falsch?</b> Die Karte kommt in den Korb. Der Korb muss leer sein, bevor die nächste Welle startet.</div>
             <div><b>Punkte:</b> {XP_BASE} XP je richtige Antwort, +{XP_STREAK} für jede 5er-Serie, +{XP_WAVE_CLEAN} für eine Welle ohne Fehler. Und das <b>ohne Ende</b>.</div>
           </div>
           <div className="inf-scopes">
             {SCOPES.map(function (s) {
-              const n = scoped(pool, s.id).length;
+              const n = poolFor(s.id).length;
               return (
                 <button key={s.id} className={'inf-scope' + (scope === s.id ? ' is-active' : '')} onClick={function () { setScope(s.id); }}>
                   <b>{s.t}</b><em>{s.d}</em><span>{n} Karten</span>

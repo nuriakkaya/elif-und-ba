@@ -407,6 +407,7 @@ function HifzCard({ ctx }) {
   const [, force] = useState(0);
   useEffect(() => (window.Hifz ? window.Hifz.onChange(() => force((x) => x + 1)) : undefined), []);
   if (!window.Hifz || !(window.HIFZ_ITEMS || []).length) return null;
+  if (window.Hifz.courseInfo && !window.Hifz.courseInfo().open) return null;   // erst nach dem Kurs
   const s = window.Hifz.summary();
   const due = (window.HIFZ_ITEMS || []).filter((it) => window.Hifz.repDue(it.id));
   const started = (window.HIFZ_ITEMS || []).find((it) => !window.Hifz.itemState(it.id).done && window.Hifz.progressPct(it.id) > 0);
@@ -442,6 +443,22 @@ function HifzCard({ ctx }) {
    Schloss ohne Erklärung frustriert Kinder nur. */
 /* Startseiten-Karte für den Unendlich-Modus — erscheint erst, wenn er
    freigeschaltet ist. Vorher wäre sie nur eine Dauer-Enttäuschung. */
+/* 🕌 Knopf zum Auswendiglernen — zeigt vor der Freischaltung ehrlich den Stand.
+   Auswendiglernen ist die Kür: erst lesen können, dann auswendig lernen. */
+function HifzButton({ ctx }) {
+  if (!window.Hifz || !window.Hifz.courseInfo) {
+    return <button className="btn btn-primary" onClick={() => ctx.go('hifz')}>🕌 Auswendig lernen</button>;
+  }
+  const info = window.Hifz.courseInfo();
+  if (info.open) return <button className="btn btn-primary" onClick={() => ctx.go('hifz')}>🕌 Auswendig lernen</button>;
+  return (
+    <button className="btn btn-ghost" title={'Noch ' + (info.total - info.done) + ' Lektionen auf 100 % bringen'}
+            onClick={() => ctx.go('hifz')}>
+      🔒 🕌 Auswendig lernen · {info.done}/{info.total}
+    </button>
+  );
+}
+
 function InfinityCard({ ctx }) {
   if (!window.InfinityMode) return null;
   const info = window.InfinityMode.unlockInfo();
@@ -1286,7 +1303,7 @@ function DecksGrid({ ctx }) {
                 : <span className="muted" style={{fontWeight:500, fontSize:13}}>Lektionen schalten sich Schritt für Schritt frei</span>}
             </div>
             <div className="row" style={{gap:8, flexWrap:'wrap'}}>
-              <button className="btn btn-primary" onClick={() => go('hifz')}>🕌 Auswendig lernen</button>
+              <HifzButton ctx={ctx}/>
               <InfinityButton ctx={ctx}/>
               <button className="btn btn-ghost" onClick={() => go('surah')}>📖 Suren lesen &amp; hören</button>
               <button className="btn btn-ghost" onClick={() => go('quranletters')}>🔤 Buchstaben-Übersicht</button>
@@ -3493,6 +3510,12 @@ function HelpScreen({ ctx }) {
         vorgesprochen, danach kommen die Fragen. Mit 🔊 hörst du ihn nochmal, mit 🐢 langsam.
         Der grüne Kreis füllt sich, je sicherer ein Buchstabe sitzt.
       </Q>
+      <Q q="Wann darf ich auswendig lernen?">
+        Auswendiglernen öffnet sich, wenn du <b>alle 17 Lektionen einmal auf 100 %</b> gebracht hast —
+        erst lesen können, dann auswendig lernen. Unter „Meine Stapel" siehst du, wie viele es schon
+        sind und was noch fehlt. Der <b>♾️ Unendlich-XP-Modus</b> kommt danach: Für ihn musst du alles
+        <b>zweimal</b> durchgespielt haben.
+      </Q>
       <Q q="Wie lerne ich eine Sure auswendig?">
         Startseite → <b>🕌 Auswendig lernen</b> (oder Meine Stapel → „🕌 Auswendig lernen").
         Such dir eine Sure aus — Sübhâneke, Fâtiha, Kevser und İhlâs brauchst du für den Namaz zuerst.
@@ -3528,6 +3551,9 @@ function HelpScreen({ ctx }) {
         hört er beim Nachsprechen mit und zeigt dir Wort für Wort, was schon gut war. Kann er das
         nicht, oder hat deine Lehrkraft das Mikrofon abgeschaltet, setzt du den Vers stattdessen aus
         <b>Wort-Bausteinen</b> zusammen — das gibt genauso viele Punkte.<br/><br/>
+        Die Prüfung ist absichtlich großzügig: verschmolzene oder geteilte Wörter werden repariert,
+        und kleine Bindewörter dürfen fehlen — ein <b>ganzes Wort</b> darfst du aber nicht auslassen.
+        Unter dem Ergebnis steht „Verstanden: …" — daran siehst du, was der Browser gehört hat.<br/><br/>
         <b>Datenschutz:</b> Beim Zuhören schickt Chrome den Ton kurz zu Google, Safari zu Apple.
         Es wird nichts aufbewahrt und nichts an unseren Server geschickt. Deine Lehrkraft kann das
         Mikrofon im Klassenzimmer für dieses Gerät komplett ausschalten.
@@ -4293,103 +4319,180 @@ function SoundCheck({ ctx }) {
   );
 }
 
+/* ==============================================================
+   ✏️ BUCHSTABEN-WERKSTATT (Neufassung 12.08.2026)
+
+   Nutzerwunsch wörtlich: „Ich brauch da viel mehr Optionen, viel mehr
+   Freiraum — ändern, umändern, sprechen, rauslöschen, die Standard-
+   stimme wieder einfügen. Auch die Schreibart von dem Buchstaben."
+
+   Pro Karte gibt es jetzt drei klar getrennte Bereiche:
+     1. SCHREIBWEISE (arabisch) — überschreibbar, Original jederzeit zurück.
+        Der Fortschritt der Kinder bleibt erhalten (srs.js schlüsselt auf
+        die Original-Schreibweise).
+     2. UMSCHRIFT / NAME — wie bisher.
+     3. TON — mit voller Kontrolle:
+        · zeigt, WAS gerade gilt (eigene Aufnahme / App-Aufnahme / Stimme)
+        · „So klingt es jetzt" und „Standardstimme anhören" zum Vergleich
+        · Aufnehmen MIT PROBEHÖREN: erst anhören, dann übernehmen
+          oder verwerfen — nichts geht ungehört online
+        · eigene Aufnahme löschen -> die Standardstimme gilt sofort wieder
+   ============================================================== */
 function CardEditor({ ctx }) {
   const CE = window.CardEdits;
   const QV = window.QuranVoice;
+  const QA = window.QuranAudio;
   const [q, setQ] = useState('');
-  const [sel, setSel] = useState(null);
-  const [draft, setDraft] = useState('');
+  const [filter, setFilter] = useState('alle');   // alle | geaendert | eigene
+  const [sel, setSel] = useState(null);           // key = Original-Schreibweise
+  const [draftQ, setDraftQ] = useState('');
+  const [draftA, setDraftA] = useState('');
   const [msg, setMsg] = useState('');
   const [err, setErr] = useState('');
-  const [onlyChanged, setOnlyChanged] = useState(false);
-  const [recAr, setRecAr] = useState(null);
-  const [busyAr, setBusyAr] = useState(null);
+  const [rec, setRec] = useState(false);          // Aufnahme läuft
+  const [recSecs, setRecSecs] = useState(0);
+  const [take, setTake] = useState(null);         // {blob, url} — Probeaufnahme
+  const [busy, setBusy] = useState(false);
   const [, force] = useState(0);
   const recRef = useRef(null);
+  const takeRef = useRef(null);
+  const tickRef = useRef(null);
 
   useEffect(() => CE && CE.onChange(() => force(x => x + 1)), []);
-  useEffect(() => { CE && CE.refresh(true); }, []);
+  useEffect(() => { CE && CE.refresh(true); if (QV) QV.refresh(true); }, []);
+  useEffect(() => () => {
+    try { recRef.current && recRef.current.stream.getTracks().forEach(t => t.stop()); } catch (e) {}
+    if (tickRef.current) clearInterval(tickRef.current);
+    if (take && take.url) URL.revokeObjectURL(take.url);
+  }, []);
 
   if (!CE) return null;
   const all = CE.catalog();
   const needle = q.trim().toLowerCase();
   const list = all.filter(c => {
-    if (onlyChanged && !c.changed) return false;
+    if (filter === 'geaendert' && !c.changed) return false;
+    if (filter === 'eigene' && !(QV && QV.has(c.q))) return false;
     if (!needle) return true;
-    return c.q.indexOf(q.trim()) >= 0
+    return c.q.indexOf(q.trim()) >= 0 || c.origQ.indexOf(q.trim()) >= 0
       || String(c.a).toLowerCase().indexOf(needle) >= 0
-      || String(c.orig).toLowerCase().indexOf(needle) >= 0
+      || String(c.origA).toLowerCase().indexOf(needle) >= 0
       || String(c.topic).toLowerCase().indexOf(needle) >= 0;
   });
   const changedCount = all.filter(c => c.changed).length;
+  const recCount = QV ? all.filter(c => QV.has(c.q)).length : 0;
 
-  const open = (c) => {
-    if (sel === c.q) { setSel(null); return; }
-    setSel(c.q); setDraft(c.a); setMsg(''); setErr('');
+  const discardTake = () => {
+    if (take && take.url) URL.revokeObjectURL(take.url);
+    setTake(null);
   };
+  const open = (c) => {
+    if (sel === c.key) { setSel(null); discardTake(); return; }
+    setSel(c.key); setDraftQ(c.q); setDraftA(c.a); setMsg(''); setErr(''); discardTake();
+  };
+  const flash = (t) => { setMsg(t); setErr(''); setTimeout(() => setMsg(m => (m === t ? '' : m)), 3200); };
+
+  /* ---- Texte speichern / zurücksetzen ---- */
   const save = async (c) => {
-    const val = draft.trim();
-    if (!val) { setErr('Bitte etwas eintragen.'); return; }
+    const vQ = draftQ.trim(), vA = draftA.trim();
+    if (!vQ || !vA) { setErr('Schreibweise und Umschrift dürfen nicht leer sein.'); return; }
     setErr(''); setMsg('Speichere …');
-    const r = val === c.orig ? await CE.reset(c.q) : await CE.set(c.q, val);
-    if (r.ok) { setMsg('Gespeichert ✅ — gilt ab sofort überall.'); setTimeout(() => setMsg(''), 3000); }
+    const r = await CE.set(c.key, {
+      ar: vQ !== c.origQ ? vQ : '',
+      a: vA !== c.origA ? vA : '',
+    });
+    if (r.ok) flash('Gespeichert ✅ — gilt ab sofort überall.');
     else { setMsg(''); setErr(r.error || 'Das hat nicht geklappt.'); }
     force(x => x + 1);
   };
   const undo = async (c) => {
     setMsg('Setze zurück …');
-    const r = await CE.reset(c.q);
-    if (r.ok) { setDraft(c.orig); setMsg('Auf das Original zurückgesetzt ✅'); setTimeout(() => setMsg(''), 3000); }
+    const r = await CE.reset(c.key);
+    if (r.ok) { setDraftQ(c.origQ); setDraftA(c.origA); flash('Original wiederhergestellt ✅'); }
     else { setMsg(''); setErr(r.error || 'Das hat nicht geklappt.'); }
     force(x => x + 1);
   };
 
-  const startRec = async (ar) => {
-    setErr('');
+  /* ---- Aufnahme mit Probehören ---- */
+  const startRec = async () => {
+    setErr(''); discardTake();
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
       const mime = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', ''].find(m => !m || (window.MediaRecorder && MediaRecorder.isTypeSupported(m)));
       const mr = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 64000 } : undefined);
       const chunks = [];
       mr.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
-      mr.onstop = async () => {
+      mr.onstop = () => {
         stream.getTracks().forEach(t => t.stop());
+        if (tickRef.current) clearInterval(tickRef.current);
+        setRec(false);
         const blob = new Blob(chunks, { type: mr.mimeType || 'audio/webm' });
-        setRecAr(null);
-        if (blob.size < 1200) { setErr('Aufnahme war zu kurz — nochmal versuchen.'); return; }
-        setBusyAr(ar);
-        const r = await QV.put(ar, blob);
-        setBusyAr(null);
-        if (!r.ok) setErr(r.error || 'Hochladen fehlgeschlagen.');
-        else { setMsg('Neue Aussprache gespeichert ✅'); setTimeout(() => setMsg(''), 3000); }
-        force(x => x + 1);
+        if (blob.size < 1200) { setErr('Die Aufnahme war zu kurz — bitte nochmal.'); return; }
+        setTake({ blob, url: URL.createObjectURL(blob) });
       };
       recRef.current = { mr, stream };
       mr.start();
-      setRecAr(ar);
-      setTimeout(() => { try { if (recRef.current && recRef.current.mr === mr && mr.state === 'recording') mr.stop(); } catch (e) {} }, 6000);
+      setRec(true); setRecSecs(0);
+      tickRef.current = setInterval(() => setRecSecs(x => x + 1), 1000);
+      setTimeout(() => { try { if (recRef.current && recRef.current.mr === mr && mr.state === 'recording') mr.stop(); } catch (e) {} }, 10000);
     } catch (e) { setErr('Mikrofon nicht verfügbar — bitte den Zugriff erlauben.'); }
   };
   const stopRec = () => { try { recRef.current && recRef.current.mr.state === 'recording' && recRef.current.mr.stop(); } catch (e) {} };
+  const playTake = () => {
+    if (!take) return;
+    if (takeRef.current) { try { takeRef.current.pause(); } catch (e) {} }
+    takeRef.current = new Audio(take.url);
+    takeRef.current.play().catch(() => {});
+  };
+  const keepTake = async (c) => {
+    if (!take) return;
+    setBusy(true); setMsg('Lade hoch …');
+    const r = await QV.put(c.q, take.blob);
+    setBusy(false);
+    if (r.ok) { discardTake(); flash('Deine Aufnahme gilt jetzt überall ✅'); }
+    else { setMsg(''); setErr(r.error || 'Hochladen fehlgeschlagen — läuft die App über die Netlify-Adresse?'); }
+    force(x => x + 1);
+  };
+  const delOwn = async (c) => {
+    setBusy(true); setMsg('Lösche …');
+    const r = await QV.del(c.q);
+    setBusy(false);
+    if (r.ok) flash('Aufnahme gelöscht — es gilt wieder die Standardstimme ✅');
+    else { setMsg(''); setErr(r.error || 'Löschen fehlgeschlagen.'); }
+    force(x => x + 1);
+  };
+
+  const srcChip = (c) => {
+    if (!QA || !QA.sourceFor) return null;
+    const src = QA.sourceFor(c.q);
+    const style = src.src === 'eigen' ? { background: 'var(--success-soft, #E7F7EE)', color: 'var(--success, #1B8A5A)' }
+      : src.src === 'app' ? { background: '#E3EFFA', color: '#2364A5' }
+      : src.src === 'fehler' ? { background: '#FDE3E8', color: '#B3123A' }
+      : { background: '#F2F2F5', color: '#66717b' };
+    const label = src.src === 'eigen' ? '🎙️ deine Aufnahme'
+      : src.src === 'app' ? '🔊 App-Aufnahme' : src.src === 'internet' ? '🌐 Internet-Aufnahme'
+      : src.src === 'fehler' ? '⚠️ Ton nicht ladbar' : '🗣 Systemstimme';
+    return <span className="pill" style={{ fontWeight: 800, ...style }}>{label}</span>;
+  };
 
   return (
     <div className="page" style={{maxWidth: 780}}>
       <div className="row" style={{justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10}}>
-        <h1 style={{margin: 0}}>✏️ Buchstaben &amp; Silben</h1>
+        <h1 style={{margin: 0}}>✏️ Buchstaben-Werkstatt</h1>
         <button className="btn btn-ghost" onClick={() => ctx.go('teacher')}>← Klassenzimmer</button>
       </div>
       <div className="muted" style={{fontSize: 13.5, marginTop: 6, lineHeight: 1.55}}>
-        Such dir eine einzelne Karte, ändere die Umschrift und sprich sie bei Bedarf neu ein.
-        Beides gilt <b>sofort überall</b>, wo dieser Buchstabe vorkommt — in jeder Lektion,
-        auf jeder Karte und in jeder Antwortauswahl. Der Fortschritt der Kinder bleibt erhalten.
+        Jede Karte gehört dir: <b>Schreibweise</b> und <b>Umschrift</b> ändern, die Aussprache <b>einsprechen,
+        probehören, übernehmen oder löschen</b> — und jederzeit zurück zum Original. Alles gilt sofort überall;
+        der Fortschritt der Kinder bleibt erhalten.
       </div>
 
       <div className="row" style={{gap: 8, marginTop: 14, flexWrap: 'wrap'}}>
         <input value={q} onChange={e => setQ(e.target.value)} placeholder="Suchen: Buchstabe, Umschrift oder Lektion…"
                style={{flex: '1 1 220px', minWidth: 0, padding: '11px 14px', borderRadius: 12, border: '1px solid var(--line)', background: 'var(--surface)', font: 'inherit'}}/>
-        <button className={'btn ' + (onlyChanged ? 'btn-primary' : 'btn-ghost')} onClick={() => setOnlyChanged(v => !v)}>
-          Nur geänderte ({changedCount})
-        </button>
+        <button className={'btn ' + (filter === 'geaendert' ? 'btn-primary' : 'btn-ghost')}
+                onClick={() => setFilter(f => f === 'geaendert' ? 'alle' : 'geaendert')}>✏️ Geändert ({changedCount})</button>
+        <button className={'btn ' + (filter === 'eigene' ? 'btn-primary' : 'btn-ghost')}
+                onClick={() => setFilter(f => f === 'eigene' ? 'alle' : 'eigene')}>🎙️ Eigene ({recCount})</button>
       </div>
       {!!msg && <div style={{color: 'var(--success, #1B8A5A)', fontWeight: 800, marginTop: 10}}>{msg}</div>}
       {!!err && <div style={{color: 'var(--rose, #D64545)', fontWeight: 800, marginTop: 10}}>{err}</div>}
@@ -4397,48 +4500,100 @@ function CardEditor({ ctx }) {
 
       <div className="col" style={{gap: 8, marginTop: 10}}>
         {list.slice(0, 300).map(c => {
-          const isOpen = sel === c.q;
+          const isOpen = sel === c.key;
           const hasRec = QV && QV.has(c.q);
-          const isRec = recAr === c.q;
-          const isBusy = busyAr === c.q;
           return (
-            <div key={c.q} className="card" style={{padding: 12, cursor: 'pointer'}} onClick={() => open(c)}>
+            <div key={c.key} className="card" style={{padding: 12, cursor: 'pointer'}} onClick={() => open(c)}>
               <div className="row" style={{alignItems: 'center', gap: 12}}>
                 <span dir="rtl" style={{fontSize: 30, fontWeight: 700, minWidth: 52, textAlign: 'center', fontFamily: '"Amiri Quran", "Scheherazade New", serif'}}>{c.q}</span>
                 <span style={{flex: 1, minWidth: 0}}>
                   <div style={{fontWeight: 800, fontSize: 15}}>{c.a}</div>
                   <div className="muted" style={{fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{c.topic}</div>
                 </span>
-                {c.changed && <span className="pill" style={{background: 'var(--success-soft, #E7F7EE)', fontWeight: 800}}>geändert</span>}
-                {hasRec && <span className="pill" title="eigene Aufnahme vorhanden">🎙️</span>}
+                <button className="icon-btn" title="Anhören" style={{width: 34, height: 34}}
+                        onClick={e => { e.stopPropagation(); QA && QA.speakText(c.q, true); }}>🔊</button>
+                {c.changedQ && <span className="pill" style={{background: '#FCF3D7', fontWeight: 800}} title="Schreibweise geändert">ابج</span>}
+                {c.changedA && <span className="pill" style={{background: 'var(--success-soft, #E7F7EE)', fontWeight: 800}}>Text</span>}
+                {hasRec && <span className="pill" title="eigene Aufnahme aktiv">🎙️</span>}
               </div>
               {isOpen && (
                 <div style={{marginTop: 12, borderTop: '1px solid var(--line)', paddingTop: 12}} onClick={e => e.stopPropagation()}>
-                  <div className="muted" style={{fontSize: 12.5, marginBottom: 6}}>
-                    Kommt vor in: <b>{CE.places(c.q).join(' · ')}</b>
+                  <div className="muted" style={{fontSize: 12.5, marginBottom: 10}}>
+                    Kommt vor in: <b>{CE.places(c.key).join(' · ')}</b>
                   </div>
-                  <label className="muted" style={{fontSize: 12.5, fontWeight: 700}}>Umschrift / Name</label>
-                  <input value={draft} autoFocus onChange={e => setDraft(e.target.value)}
-                         onKeyDown={e => e.key === 'Enter' && save(c)}
-                         style={{width: '100%', marginTop: 4, padding: '11px 14px', borderRadius: 12, border: '1px solid var(--line)', background: 'var(--surface)', font: 'inherit', fontSize: 16, fontWeight: 700, boxSizing: 'border-box'}}/>
-                  {c.orig !== c.a && (
-                    <div className="muted" style={{fontSize: 12, marginTop: 4}}>Original war: <b>{c.orig}</b></div>
-                  )}
-                  <div className="row" style={{gap: 8, marginTop: 12, flexWrap: 'wrap'}}>
+
+                  {/* ---- 1. Schreibweise & Umschrift ---- */}
+                  <div className="row" style={{gap: 10, flexWrap: 'wrap'}}>
+                    <div style={{flex: '1 1 180px'}}>
+                      <label className="muted" style={{fontSize: 12.5, fontWeight: 700}}>Schreibweise (arabisch)</label>
+                      <input value={draftQ} dir="rtl" onChange={e => setDraftQ(e.target.value)}
+                             style={{width: '100%', marginTop: 4, padding: '10px 14px', borderRadius: 12, border: '1px solid var(--line)', background: 'var(--surface)', fontFamily: '"Amiri Quran", "Scheherazade New", serif', fontSize: 26, boxSizing: 'border-box'}}/>
+                      {c.origQ !== draftQ.trim() && <div className="muted" style={{fontSize: 12, marginTop: 4}}>Original: <b dir="rtl">{c.origQ}</b></div>}
+                    </div>
+                    <div style={{flex: '1 1 180px'}}>
+                      <label className="muted" style={{fontSize: 12.5, fontWeight: 700}}>Umschrift / Name</label>
+                      <input value={draftA} onChange={e => setDraftA(e.target.value)}
+                             onKeyDown={e => e.key === 'Enter' && save(c)}
+                             style={{width: '100%', marginTop: 4, padding: '13px 14px', borderRadius: 12, border: '1px solid var(--line)', background: 'var(--surface)', font: 'inherit', fontSize: 16, fontWeight: 700, boxSizing: 'border-box'}}/>
+                      {c.origA !== draftA.trim() && <div className="muted" style={{fontSize: 12, marginTop: 4}}>Original: <b>{c.origA}</b></div>}
+                    </div>
+                  </div>
+                  <div className="row" style={{gap: 8, marginTop: 10, flexWrap: 'wrap'}}>
                     <button className="btn btn-primary" onClick={() => save(c)}>💾 Speichern</button>
-                    {c.changed && <button className="btn btn-ghost" onClick={() => undo(c)}>↩︎ Original</button>}
-                    {!isRec && (
-                      <button className="btn btn-ghost" disabled={isBusy} onClick={() => startRec(c.q)}>
-                        {isBusy ? '⏳ Lädt hoch…' : hasRec ? '🎙️ Neu aufnehmen' : '🎙️ Aussprache aufnehmen'}
-                      </button>
-                    )}
-                    {isRec && <button className="btn btn-primary" onClick={stopRec}>⏹ Stopp</button>}
-                    {hasRec && !isRec && (
-                      <button className="btn btn-ghost" onClick={() => QV.play(c.q)}>▶️ Anhören</button>
-                    )}
+                    {c.changed && <button className="btn btn-ghost" onClick={() => undo(c)}>↩︎ Original wiederherstellen</button>}
                   </div>
-                  <div className="muted" style={{fontSize: 12, marginTop: 8}}>
-                    Die Aufnahme gilt ebenfalls überall — beim Lernen, beim Aufdecken und im Duell.
+
+                  {/* ---- 2. Ton ---- */}
+                  <div style={{marginTop: 14, background: 'var(--surface-2, #F7F7F9)', borderRadius: 12, padding: '12px 14px'}}>
+                    <div className="row" style={{alignItems: 'center', gap: 8, flexWrap: 'wrap'}}>
+                      <b style={{fontSize: 14}}>🔉 Aussprache</b>
+                      {srcChip(c)}
+                    </div>
+                    <div className="row" style={{gap: 8, marginTop: 10, flexWrap: 'wrap'}}>
+                      <button className="btn btn-ghost" onClick={() => QA && QA.speakText(c.q, true)}>▶️ So klingt es jetzt</button>
+                      {hasRec && (
+                        <button className="btn btn-ghost" title="Ohne deine Aufnahme — so klänge es nach dem Löschen"
+                                onClick={() => QA && QA.speakText(c.q, true, { skipOwn: true })}>🔊 Standardstimme anhören</button>
+                      )}
+                    </div>
+
+                    {/* Aufnahme mit Probehören */}
+                    {!rec && !take && (
+                      <div className="row" style={{gap: 8, marginTop: 10, flexWrap: 'wrap'}}>
+                        <button className="btn btn-primary" disabled={busy} onClick={startRec}>
+                          🎙️ {hasRec ? 'Neu einsprechen' : 'Selbst einsprechen'}
+                        </button>
+                        {hasRec && (
+                          <button className="btn btn-ghost" disabled={busy} style={{color: 'var(--rose, #D64545)'}} onClick={() => delOwn(c)}>
+                            🗑️ Aufnahme löschen → Standardstimme
+                          </button>
+                        )}
+                      </div>
+                    )}
+                    {rec && (
+                      <div className="row" style={{gap: 10, marginTop: 10, alignItems: 'center', flexWrap: 'wrap'}}>
+                        <button className="btn" style={{background: '#F02048', color: '#fff', fontWeight: 800}} onClick={stopRec}>⏹ Fertig</button>
+                        <span style={{fontWeight: 800, color: '#B3123A'}}>● Aufnahme läuft … {recSecs}s</span>
+                        <span className="muted" style={{fontSize: 12}}>(stoppt von selbst nach 10 s)</span>
+                      </div>
+                    )}
+                    {take && (
+                      <div style={{marginTop: 10, background: '#fff', border: '1px dashed var(--line)', borderRadius: 10, padding: '10px 12px'}}>
+                        <div style={{fontWeight: 800, fontSize: 13.5, marginBottom: 8}}>Probeaufnahme — erst anhören, dann entscheiden:</div>
+                        <div className="row" style={{gap: 8, flexWrap: 'wrap'}}>
+                          <button className="btn btn-ghost" onClick={playTake}>▶️ Probehören</button>
+                          <button className="btn btn-primary" disabled={busy} onClick={() => keepTake(c)}>
+                            {busy ? '⏳ Lädt hoch…' : '✅ Übernehmen'}
+                          </button>
+                          <button className="btn btn-ghost" onClick={startRec}>🔁 Nochmal aufnehmen</button>
+                          <button className="btn btn-ghost" style={{color: 'var(--rose, #D64545)'}} onClick={discardTake}>🗑️ Verwerfen</button>
+                        </div>
+                      </div>
+                    )}
+                    <div className="muted" style={{fontSize: 12, marginTop: 10, lineHeight: 1.5}}>
+                      Ohne eigene Aufnahme gilt automatisch die Standardstimme (App-Aufnahme bzw. Gerätestimme).
+                      Löschen bringt sie jederzeit zurück — nichts ist endgültig.
+                    </div>
                   </div>
                 </div>
               )}
@@ -4713,10 +4868,10 @@ function TeacherCorner({ ctx }) {
       <div className="card" style={{padding: 16, marginTop: 12}}>
         <div className="row" style={{justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap'}}>
           <div style={{flex: '1 1 220px'}}>
-            <div style={{fontWeight: 800}}>✏️ Buchstaben &amp; Silben bearbeiten</div>
+            <div style={{fontWeight: 800}}>✏️ Buchstaben-Werkstatt</div>
             <div className="muted" style={{fontSize: 13, marginTop: 2}}>
-              Einzelne Karte suchen, Umschrift ändern, Aussprache neu einsprechen —
-              die Änderung gilt sofort überall, wo der Buchstabe vorkommt.
+              Schreibweise und Umschrift ändern, Aussprache einsprechen, probehören,
+              löschen oder zur Standardstimme zurück — gilt sofort überall.
             </div>
           </div>
           <button className="btn btn-primary" onClick={() => ctx.go('cardedit')}>✏️ Bearbeiten</button>

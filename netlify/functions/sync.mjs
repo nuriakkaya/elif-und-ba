@@ -29,7 +29,7 @@ import { pbkdf2Sync, randomBytes, timingSafeEqual } from "node:crypto";
 import { gunzipSync } from "node:zlib";
 import { Buffer } from "node:buffer";
 
-const VERSION = "8.1";
+const VERSION = "8.3";
 const TEACHER_PW = "1907";          // Lehrer-Passwort — hier zentral änderbar
 const DEFAULT_CLASS = "ALLE";       // Klasse, in die JEDES Kind automatisch kommt
 const STORE = "site:elifba-sync";   // Blobs-Store (Präfix "site:" = siteweit)
@@ -594,9 +594,17 @@ export default async (req) => {
         rec.cards = rec.cards || {};
         if (body.del) delete rec.cards[q];
         else {
+          /* (12.08.2026) Neben der Umschrift (a) darf jetzt auch die arabische
+             SCHREIBWEISE (ar) überschrieben werden. Der Schlüssel bleibt immer
+             die URSPRÜNGLICHE Schreibweise — so bleibt der Eintrag stabil,
+             auch wenn mehrfach umgeschrieben wird. */
           const a = String(body.a || "").trim().slice(0, 80);
-          if (!a) return json({ error: "Neue Umschrift fehlt" }, 400);
-          rec.cards[q] = { a, ts: Date.now() };
+          const ar = String(body.ar || "").trim().slice(0, 60);
+          if (!a && !ar) return json({ error: "Nichts zu speichern" }, 400);
+          const ov = { ts: Date.now() };
+          if (a) ov.a = a;
+          if (ar) ov.ar = ar;
+          rec.cards[q] = ov;
         }
         rec.rev = (rec.rev || 0) + 1;
         await bSet("card-overrides", rec);

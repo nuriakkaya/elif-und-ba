@@ -113,6 +113,41 @@ window.Recite = (function () {
     return 0;
   }
 
+  /* Spracherkennungen trennen Wörter anders, als der Vers sie schreibt:
+     mal wird „bismillâh" zu EINEM Wort verschmolzen, mal „wa-bihamdik" in
+     zwei zerlegt. Vor dem Vergleich bringen wir das wieder in Form —
+     sonst gilt ein völlig richtig gesprochener Vers als halb falsch.
+     (12.08.2026, nach „die KI erkennt es nicht, wenn die Kinder es
+     richtig sagen".) */
+  function repair(exp, got) {
+    const out = [];
+    for (let i = 0; i < got.length; i++) {
+      let done = false;
+      // a) EIN gehörtes Wort = ZWEI erwartete („بسمالله" -> „بسم" + „الله")
+      for (let k = 0; k + 1 < exp.length; k++) {
+        const join = exp[k] + exp[k + 1];
+        if (join.length >= 5 && lev(join, got[i], 2) <= 2) { out.push(exp[k], exp[k + 1]); done = true; break; }
+      }
+      if (done) continue;
+      // b) ZWEI gehörte Wörter = EIN erwartetes („و بحمدك" -> „وبحمدك")
+      if (i + 1 < got.length) {
+        const join = got[i] + got[i + 1];
+        let hit = null;
+        for (let k = 0; k < exp.length; k++) {
+          if (exp[k].length >= 5 && lev(exp[k], join, 2) <= 2) { hit = exp[k]; break; }
+        }
+        if (hit) { out.push(hit); i++; continue; }
+      }
+      out.push(got[i]);
+    }
+    return out;
+  }
+
+  /* Wie schwer wiegt ein Wort? Kurze Bindewörter (و, ما, في, لا) verschluckt
+     jede Spracherkennung gern — sie dürfen nicht so viel zählen wie ein
+     langes Hauptwort. */
+  function weightOf(w) { return Math.min(6, Math.max(2, w.length)) / 6; }
+
   /* ---------------- 2. Zwei Wortfolgen ausrichten ----------------
      Needleman-Wunsch: findet die beste Zuordnung inklusive Lücken,
      damit ein vergessenes Wort in der Mitte nicht alles danach
@@ -161,28 +196,45 @@ window.Recite = (function () {
        level  'gut' | 'fast' | 'nochmal'
        marks  pro Sollwort {w, got, st}   st: ok|fast|falsch|fehlt
        heard  was der Browser verstanden hat (normalisiert)         */
+  /* Schwellen richten sich nach der Länge: Bei einem Drei-Wort-Vers ist EIN
+     verschlucktes Wort schon ein Drittel — da muss großzügiger gewertet werden
+     als bei einem langen Vers. Wer will, kann feste Werte übergeben. */
+  function thresholds(n) {
+    const pass = n <= 3 ? 62 : n <= 6 ? 70 : 76;
+    return { pass: pass, near: Math.max(35, pass - 22) };
+  }
+
   function grade(expected, heard, opts) {
     opts = opts || {};
     const e = words(expected);
-    const g = words(heard);
+    const gRaw = words(heard);
     if (!e.length) return { pct: 0, level: 'nochmal', marks: [], heard: '', empty: true };
-    if (!g.length) {
+    if (!gRaw.length) {
       return { pct: 0, level: 'nochmal', heard: '', empty: true,
                marks: e.map(function (w) { return { w: w, got: '', score: 0, st: 'fehlt' }; }) };
     }
+    const g = repair(e, gRaw);
     const a = align(e, g);
-    let sum = 0;
-    a.marks.forEach(function (mk) { sum += mk.score; });
-    const raw = Math.round(100 * sum / e.length);
+    let sum = 0, gew = 0;
+    a.marks.forEach(function (mk) { const w = weightOf(mk.w); sum += mk.score * w; gew += w; });
+    const raw = Math.round(100 * sum / (gew || 1));
     let pct = raw;
     // Ein bisschen weiterzusprechen ist kein Fehler (beim Ketten-Üben sogar
     // erwünscht). Nur wer wahllos drauflosredet, in der Hoffnung, dass schon
     // die richtigen Wörter dabei sind, bekommt einen Abzug.
     const allowedExtra = Math.max(6, e.length * 2);
     if (a.extra > allowedExtra) pct = Math.max(0, pct - Math.min(40, (a.extra - allowedExtra) * 5));
-    const passAt = opts.passAt || 85, nearAt = opts.nearAt || 60;
-    const level = pct >= passAt ? 'gut' : pct >= nearAt ? 'fast' : 'nochmal';
+    const th = thresholds(e.length);
+    const passAt = opts.passAt || th.pass, nearAt = opts.nearAt || th.near;
+    let level = pct >= passAt ? 'gut' : pct >= nearAt ? 'fast' : 'nochmal';
+    /* Ein verschlucktes Bindewort (و, ما, رب, هو) ist ein Fehler der
+       Spracherkennung — ein ausgelassenes INHALTSWORT (ab 5 Buchstaben) ist
+       eine Lücke im Kopf. Deshalb: kurze Wörter dürfen fehlen, lange nicht.
+       So bleibt die Prüfung großzügig, ohne Punkte zu verschenken. */
+    const echteLuecken = a.marks.filter(function (m) { return m.st === 'fehlt' && m.w.length >= 5; }).length;
+    if (level === 'gut' && echteLuecken > 0 && pct < 95) level = 'fast';
     return { pct: pct, raw: raw, level: level, marks: a.marks, heard: normalize(heard),
+             passAt: passAt, nearAt: nearAt, words: e.length, gaps: echteLuecken,
              extra: a.extra, over: a.extra > Math.max(2, Math.ceil(e.length * 0.5)) };
   }
 
@@ -380,7 +432,7 @@ window.Recite = (function () {
 
   return {
     normalize: normalize, words: words, grade: grade, wordScore: wordScore, align: align,
-    normalizeLatin: normalizeLatin, gradeName: gradeName,
+    normalizeLatin: normalizeLatin, gradeName: gradeName, thresholds: thresholds, repair: repair,
     listen: listen, record: record, mode: mode, modeLabel: modeLabel,
     micAllowed: micAllowed, setMicAllowed: setMicAllowed, canRecord: canRecord,
     hasSpeech: function () { return !!SR(); }, errorText: errorText,

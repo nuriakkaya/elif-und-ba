@@ -29,7 +29,10 @@
     try { localStorage.setItem(SRS_KEY, JSON.stringify(all)); } catch (e) { /* storage voll/gesperrt: einfach ignorieren */ }
   }
   function cardKey(topicId, q) {
-    return String(topicId || '?') + '::' + String((q && q.q) || '');
+    // _q0 = Original-Schreibweise (app/cardedits.js). Darauf schlüsseln wir,
+    // damit der Fortschritt auch dann erhalten bleibt, wenn die Lehrkraft die
+    // SCHREIBWEISE einer Karte ändert (12.08.2026).
+    return String(topicId || '?') + '::' + String((q && (q._q0 || q.q)) || '');
   }
   function getState(topicId, q) {
     const all = loadAll();
