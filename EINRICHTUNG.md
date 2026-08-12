@@ -1,4 +1,4 @@
-# 🌙 Elif & Ba — Einrichtung & Update (Version 8.4)
+# 🌙 Elif & Ba — Einrichtung & Update (Version 8.6)
 
 **Das Wichtigste in einem Satz:** Ein Kind tippt auf *Anmelden*, schreibt seinen
 **Namen**, drückt einmal — und ist im Kurs. Kein Anmeldecode, kein Passwort,
@@ -222,10 +222,14 @@ Karteikarten**: Kinder lernen hier eine ganze Sure, nicht eine einzelne Karte.
 
 | Stufe | Was das Kind tut | Punkte |
 |---|---|---|
-| 👂 Hören & Mitlesen | zuhören, mitlesen, den Klang aufnehmen | +10 |
-| 🎤 Nachsprechen | laut nachsprechen, Text darf dabei zu sehen sein | +25 |
-| 🧩 Wort-Puzzle | die Wörter in die richtige Reihenfolge tippen | +25 |
-| 🌟 Aus dem Kopf | Text verdeckt, frei aufsagen | +60 |
+| 👂 Hören & Mitlesen | zuhören, mitlesen — **Pflicht, aber ohne Punkte** | 0 |
+| 🎤 Nachsprechen | laut nachsprechen — **gesprochen!** | +30 |
+| 🧩 Wort-Puzzle | die Wörter in die richtige Reihenfolge tippen | +15 |
+| 🌟 Aus dem Kopf | Text verdeckt, **frei aufsagen** | +75 |
+
+**Punkte-Umbau 12.08.2026:** Fürs bloße Anhören gibt es nichts mehr — Punkte
+gibt es erst, wenn das Kind **selbst spricht**. Zusammen bleibt es bei 120 XP
+je Vers, nur die Verteilung folgt jetzt dem Sprechen.
 
 **Danach die Kette** (die klassische Hafız-Methode): Vers 1+2 am Stück, dann
 1+2+3 … je neue Kettenstufe +40. Zum Schluss die **ganze Sure am Stück** — dafür
@@ -443,6 +447,69 @@ siehst die Trainingszahlen trotzdem: Im Klassenzimmer steht pro Kind, wie viele
 Wellen es geschafft hat, die Trefferquote, die beste Serie — und die fünf
 Karten, die **auch nach allem** noch am häufigsten danebengehen. Das ist die
 ehrlichste Fehlerliste, die die App hat.
+
+## 🔊 Sprachausgabe: verlässlich + Cezim repariert (12.08.2026)
+
+**Warum es „oft mal nicht funktionierte":** Drei echte Ursachen, alle behoben.
+
+1. **Ohne arabische Stimme blieb die App still.** Viele Geräte (besonders
+   Schul-Tablets) haben gar keine arabische Systemstimme installiert. Jetzt
+   gibt es eine **Ersatzstimme**: Die App spricht dann die **Umschrift** der
+   Karte („be", „ab, ib, ub", „ra-hı-me") mit der türkischen — sonst deutschen
+   — Stimme. Türkisch ist lautgetreu, das klingt für Elifba-Silben richtig,
+   und eine türkische/deutsche Stimme hat praktisch jedes Gerät.
+2. **Chrome verschluckt Sprachbefehle**, die zu schnell nach einem Abbruch
+   kommen — jetzt mit kurzem Abstand und einem „Wachhund", der genau einmal
+   nachschiebt, wenn nichts angelaufen ist.
+3. **Chrome pausiert die Sprachausgabe beim Tab-Wechsel und bleibt pausiert.**
+   Die App weckt sie jetzt beim Zurückkommen automatisch wieder auf.
+
+**Cezim klingt jetzt richtig:** Geschlossene Silben mit Stopper (اَبْ) und die
+Drills (اَبْ اِبْ اُبْ) kann **keine** arabische Computerstimme sauber sprechen —
+sie buchstabiert oder nuschelt. Diese Karten nutzen deshalb immer die
+Ersatzstimme mit der Lesung („ab, ib, ub") — klar und richtig. Noch besser
+klingt natürlich deine eigene Aufnahme: Cezim-Karten lassen sich wie alles
+andere in der **Werkstatt** einsprechen.
+
+**Neu im „Ton prüfen"-Kasten (Klassenzimmer):** Zwei Chips zeigen sofort, ob
+das Gerät eine arabische Stimme und eine Ersatzstimme hat, daneben zwei
+Testknöpfe („be" und der Cezim-Drill). So siehst du in fünf Sekunden, woran
+es auf einem bestimmten Gerät liegt.
+
+## 🧠 Schwieriger, aber fair (12.08.2026)
+
+Zwei Umbauten machen das Lernen überall im Kurs anspruchsvoller, ohne die
+Kinder zu ärgern:
+
+**1. Verwechsel-Antworten statt Zufallsantworten.** Die falschen Antworten
+kommen jetzt zuerst aus der **Verwechsel-Familie** des Buchstabens — die
+Geschwister mit demselben Grundkörper, die sich nur durch die Punkte
+unterscheiden (ب ت ث ن ي · ج ح خ · د ذ · ر ز · س ش · ص ض · ط ظ · ع غ · ف ق).
+Wer ب lernt, hat jetzt ت, ث, ن und ي als Auswahl daneben — man muss wirklich
+hinschauen. Außerdem haben Koran-Fragen jetzt **fünf statt vier Antworten**.
+Fair bleibt es: Die richtige Antwort ist immer dabei, und nach einem Fehler
+kommt die Karte einfach wieder.
+
+**2. Lektion 2 (Formen) hat zwei neue Übungsformen.** Neben dem Wort-Antippen
+und dem Erraten der markierten Form gibt es jetzt:
+
+- **„Wie sieht Be in der MITTE eines Wortes aus?"** — fünf verbundene Formen
+  zur Auswahl, darunter ـتـ, ـثـ, ـنـ und ـيـ. Wer nur den Grundkörper kennt,
+  kommt hier nicht durch.
+- **Eine einzelne Form steht groß da** (z. B. ـبـ) — welcher Buchstabe ist das?
+  Genau die Blickrichtung, die man beim echten Lesen braucht.
+
+Der Anteil der Abruf-Karten („erst selbst denken, dann aufdecken") ist im
+ganzen Kurs leicht erhöht.
+
+## 🗂 Suren & Gebete direkt in „Meine Stapel" (12.08.2026)
+
+Die Kinder müssen nicht mehr suchen: Unter **Meine Stapel** steht jetzt der
+Abschnitt **„🕌 Suren & Gebete — Auswendig lernen"** mit allen 18 Suren und
+Gebeten als eigene Kacheln — mit Fortschrittsbalken, 🏆 bei auswendig, ⭐ bei
+den vier Namaz-Suren und dem Hinweis „🔁 Auffrischung fällig". Eine Kachel
+antippen öffnet die Sure direkt. Solange der Bereich noch gesperrt ist, zeigen
+die Kacheln das Schloss und den Stand.
 
 ## 🤝 „Unsere Klasse": sich gegenseitig anspornen (neu in 8.0)
 

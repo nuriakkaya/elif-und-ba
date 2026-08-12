@@ -29,7 +29,7 @@ import { pbkdf2Sync, randomBytes, timingSafeEqual } from "node:crypto";
 import { gunzipSync } from "node:zlib";
 import { Buffer } from "node:buffer";
 
-const VERSION = "8.4";
+const VERSION = "8.6";
 const TEACHER_PW = "1907";          // Lehrer-Passwort — hier zentral änderbar
 const DEFAULT_CLASS = "ALLE";       // Klasse, in die JEDES Kind automatisch kommt
 const STORE = "site:elifba-sync";   // Blobs-Store (Präfix "site:" = siteweit)

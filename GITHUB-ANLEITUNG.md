@@ -58,7 +58,7 @@ Diesen Ordner offen lassen.
 Die neue Adresse öffnen (z. B. `zufallsname-1234.netlify.app`) und dahinter
 **`/check.html`** anhängen. Dort muss oben grün stehen:
 
-> ✅ Alles in Ordnung — Der Klassen-Server läuft (Version 8.4), Speicher: dauerhaft ✓
+> ✅ Alles in Ordnung — Der Klassen-Server läuft (Version 8.6), Speicher: dauerhaft ✓
 
 Dann: zurück zur App, **Anmelden**, Namen eintippen — fertig. Im Klassenzimmer
 (Lehrer-Passwort `1907`) erscheint jedes Kind automatisch.

@@ -1342,6 +1342,59 @@ function DecksGrid({ ctx }) {
           </div>
         </>
       )}
+      {/* 🕌 Suren & Gebete ZUM AUSWENDIGLERNEN direkt hier (12.08.2026,
+          Nutzerwunsch „alles verfügbar bei Meine Stapel, dass die Kinder
+          nicht groß rumsuchen müssen"): jede Sure als eigene Kachel. Vor der
+          Freischaltung zeigen die Kacheln ehrlich das Schloss samt Stand. */}
+      {window.HIFZ_ITEMS && window.HIFZ_ITEMS.length > 0 && window.Hifz && (() => {
+        const frei = window.Hifz.courseInfo ? window.Hifz.courseInfo() : { open: true };
+        return (
+          <>
+            <div className="section-head" style={{marginTop:18, display:'flex', alignItems:'center', justifyContent:'space-between', gap:12, flexWrap:'wrap'}}>
+              <div className="title">🕌 Suren &amp; Gebete — Auswendig lernen{' '}
+                {frei.open
+                  ? <span className="muted" style={{fontWeight:500, fontSize:13}}>Punkte gibt es fürs Aufsagen — die höchsten der App</span>
+                  : <span className="pill" style={{fontSize:12}}>🔒 öffnet sich: {frei.done}/{frei.total} Lektionen auf 100 %</span>}
+              </div>
+              {frei.open && <button className="btn btn-ghost" onClick={() => go('hifz')}>Übersicht &amp; Ränge</button>}
+            </div>
+            <div className="deck-grid">
+              {window.HIFZ_ITEMS.map(it => {
+                const st = window.Hifz.itemState(it.id);
+                const pct = window.Hifz.progressPct(it.id);
+                const due = frei.open ? window.Hifz.repDue(it.id) : 0;
+                const open = () => { frei.open ? go('hifz', { hifzId: it.id }) : go('hifz'); };
+                return (
+                  <div key={it.id} className={'deck-card' + (frei.open ? '' : ' locked')} role="button" tabIndex={0}
+                       onClick={open}
+                       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } }}>
+                    {!frei.open && <div className="deck-lock">🔒</div>}
+                    <div className="row" style={{justifyContent:'space-between', alignItems:'center'}}>
+                      <span dir="rtl" style={{fontFamily:'"Amiri Quran", "Scheherazade New", serif', fontSize:22, fontWeight:700, color:'#2364A5'}}>{it.arName}</span>
+                      {frei.open && st.done
+                        ? <span className="pill" style={{fontSize:11.5, padding:'3px 9px', fontWeight:800, background:'var(--success-soft, #E7F7EE)', color:'var(--success, #1B8A5A)'}}>🏆</span>
+                        : frei.open && pct > 0
+                          ? <span className="pill" style={{fontSize:11.5, padding:'3px 9px', fontWeight:800}}>{pct}%</span>
+                          : it.stern ? <span className="pill" style={{fontSize:11, padding:'3px 8px', background:'#FCF3D7'}} title="Für den Namaz zuerst">⭐</span> : null}
+                    </div>
+                    <div className="deck-name">{it.name}</div>
+                    {frei.open && pct > 0 && !st.done && (
+                      <div style={{height:6, borderRadius:999, background:'var(--line, #ECEBE6)', overflow:'hidden', margin:'6px 0 2px'}}>
+                        <div style={{width: pct + '%', height:'100%', borderRadius:999, background:'linear-gradient(90deg, #2E77C6, #4FC3A1)'}}/>
+                      </div>
+                    )}
+                    <div className="deck-meta">
+                      {it.deName} · {it.parts.length} {it.kind === 'sure' ? 'Verse' : 'Teile'}
+                      {frei.open && due > 0 ? ' · 🔁 Auffrischung fällig' : ''}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        );
+      })()}
+
       {/* (07.08.2026) Zusatz-Stapel GANZ NACH UNTEN — der Elifba-Kurs hat
           Vorrang. Reihenfolge: Gebete, dann Wortschatz als letzter Stapel. */}
       {EXTRA_CHILDREN.length > 0 && (
@@ -4278,6 +4331,25 @@ function SoundCheck({ ctx }) {
       <div className="row" style={{justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap'}}>
         <div style={{flex: '1 1 220px'}}>
           <div style={{fontWeight: 800}}>🔊 Ton prüfen</div>
+          {QA && QA.voiceInfo && (() => {
+            const v = QA.voiceInfo();
+            return (
+              <div className="row" style={{gap: 6, flexWrap: 'wrap', marginTop: 6}}>
+                <span className="pill" style={{fontSize: 11.5, background: v.ar ? 'var(--success-soft, #E7F7EE)' : 'var(--rose-soft, #FDECEC)'}}
+                      title={v.ar || 'Auf diesem Gerät ist keine arabische Stimme installiert.'}>
+                  {v.ar ? '🗣 Arabische Stimme ✓' : '🗣 Arabische Stimme fehlt'}
+                </span>
+                <span className="pill" style={{fontSize: 11.5, background: v.latin ? 'var(--success-soft, #E7F7EE)' : 'var(--rose-soft, #FDECEC)'}}
+                      title={v.latin || 'Auch keine türkische/deutsche Stimme gefunden.'}>
+                  {v.latin ? '🔤 Ersatzstimme ✓' : '🔤 Ersatzstimme fehlt'}
+                </span>
+                <button className="btn btn-ghost" style={{padding: '4px 10px', fontSize: 12}}
+                        onClick={() => QA.speakText('بَ', true, { reading: 'be' })}>▶️ Test „be"</button>
+                <button className="btn btn-ghost" style={{padding: '4px 10px', fontSize: 12}}
+                        onClick={() => QA.speakText('اَبْ اِبْ اُبْ', true, { reading: 'ab · ib · ub' })}>▶️ Test Cezim</button>
+              </div>
+            );
+          })()}
           <div className="muted" style={{fontSize: 13, marginTop: 2}}>
             Alle Buchstaben-Aufnahmen sind fest in der App enthalten — sie laufen offline
             und ohne fremden Server. Hier siehst du für jeden Buchstaben, woher der Ton

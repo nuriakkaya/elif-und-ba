@@ -179,6 +179,56 @@
   /* -------- Format-Generator --------
      Gibt ein render-fertiges Frageobjekt zurück:
      { kind:'mc'|'cloze'|'order'|'recall', ... } */
+  /* ==============================================================
+     SCHWIERIGER, ABER FAIR (12.08.2026, Nutzerwunsch „an vielen Stellen
+     noch zu einfach — der Lerneffekt muss größer werden").
+
+     Der größte Hebel sind die FALSCHEN Antworten: Bisher kamen sie
+     zufällig — wer ب lernt, bekam ك und م daneben, das errät jedes Kind
+     an der Form. Jetzt kommen zuerst die VERWECHSEL-GESCHWISTER (gleicher
+     Grundkörper, nur die Punkte unterscheiden sich): ب ت ث ن ي,
+     ج ح خ, د ذ, ر ز, س ش, ص ض, ط ظ, ع غ, ف ق. Man muss wirklich
+     hinschauen. Zusätzlich haben Koran-Fragen jetzt FÜNF statt vier
+     Antworten. Kindgerecht bleibt es: Die richtige Antwort ist immer da,
+     und nach jedem Fehler kommt die Karte einfach wieder.
+     ============================================================== */
+  const FAMILIES = [
+    ['ا', 'أ', 'إ', 'آ', 'ٱ'], ['ب', 'ت', 'ث', 'ن', 'ي'], ['ج', 'ح', 'خ'],
+    ['د', 'ذ'], ['ر', 'ز'], ['س', 'ش'], ['ص', 'ض'], ['ط', 'ظ'],
+    ['ع', 'غ'], ['ف', 'ق'], ['ه', 'ة'], ['و', 'ؤ'],
+  ];
+  const FAM_BY = {};
+  FAMILIES.forEach(f => f.forEach(ch => { FAM_BY[ch] = f; }));
+  function familyOf(ch) { return FAM_BY[ch] || null; }
+
+  /* Falsche NAMEN zu einer Koran-Karte: erst die Namen der Verwechsel-
+     Geschwister (aus derselben Lektion, also mit demselben Zeichen davor/
+     dahinter), dann Auffüller aus dem Stapel. */
+  function quranNameWrongs(card, topicId, a, n) {
+    const bare = String(card.q).replace(/[\u064B-\u0652\u0670\u0640]/g, '').replace(/[^\u0600-\u06FF]/g, '');
+    const base = bare[0];
+    const fam = familyOf(base);
+    const topic = (window.QURAN_TOPICS || []).concat(window.QURAN_EXTRA_TOPICS || []).find(t => t.id === topicId);
+    const out = [];
+    if (fam && topic) {
+      const sisters = [];
+      topic.blocks.forEach(b => (b.quiz || []).forEach(c => {
+        const cb = String(c.q).replace(/[\u064B-\u0652\u0670\u0640]/g, '').replace(/[^\u0600-\u06FF]/g, '');
+        if (cb.length === bare.length && cb !== bare && fam.indexOf(cb[0]) >= 0
+            && String(c.q).replace(cb[0], '') === String(card.q).replace(base, '')
+            && c.a && c.a !== a && sisters.indexOf(c.a) < 0) sisters.push(c.a);
+      }));
+      shuffle(sisters).forEach(x => { if (out.length < n && out.indexOf(x) < 0) out.push(x); });
+    }
+    if (out.length < n) {
+      const pool = pools(topicId);
+      distractors(pool, card, a, n * 2, 'short').forEach(x => {
+        if (out.length < n && out.indexOf(x) < 0 && x !== a) out.push(x);
+      });
+    }
+    return out;
+  }
+
   function generate(card, topicId) {
     const pool = pools(topicId);
     const a = (card.a || '').trim();
@@ -205,7 +255,10 @@
       const isLetterCard = !/[\u064B-\u0652]/.test(card.q) && bare.length >= 1 && uniq.length === 1 && String(a).length <= 8;
       const hf = (window.QURAN_TOPICS || []).find(t => t.id === 'quran-harfler');
       if (isLetterCard && hf && Math.random() < 0.35) {
-        const wrongs = shuffle(hf.blocks[0].quiz.map(x => x.q).filter(g => g !== uniq[0])).slice(0, 3);
+        const alle = hf.blocks[0].quiz.map(x => x.q).filter(g => g !== uniq[0]);
+        const fam = (familyOf(uniq[0]) || []).filter(g => g !== uniq[0] && alle.indexOf(g) >= 0);
+        const rest = shuffle(alle.filter(g => fam.indexOf(g) < 0));
+        const wrongs = shuffle(fam).concat(rest).slice(0, 4);   // 5 Antworten
         if (wrongs.length >= 3) {
           return {
             kind: 'mc', multi: false, generated: true, arabicOptions: true,
@@ -225,9 +278,17 @@
           if (r2 < 0.6) return { kind: 'scriptPick', q: 'Höre zu und wähle die richtige Schrift', say: card.q, a, variants: v.variants, correct: v.correct };
         }
       }
-      // 2) Active-Recall-Schwerpunkt: knapp ein Drittel reiner Abruf
+      // 2) Active-Recall-Schwerpunkt: gut ein Drittel reiner Abruf
       //    ("ansehen → laut sagen → aufdecken → ehrlich bewerten").
-      if (Math.random() < 0.3) return { kind: 'recall', q: card.q, a };
+      if (Math.random() < 0.35) return { kind: 'recall', q: card.q, a };
+      // 3) Sonst: Auswahl-Frage mit VERWECHSEL-Antworten und 5 Optionen.
+      if (a) {
+        const wrongs = quranNameWrongs(card, topicId, a, 4);
+        if (wrongs.length >= 3) {
+          return { kind: 'mc', multi: false, generated: true, q: card.q, a,
+                   options: shuffle([{ t: a, c: true }, ...wrongs.map(t => ({ t, c: false }))]) };
+        }
+      }
     }
 
     const listItems = splitList(a);
@@ -328,7 +389,7 @@
   }
 
   window.QEngine = {
-    generate, blitzSeconds, keyTerm, splitList, shuffle, _pools: pools,
+    generate, blitzSeconds, keyTerm, splitList, shuffle, familyOf, _pools: pools,
     _invalidate: (topicId) => { delete cache[topicId]; },
   };
 })();

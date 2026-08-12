@@ -195,6 +195,9 @@ function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor }) {
   useEffect(() => { revealedRef.current = revealed; }, [revealed]);
   useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current); if (echoTimer.current) clearTimeout(echoTimer.current); }, []);
 
+  // Lesung der Karte für die Ersatzstimme (12.08.2026): nur wenn sie wirklich
+  // lateinisch ist (Namen/Umschrift) — arabische Antworten nie vorlesen lassen.
+  const genReading = (typeof gen.a === 'string' && !gen.arabicOptions && /[A-Za-zçğıöşüÇĞİÖŞÜ]/.test(gen.a)) ? gen.a : undefined;
   const badge = srsBadge(topicId, item);
   const correctIdxs = (gen.options || []).map((o, i) => o.c ? i : -1).filter(i => i >= 0);
   const isMulti = kind === 'mc' && gen.multi;
@@ -223,7 +226,7 @@ function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor }) {
     }
     // (06.08.2026) Aussprache kommt jetzt FAST sofort (60 ms statt 160 ms) —
     // der Feedback-Ton ist leiser abgemischt, die Stimme liegt klar darüber.
-    if (window.QuranAudio && !res.teach) window.QuranAudio.speakForCard(topicId, { q: gen.arabicOptions ? gen.a : (gen.say || gen.q) }, 60);
+    if (window.QuranAudio && !res.teach) window.QuranAudio.speakForCard(topicId, { q: gen.arabicOptions ? gen.a : (gen.say || gen.q), a: genReading }, 60);
     /* 🎤 Nachsprech-Bonus (app/echo.js): In Lektion 1 bleibt die Karte kurz
        stehen, damit das Kind den Buchstabennamen laut sagen kann — sonst
        springt sie sofort weiter und der Bonus wäre nie sichtbar. Wichtig: Sie
@@ -282,7 +285,7 @@ function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor }) {
   useEffect(() => {
     if (gate) return;
     if ((kind === 'teach' || kind === 'scriptPick' || kind === 'formTeach') && window.QuranAudio) {
-      window.QuranAudio.speakText(gen.say || gen.q, true);
+      window.QuranAudio.speakText(gen.say || gen.q, true, { reading: genReading });
     }
   }, [gate, kind]);
 
@@ -352,14 +355,14 @@ function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor }) {
     const ok = selected[0] === gen.correct;
     if (!ok) setWasWrong(true);
     setRevealed(true);
-    if (window.QuranAudio) window.QuranAudio.speakText(gen.say || gen.q, true);
+    if (window.QuranAudio) window.QuranAudio.speakText(gen.say || gen.q, true, { reading: genReading });
     finish({ correct: ok, wasWrong: !ok || wasWrong }, ok ? 1300 : 2100);
   };
   const variantDontKnow = () => {
     if (revealed || doneRef.current) return;
     setWasWrong(true);
     setRevealed(true);
-    if (window.QuranAudio) window.QuranAudio.speakText(gen.say || gen.q, true);
+    if (window.QuranAudio) window.QuranAudio.speakText(gen.say || gen.q, true, { reading: genReading });
     finish({ correct: false, wasWrong: true }, 2100);
   };
 
@@ -374,14 +377,14 @@ function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor }) {
     const ok = selected[0] === gen.correct;
     if (!ok) setWasWrong(true);
     setRevealed(true);
-    if (window.QuranAudio) window.QuranAudio.speakText(gen.say || gen.q, true);
+    if (window.QuranAudio) window.QuranAudio.speakText(gen.say || gen.q, true, { reading: genReading });
     finish({ correct: ok, wasWrong: !ok || wasWrong }, ok ? 1400 : 2200);
   };
   const formTileDontKnow = () => {
     if (revealed || doneRef.current) return;
     setWasWrong(true);
     setRevealed(true);
-    if (window.QuranAudio) window.QuranAudio.speakText(gen.say || gen.q, true);
+    if (window.QuranAudio) window.QuranAudio.speakText(gen.say || gen.q, true, { reading: genReading });
     finish({ correct: false, wasWrong: true }, 2200);
   };
   // "Vage" (Video): zählt als "nochmal üben", kostet aber kein Herz.
@@ -476,9 +479,9 @@ function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor }) {
           <span className="qp-labelicons">
             <span className={badge.cls}>{badge.label}</span>
             {isQuranCard && <button className="qp-spk-mini" title="Anhören"
-              onClick={() => window.QuranAudio && window.QuranAudio.speakText(gen.say || gen.q, true)}>🔊</button>}
+              onClick={() => window.QuranAudio && window.QuranAudio.speakText(gen.say || gen.q, true, { reading: genReading })}>🔊</button>}
             {isQuranCard && <button className="qp-spk-mini" title="Langsam anhören"
-              onClick={() => window.QuranAudio && window.QuranAudio.speakText(gen.say || gen.q, true, { slow: true })}>🐢</button>}
+              onClick={() => window.QuranAudio && window.QuranAudio.speakText(gen.say || gen.q, true, { slow: true, reading: genReading })}>🐢</button>}
           </span>
         </div>
         <div className="qp-cardbody">
@@ -542,10 +545,10 @@ function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor }) {
             <div className="qp-teachtitle">{gen.teachKind === 'Silbe' ? '🌱 Neue Silbe!' : gen.teachKind === 'Wort' ? '🌱 Neu!' : '🌱 Neuer Buchstabe!'}</div>
             <div className="qp-teachname">{gen.a}</div>
             <div className="row" style={{ gap: 8, justifyContent: 'center' }}>
-              <button className="qp-teachspk" onClick={() => window.QuranAudio && window.QuranAudio.speakText(gen.say || gen.q, true)}>
+              <button className="qp-teachspk" onClick={() => window.QuranAudio && window.QuranAudio.speakText(gen.say || gen.q, true, { reading: genReading })}>
                 🔊 Nochmal anhören
               </button>
-              <button className="qp-teachspk" onClick={() => window.QuranAudio && window.QuranAudio.speakText(gen.say || gen.q, true, { slow: true })}>
+              <button className="qp-teachspk" onClick={() => window.QuranAudio && window.QuranAudio.speakText(gen.say || gen.q, true, { slow: true, reading: genReading })}>
                 🐢 Langsam
               </button>
             </div>
@@ -652,7 +655,7 @@ function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor }) {
       {/* Koran Typ C (Video): Audio hören — richtige Schrift wählen */}
       {!gate && kind === 'scriptPick' && (
         <>
-          <button className="bigspk" onClick={() => window.QuranAudio && window.QuranAudio.speakText(gen.say, true)} title="Nochmal anhören">🔊</button>
+          <button className="bigspk" onClick={() => window.QuranAudio && window.QuranAudio.speakText(gen.say, true, { reading: genReading })} title="Nochmal anhören">🔊</button>
           <div className="script-row">
             {gen.variants.map((v, i) => {
               let cls = 'option option-arabic script-tile';

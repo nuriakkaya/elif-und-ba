@@ -18,14 +18,91 @@ window.QuranAudio = (function () {
     'ه':'26_haah','و':'27_waw','ي':'30_yaa','ى':'30_yaa','لا':'29_laaa','ئ':'28_hamzah','ؤ':'28_hamzah'
   };
   const cache = {};
+  /* ==============================================================
+     STIMMEN (Neufassung 12.08.2026, „oft funktioniert die Sprachausgabe
+     nicht"). Drei echte Ursachen, drei Gegenmittel:
+
+     1. Ohne arabische Stimme blieb die App STILL („lieber still").
+        Jetzt gibt es eine ERSATZSTIMME: Die Lesung der Karte („ab · ib
+        · ub", „be", „ra-ha-be") wird von einer türkischen (sonst
+        deutschen) Stimme gesprochen — Türkisch ist lautgetreu, das
+        klingt für Elifba-Silben richtig. Eine tr/de-Stimme hat
+        praktisch jedes Gerät.
+     2. Chrome verschluckt ein speak() direkt nach cancel() — deshalb
+        jetzt immer ~60 ms Abstand plus ein Wachhund, der einmal
+        nachschiebt, wenn nichts zu hören ist.
+     3. Chrome PAUSIERT die Sprachausgabe beim Tab-Wechsel und bleibt
+        pausiert — deshalb resume() beim Zurückkommen und vor jedem
+        Sprechen.
+     ============================================================== */
   let arVoice = null;
+  let latVoice = null;
   function findVoice() {
     try {
       const vs = window.speechSynthesis ? speechSynthesis.getVoices() : [];
-      arVoice = vs.find(v => /^ar/i.test(v.lang)) || vs.find(v => /arab/i.test(v.name)) || null;
-    } catch (e) { arVoice = null; }
+      arVoice = vs.find(v => /^ar[-_]sa/i.test(v.lang))
+        || vs.find(v => /^ar/i.test(v.lang))
+        || vs.find(v => /arab/i.test(v.name)) || null;
+      latVoice = vs.find(v => /^tr/i.test(v.lang))
+        || vs.find(v => /^de/i.test(v.lang))
+        || vs.find(v => /^en/i.test(v.lang)) || null;
+    } catch (e) { arVoice = null; latVoice = null; }
   }
-  if (window.speechSynthesis) { findVoice(); speechSynthesis.addEventListener('voiceschanged', findVoice); }
+  if (window.speechSynthesis) {
+    findVoice();
+    speechSynthesis.addEventListener('voiceschanged', findVoice);
+    // Chrome bleibt nach Tab-Wechsel dauerhaft „paused" — hier wieder anwerfen.
+    document.addEventListener('visibilitychange', function () {
+      try { if (!document.hidden && speechSynthesis.paused) speechSynthesis.resume(); } catch (e) {}
+    });
+  }
+
+  /* Lesung („ab · ib · ub") in etwas verwandeln, das eine Stimme gut spricht. */
+  function cleanReading(r) {
+    const t = String(r || '')
+      .replace(/\(.*?\)/g, ' ')
+      .replace(/[·|]/g, ', ')
+      .replace(/-/g, '')
+      .replace(/[^A-Za-zÀ-žçğıöşüÇĞİÖŞÜâîûÂÎÛ’',\s]/g, ' ')
+      .replace(/\s+/g, ' ').replace(/\s+,/g, ',').trim();
+    return t.length >= 1 && /[A-Za-zçğıöşüÇĞİÖŞÜ]/.test(t) ? t : '';
+  }
+
+  /* Sprechen mit Chrome-Reparaturen: cancel -> kurze Pause -> speak,
+     resume() falls pausiert, und EIN Nachschub, wenn nichts anläuft. */
+  function speakUtter(u) {
+    try {
+      let started = false;
+      const prevStart = u.onstart;
+      u.onstart = function (ev) { started = true; if (prevStart) prevStart(ev); };
+      speechSynthesis.cancel();
+      setTimeout(function () {
+        try {
+          speechSynthesis.speak(u);
+          if (speechSynthesis.paused) speechSynthesis.resume();
+          setTimeout(function () {
+            try {
+              // Wachhund: NUR nachschieben, wenn die Ausgabe nie angelaufen ist
+              // (Chrome-Verschlucker) — eine kurze Silbe, die längst fertig
+              // ist, darf nicht doppelt kommen.
+              if (!started && !speechSynthesis.speaking && !speechSynthesis.pending) {
+                speechSynthesis.speak(u);
+                if (speechSynthesis.paused) speechSynthesis.resume();
+              }
+            } catch (e) {}
+          }, 700);
+        } catch (e) {}
+      }, 60);
+    } catch (e) {}
+  }
+  function latinTts(reading, opts) {
+    if (!latVoice) return false;
+    const u = new SpeechSynthesisUtterance(reading);
+    u.voice = latVoice; u.lang = latVoice.lang || 'tr-TR';
+    u.rate = opts && opts.slow ? 0.62 : 0.85; u.pitch = 1; u.volume = 1;
+    speakUtter(u);
+    return true;
+  }
 
   /* (06.08.2026, Nutzerkritik "Stimme verzerrt — lass die Stimme original"):
      Zurück zur puren Aufnahme — Originaltempo (playbackRate 1.0), volle
@@ -125,14 +202,27 @@ window.QuranAudio = (function () {
   function tts(text, opts) {
     opts = opts || {};
     if (!window.speechSynthesis) return;
-    if (!arVoice) findVoice();
-    if (!arVoice) return; // keine arabische Stimme installiert -> lieber still
+    if (!arVoice || !latVoice) findVoice();
+    const reading = cleanReading(opts.reading);
     try {
-      speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.voice = arVoice; u.lang = arVoice.lang || 'ar-SA';
-      u.rate = opts.slow ? 0.6 : 0.85; u.pitch = 1; u.volume = 1;
-      speechSynthesis.speak(u);
+      /* CEZIM & Co. (12.08.2026): Geschlossene Silben mit Sukun (اَبْ) und
+         die Dreier-Drills (اَبْ اِبْ اُبْ) kann KEINE arabische Computer-
+         stimme sauber sprechen — sie buchstabiert oder nuschelt. Wenn die
+         Karte eine Lesung hat („ab · ib · ub"), spricht sie deshalb die
+         lautgetreue Ersatzstimme (türkisch/deutsch): klar und richtig. */
+      const hasSukun = /\u0652/.test(text);
+      if (hasSukun && reading && latVoice) { latinTts(reading, opts); return; }
+      if (arVoice) {
+        const u = new SpeechSynthesisUtterance(text);
+        u.voice = arVoice; u.lang = arVoice.lang || 'ar-SA';
+        u.rate = opts.slow ? 0.6 : 0.85; u.pitch = 1; u.volume = 1;
+        if (reading) u.onerror = function () { latinTts(reading, opts); };
+        speakUtter(u);
+        return;
+      }
+      // Keine arabische Stimme: statt Stille die Lesung mit der Ersatzstimme.
+      if (reading && latinTts(reading, opts)) return;
+      try { window.dispatchEvent(new CustomEvent('quran-tts-missing')); } catch (e) {}
     } catch (e) {}
   }
   let last = { t: '', at: 0 };
@@ -167,8 +257,9 @@ window.QuranAudio = (function () {
   function speakForCard(topicId, card, delayMs) {
     if (!/^quran-/.test(String(topicId || ''))) return;
     if (card && card.options) return; // Suren-Wissensfragen (deutsch) nicht vorlesen
-    if (delayMs) { setTimeout(function () { speakText(card && card.q); }, delayMs); return; }
-    speakText(card && card.q);
+    const opts = { reading: card && card.a };
+    if (delayMs) { setTimeout(function () { speakText(card && card.q, false, opts); }, delayMs); return; }
+    speakText(card && card.q, false, opts);
   }
   /* Welche Quelle würde für diesen Text benutzt? (für „Ton prüfen") */
   function sourceFor(text) {
@@ -187,12 +278,25 @@ window.QuranAudio = (function () {
                             : { src: 'internet', label: 'Tondatei aus dem Internet', file: name };
       }
     }
-    return { src: 'stimme', label: 'Systemstimme (kann fehlen)' };
+    if (/\u0652/.test(ar)) return { src: 'lesung', label: 'Ersatzstimme liest die Umschrift (Cezim)' };
+    return arVoice
+      ? { src: 'stimme', label: 'arabische Systemstimme' }
+      : latVoice
+        ? { src: 'lesung', label: 'Ersatzstimme liest die Umschrift' }
+        : { src: 'fehler', label: 'keine Stimme installiert' };
   }
   function letterFiles() { return Object.assign({}, FILES); }
   function cdnUrl(name) { return CDN + name + '.mp3'; }
 
+  function voiceInfo() {
+    if (!arVoice || !latVoice) findVoice();
+    return {
+      ar: arVoice ? (arVoice.name + ' (' + arVoice.lang + ')') : null,
+      latin: latVoice ? (latVoice.name + ' (' + latVoice.lang + ')') : null,
+    };
+  }
   return { speakForCard: speakForCard, speakText: speakText,
            sourceFor: sourceFor, letterFiles: letterFiles, cdnUrl: cdnUrl,
+           voiceInfo: voiceInfo, _cleanReading: cleanReading,
            failedFiles: function () { return Object.keys(failed); } };
 })();

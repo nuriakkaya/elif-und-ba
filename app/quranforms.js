@@ -96,6 +96,70 @@
     try { localStorage.setItem(TAUGHT_KEY, JSON.stringify(m)); } catch (e) {}
   }
 
+  /* Formen je Buchstabe (aus den Karten der Formen-Lektion selbst). */
+  let FORMS_BY = null;
+  function formsByChar() {
+    if (FORMS_BY) return FORMS_BY;
+    FORMS_BY = {};
+    const t = (window.QURAN_TOPICS || []).find(x => x.id === 'quran-formen');
+    if (t) t.blocks[0].cards.forEach(c => {
+      const base = String(c.q).replace(/[ًٌٍَُِّْٰـ\s]/g, '')[0];
+      if (base) FORMS_BY[base] = { forms: formsOf(c.q), name: c.a };
+    });
+    return FORMS_BY;
+  }
+  function famOf(ch) {
+    return (window.QEngine && window.QEngine.familyOf && window.QEngine.familyOf(ch)) || [];
+  }
+
+  /* NEU (12.08.2026, „vor allem der zweite Stapel muss mehr Lerneffekt
+     haben"): zwei zusätzliche Übungsformen, beide mit Verwechsel-
+     Geschwistern als falschen Antworten —
+
+     formPos:  „Wie sieht Be in der MITTE aus?" → fünf verbundene Formen
+               zur Auswahl, darunter ـتـ ـثـ ـنـ ـيـ. Wer nur den
+               Grundkörper kennt, kommt hier nicht durch.
+     posName:  eine EINZELNE Form steht groß da (z. B. ـبـ) → welcher
+               Buchstabe ist das? Genau die Blickrichtung, die man beim
+               echten Lesen braucht. */
+  function formPos(base, name) {
+    const F = formsByChar();
+    const me = F[base];
+    if (!me || !me.forms.joins) return null;
+    const pos = Math.random() < 0.55 ? 'mid' : 'end';
+    const get = ch => (pos === 'mid' ? F[ch].forms.mid : F[ch].forms.end);
+    const fam = famOf(base).filter(ch => ch !== base && F[ch] && F[ch].forms.joins);
+    const rest = Object.keys(F).filter(ch => ch !== base && F[ch].forms.joins && fam.indexOf(ch) < 0);
+    const wrong = fam.concat(rest.sort(() => Math.random() - 0.5)).slice(0, 4);
+    if (wrong.length < 3) return null;
+    const opts = [{ t: get(base), c: true }].concat(wrong.map(ch => ({ t: get(ch), c: false })));
+    return {
+      kind: 'mc', multi: false, generated: true, arabicOptions: true,
+      q: 'Wie sieht „' + name + '“ ' + (pos === 'mid' ? 'in der MITTE eines Wortes' : 'am ENDE eines Wortes') + ' aus?',
+      a: get(base), say: base,
+      options: opts.sort(() => Math.random() - 0.5),
+    };
+  }
+  function posName(base, name) {
+    const F = formsByChar();
+    const me = F[base];
+    if (!me) return null;
+    const forms = me.forms.joins
+      ? [me.forms.mid, me.forms.end, me.forms.start]
+      : [me.forms.alone, me.forms.end].filter(Boolean);
+    const form = forms[Math.floor(Math.random() * forms.length)];
+    if (!form) return null;
+    const famNames = famOf(base).map(ch => F[ch] && F[ch].name).filter(n => n && n !== name);
+    const restNames = Object.keys(F).map(ch => F[ch].name).filter(n => n !== name && famNames.indexOf(n) < 0);
+    const wrong = famNames.concat(restNames.sort(() => Math.random() - 0.5)).slice(0, 4);
+    if (wrong.length < 3) return null;
+    return {
+      kind: 'mc', multi: false, generated: true,
+      q: form, a: name, say: base,
+      options: [{ t: name, c: true }].concat(wrong.map(t => ({ t, c: false }))).sort(() => Math.random() - 0.5),
+    };
+  }
+
   /* Haupteinstieg: liefert ein Frage-Objekt für den Auswendig-Modus —
      oder null (dann greift die normale Engine: MC/Abruf). */
   function generate(card) {
@@ -111,7 +175,7 @@
     }
 
     const r = Math.random();
-    if (r < 0.55) {
+    if (r < 0.30) {
       const f = findWordFor(base);
       if (f) {
         return {
@@ -122,7 +186,7 @@
         };
       }
     }
-    if (r < 0.82) {
+    if (r < 0.55) {
       const f = findWordFor(base);
       if (f) {
         return {
@@ -131,6 +195,12 @@
         };
       }
     }
+    if (r < 0.78) {
+      const fx = formPos(base, name);
+      if (fx) return fx;
+    }
+    const px = posName(base, name);
+    if (px) return px;
     return null; /* Engine-Fallback: "Wo ist X?" -MC oder Abruf-Karte */
   }
 

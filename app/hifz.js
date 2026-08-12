@@ -45,8 +45,16 @@
   const KEY = 'eb_hifz_v1';
   const AUDIO_BASE = 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/';
 
-  const XP_STAGE = [0, 10, 25, 25, 60];   // Index = Stufe
-  const XP_LISTEN_ALL = 15;               // die ganze Sure einmal anhören
+  /* Punkte-Umbau 12.08.2026 (Nutzerwunsch wörtlich: „nicht Punkte bekommen
+     beim Anhören, sondern erst, wenn sie das GESAGT haben"):
+       👂 Hören ............ 0 XP  — Pflichtschritt, aber keine Punkte
+       🎤 Nachsprechen ..... 30 XP — gesprochen!
+       🧩 Wort-Puzzle ...... 15 XP — Arbeit, aber nicht gesprochen
+       🌟 Aus dem Kopf ..... 75 XP — frei gesprochen, der Kern des Ganzen
+     Zusammen weiter 120 XP je Vers — nur die Verteilung folgt jetzt dem
+     Sprechen. Auch das Anhören der ganzen Sure gibt nichts mehr. */
+  const XP_STAGE = [0, 0, 30, 15, 75];    // Index = Stufe
+  const XP_LISTEN_ALL = 0;                // Anhören bringt keine Punkte mehr
   const XP_CHAIN = 40;
   const XP_DONE_BASE = 200;
   const XP_DONE_STEP = 100;
@@ -152,14 +160,13 @@
     return { xp: xp, already: false };
   }
 
-  /* Erstes Kennenlernen: einmal komplett anhören. Öffnet den Weg und gibt
-     einen kleinen Startbonus — Zuhören ist beim Auswendiglernen kein Beiwerk,
-     sondern der erste echte Lernschritt. */
+  /* Erstes Kennenlernen: einmal komplett anhören. Öffnet den Weg — gibt aber
+     bewusst KEINE Punkte (12.08.2026): Punkte gibt es erst fürs Sprechen. */
   function markHeard(id) {
     const it = itemState(id);
-    if (it.heard) return { xp: 0, already: true };
+    if (it.heard) return { xp: 0, already: true, hoer: true };
     writeItem(id, function (x) { x.heard = 1; });
-    return { xp: award(XP_LISTEN_ALL, id), already: false };
+    return { xp: 0, already: false, hoer: true };
   }
 
   function reachChain(id, k, half) {
@@ -430,10 +437,20 @@
     function speakFallback(part, opts, onEnd, warEsInternet) {
       let spoke = false;
       try {
-        if (window.QuranAudio && window.QuranAudio.speakText) { window.QuranAudio.speakText(part.ar, true, opts); spoke = true; }
+        if (window.QuranAudio && window.QuranAudio.speakText) {
+          // Die Umschrift (part.tr) als Lesung mitgeben: Fehlt die arabische
+          // Stimme, spricht die türkische/deutsche Ersatzstimme die Umschrift
+          // — statt Stille (12.08.2026).
+          window.QuranAudio.speakText(part.ar, true, Object.assign({}, opts, { reading: part.tr }));
+          spoke = true;
+        }
       } catch (e) {}
       checkVoices();
-      const hatStimme = VOICES_AR !== false;    // unbekannt = optimistisch
+      let hatStimme = VOICES_AR !== false;      // unbekannt = optimistisch
+      try {
+        const v = window.QuranAudio && window.QuranAudio.voiceInfo ? window.QuranAudio.voiceInfo() : null;
+        if (v) hatStimme = !!(v.ar || v.latin); // Ersatzstimme zählt jetzt mit
+      } catch (e) {}
       if (!spoke || !hatStimme) {
         setFailed(warEsInternet
           ? 'Die Rezitation aus dem Internet kam nicht durch, und dein Gerät hat keine arabische Stimme. Bitte deine Lehrkraft, die Sure im Aussprache-Studio einzusprechen — dann hörst du sie immer.'
@@ -738,6 +755,7 @@
          frei aufgesagt (Stufe 4), Kette, ganze Sure, Auffrischung. */
       const klein = isListen || (step.kind === 'verse' && stage < 4);
       if (klein) {
+        info.hoer = isListen || stage === 1;
         setToast(info);
         autoNext.current = setTimeout(function () { onFinish(true); }, 1150);
         return;
@@ -801,8 +819,9 @@
           <div className="hz-toast">
             <div className="hz-toast-ico">✅</div>
             <div className="hz-toast-txt">
-              {toast.xp > 0 ? <b>+{toast.xp} XP</b> : <b>Geübt!</b>}
+              {toast.xp > 0 ? <b>+{toast.xp} XP</b> : toast.hoer ? <b>Zugehört ✓</b> : <b>Geübt!</b>}
               {toast.half || toast.slow || toast.self ? <em>halbe Punkte</em> : null}
+              {toast.xp <= 0 && toast.hoer ? <em>Punkte gibt es fürs Aufsagen</em> : null}
             </div>
             <div className="hz-toast-sub">weiter …</div>
           </div>
@@ -866,7 +885,7 @@
           <div className="hz-prac-top">
             <button className="btn btn-ghost" onClick={onExit}>← Zurück</button>
             <div className="hz-prac-title"><b>{title}</b><span className="muted">{item.name}</span></div>
-            <span className="pill">+{XP_LISTEN_ALL} XP</span>
+            <span className="pill">🎧 ohne Punkte</span>
           </div>
           <div className="hz-prac-sub">{sub}</div>
           <div className="hz-row">
@@ -911,7 +930,9 @@
               </span>
             )}
           </div>
-          <span className="pill">{step.kind === 'verse' ? '+' + (XP_STAGE[stage] || 0) : step.kind === 'chain' ? '+' + XP_CHAIN : step.kind === 'refresh' ? '+' + XP_REFRESH : '+' + window.Hifz.completionBonus()} XP</span>
+          <span className="pill">{step.kind === 'verse'
+            ? (XP_STAGE[stage] > 0 ? '+' + XP_STAGE[stage] + ' XP' : '🎧 ohne Punkte')
+            : step.kind === 'chain' ? '+' + XP_CHAIN + ' XP' : step.kind === 'refresh' ? '+' + XP_REFRESH + ' XP' : '+' + window.Hifz.completionBonus() + ' XP'}</span>
         </div>
         <div className="hz-prac-sub">{sub}</div>
 
@@ -1313,7 +1334,7 @@
                     <div className="hz-dots">
                       {[1, 2, 3, 4].map(function (k) {
                         return <button key={k} className={'hz-dot' + (s >= k ? ' is-on' : '') + (s + 1 === k ? ' is-next' : '')}
-                                       title={STAGE_INFO[k].t + ' (+' + XP_STAGE[k] + ' XP)'}
+                                       title={STAGE_INFO[k].t + (XP_STAGE[k] > 0 ? ' (+' + XP_STAGE[k] + ' XP)' : ' (Pflicht, ohne Punkte)')}
                                        onClick={function () { audio.stop(); setStep({ kind: 'verse', i: i, stage: k }); }}>
                           {STAGE_INFO[k].ic}
                         </button>;
@@ -1340,8 +1361,8 @@
               </div>
             )}
             <div className="hz-legend">
-              👂 hören +{XP_STAGE[1]} · 🎤 nachsprechen +{XP_STAGE[2]} · 🧩 puzzeln +{XP_STAGE[3]} · 🌟 aus dem Kopf +{XP_STAGE[4]} ·
-              🔗 Kette +{XP_CHAIN} · 🏆 ganze {item.kind === 'sure' ? 'Sure' : 'Dua'} +{window.Hifz.completionBonus()}
+              👂 hören: Pflicht, ohne Punkte · 🎤 nachsprechen +{XP_STAGE[2]} · 🧩 puzzeln +{XP_STAGE[3]} · 🌟 aus dem Kopf +{XP_STAGE[4]} ·
+              🔗 Kette +{XP_CHAIN} · 🏆 ganze {item.kind === 'sure' ? 'Sure' : 'Dua'} +{window.Hifz.completionBonus()} — Punkte gibt es fürs <b>Sprechen</b>, nicht fürs Anhören.
             </div>
           </div>
         )}
@@ -1385,7 +1406,8 @@
      ============================================================== */
   function Screen({ ctx }) {
     const { go } = ctx;
-    const [selId, setSelId] = useState(null);
+    // Direkteinstieg aus „Meine Stapel": go('hifz', { hifzId: 'fatiha' })
+    const [selId, setSelId] = useState((ctx.route && ctx.route.hifzId) || null);
     const [, force] = useState(0);
     useEffect(function () { return window.Hifz.onChange(function () { force(function (x) { return x + 1; }); }); }, []);
 
@@ -1454,8 +1476,9 @@
         {frei.teacher && <div className="hz-note">🔓 Lehrer-Modus: Du siehst den Bereich, obwohl er für die Kinder noch zu ist.</div>}
         <div className="hz-intro">
           Hier lernst du ganz anders als bei den Buchstaben: Du nimmst dir eine Sure vor und baust sie Vers für Vers
-          in deinem Kopf auf — hören, nachsprechen, puzzeln, frei aufsagen. Dann hängst du die Verse zu einer Kette
-          zusammen. <b>Das gibt die meisten Punkte in der ganzen App</b> — und je mehr Suren du schon kannst, desto
+          in deinem Kopf auf — hören, nachsprechen, puzzeln, frei aufsagen. <b>Punkte gibt es erst, wenn du selbst
+          sprichst</b> — Zuhören ist Pflicht, bringt aber nichts. <b>Insgesamt gibt es hier die meisten Punkte der
+          ganzen App</b> — und je mehr Suren du schon kannst, desto
           mehr bringt die nächste: allein der Abschluss-Bonus für die nächste fertige Sure ist
           <b> {window.Hifz.completionBonus()} XP</b> wert.
         </div>
