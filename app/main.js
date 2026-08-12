@@ -3533,6 +3533,12 @@ function HelpScreen({ ctx }) {
         Beim <b>Auswendiglernen</b> der Suren sprichst du dagegen ganze Verse — dort hört der
         Browser auf Arabisch mit.
       </Q>
+      <Q q="Warum klingt ein Gebet wie ein Computer?">
+        Die Suren aus dem Koran haben eine echte Rezitation. Die Namaz-Gebete (Sübhâneke,
+        Ettehiyyâtü …) gibt es in keiner Koran-Aufnahme — bis deine Lehrkraft sie selbst
+        einspricht, liest die Gerätestimme vor. Lehrkräfte: In der Sure auf <b>🎙️ Ton</b> tippen
+        und Vers für Vers einsprechen — mit Probehören, ab dann hören alle Kinder dich.
+      </Q>
       <Q q="Ich höre beim Auswendiglernen nichts">
         Der Ton startet nur, wenn du ihn antippst („🔊 Vers anhören") — Handys blockieren Ton, der
         von allein losgeht. Kommt dann immer noch nichts, sagt dir die App warum. Am sichersten ist

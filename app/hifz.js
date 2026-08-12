@@ -1058,14 +1058,177 @@
   }
 
   /* ==============================================================
+     TEIL D½ — 🎙️ TON-TAB (12.08.2026)
+
+     Nutzerwunsch wörtlich: „Sübhaneke ist noch mit \'ner Computerstimme —
+     da hätte ich gern die Option, das selber aufzunehmen."
+
+     Die Suren aus dem Koran haben eine echte Rezitation aus dem Internet.
+     Die NAMAZ-GEBETE (Sübhâneke, Ettehiyyâtü, Salli, Bârik, Rabbenâ …)
+     gibt es in keiner Koran-Aufnahme — ohne eigene Aufnahme bleibt dort
+     nur die Computerstimme. Deshalb kann die Lehrkraft jetzt DIREKT in
+     der Sure einsprechen, Vers für Vers: aufnehmen, probehören,
+     übernehmen oder verwerfen, löschen. Die Aufnahme liegt auf dem
+     eigenen Server und spielt ab sofort ÜBERALL zuerst — beim Zuhören,
+     beim Vormachen, offline. (Dasselbe geht weiter auch im Studio.)
+     ============================================================== */
+  function istLehrkraft() {
+    try { return !!(window.SimpleSync && window.SimpleSync.isTeacher()); } catch (e) { return false; }
+  }
+  function partsRecorded(item) {
+    const QV = window.QuranVoice;
+    if (!QV) return 0;
+    return item.parts.filter(function (p) { return QV.has(p.ar); }).length;
+  }
+
+  function PartRecorder({ item, part, i, audio }) {
+    const QV = window.QuranVoice;
+    const [rec, setRec] = useState(false);
+    const [secs, setSecs] = useState(0);
+    const [take, setTake] = useState(null);      // {blob, url}
+    const [busy, setBusy] = useState(false);
+    const [err, setErr] = useState('');
+    const [, force] = useState(0);
+    const recRef = useRef(null);
+    const tickRef = useRef(null);
+    const playRef = useRef(null);
+    useEffect(function () {
+      return function () {
+        try { recRef.current && recRef.current.stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {}
+        if (tickRef.current) clearInterval(tickRef.current);
+      };
+    }, []);
+    if (!QV) return null;
+    const has = QV.has(part.ar);
+
+    const discard = function () { if (take && take.url) URL.revokeObjectURL(take.url); setTake(null); };
+    const start = async function () {
+      setErr(''); discard();
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+        const mime = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', ''].find(function (m) { return !m || (window.MediaRecorder && MediaRecorder.isTypeSupported(m)); });
+        const mr = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 64000 } : undefined);
+        const chunks = [];
+        mr.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+        mr.onstop = function () {
+          stream.getTracks().forEach(function (t) { t.stop(); });
+          if (tickRef.current) clearInterval(tickRef.current);
+          setRec(false);
+          const blob = new Blob(chunks, { type: mr.mimeType || 'audio/webm' });
+          if (blob.size < 1200) { setErr('Die Aufnahme war zu kurz — bitte nochmal.'); return; }
+          setTake({ blob: blob, url: URL.createObjectURL(blob) });
+        };
+        recRef.current = { mr: mr, stream: stream };
+        mr.start();
+        setRec(true); setSecs(0);
+        tickRef.current = setInterval(function () { setSecs(function (x) { return x + 1; }); }, 1000);
+        // Verse sind länger als Buchstaben: bis 30 Sekunden, dann Auto-Stopp.
+        setTimeout(function () { try { if (recRef.current && recRef.current.mr === mr && mr.state === 'recording') mr.stop(); } catch (e) {} }, 30000);
+      } catch (e) { setErr('Mikrofon nicht verfügbar — bitte den Zugriff erlauben.'); }
+    };
+    const stop = function () { try { recRef.current && recRef.current.mr.state === 'recording' && recRef.current.mr.stop(); } catch (e) {} };
+    const playTake = function () {
+      if (!take) return;
+      if (playRef.current) { try { playRef.current.pause(); } catch (e) {} }
+      playRef.current = new Audio(take.url);
+      playRef.current.play().catch(function () {});
+    };
+    const keep = async function () {
+      if (!take) return;
+      setBusy(true); setErr('');
+      const r = await QV.put(part.ar, take.blob);
+      setBusy(false);
+      if (r.ok) discard();
+      else setErr(r.error || 'Hochladen fehlgeschlagen — läuft die App über die Netlify-Adresse?');
+      force(function (x) { return x + 1; });
+    };
+    const remove = async function () {
+      setBusy(true); setErr('');
+      const r = await QV.del(part.ar);
+      setBusy(false);
+      if (!r.ok) setErr(r.error || 'Löschen fehlgeschlagen.');
+      force(function (x) { return x + 1; });
+    };
+
+    const chip = has
+      ? <span className="pill" style={{ background: 'var(--success-soft, #E7F7EE)', color: 'var(--success, #1B8A5A)', fontWeight: 800 }}>🎙️ deine Aufnahme</span>
+      : item.audioStart
+        ? <span className="pill" style={{ background: '#E3EFFA', color: '#2364A5', fontWeight: 800 }}>🌐 Internet-Rezitation</span>
+        : <span className="pill" style={{ background: '#FDF1E0', color: '#8a5a06', fontWeight: 800 }}>🗣 Computerstimme</span>;
+
+    return (
+      <div className="hz-ton-row">
+        <div className="hz-ton-head">
+          <b>{item.kind === 'sure' ? 'Vers ' : 'Teil '}{i + 1}</b>
+          {chip}
+        </div>
+        <div className="hz-ton-ar" dir="rtl">{part.ar}</div>
+        <div className="hz-ton-tr">{part.tr}</div>
+        {!rec && !take && (
+          <div className="hz-row" style={{ marginTop: 8 }}>
+            <button className="btn btn-ghost" onClick={function () { audio.play(i); }}>▶️ So klingt es jetzt</button>
+            <button className="btn btn-primary" disabled={busy} onClick={start}>🎙️ {has ? 'Neu einsprechen' : 'Einsprechen'}</button>
+            {has && (
+              <button className="btn btn-ghost" disabled={busy} style={{ color: 'var(--rose, #D64545)' }} onClick={remove}>
+                🗑️ Löschen{item.audioStart ? ' → Rezitation' : ' → Computerstimme'}
+              </button>
+            )}
+          </div>
+        )}
+        {rec && (
+          <div className="hz-row" style={{ marginTop: 8, alignItems: 'center' }}>
+            <button className="btn" style={{ background: '#F02048', color: '#fff', fontWeight: 800 }} onClick={stop}>⏹ Fertig</button>
+            <span style={{ fontWeight: 800, color: '#B3123A' }}>● Aufnahme läuft … {secs}s</span>
+            <span className="muted" style={{ fontSize: 12 }}>(max. 30 s)</span>
+          </div>
+        )}
+        {take && (
+          <div className="hz-ton-take">
+            <div style={{ fontWeight: 800, fontSize: 13 }}>Probeaufnahme — erst anhören, dann entscheiden:</div>
+            <div className="hz-row" style={{ marginTop: 6 }}>
+              <button className="btn btn-ghost" onClick={playTake}>▶️ Probehören</button>
+              <button className="btn btn-primary" disabled={busy} onClick={keep}>{busy ? '⏳ Lädt hoch…' : '✅ Übernehmen'}</button>
+              <button className="btn btn-ghost" onClick={start}>🔁 Nochmal</button>
+              <button className="btn btn-ghost" style={{ color: 'var(--rose, #D64545)' }} onClick={discard}>🗑️ Verwerfen</button>
+            </div>
+          </div>
+        )}
+        {err && <div className="hz-err" style={{ marginTop: 8 }}>{err}</div>}
+      </div>
+    );
+  }
+
+  function TonTab({ item, audio }) {
+    const [, force] = useState(0);
+    useEffect(function () { return window.QuranVoice ? window.QuranVoice.onChange(function () { force(function (x) { return x + 1; }); }) : undefined; }, []);
+    useEffect(function () { if (window.QuranVoice) window.QuranVoice.refresh(true); }, []);
+    const done = partsRecorded(item);
+    return (
+      <div>
+        <div className="hz-note" style={{ marginTop: 0 }}>
+          {item.audioStart
+            ? 'Diese Sure hat eine Internet-Rezitation. Deine eigene Aufnahme spielt trotzdem zuerst — und geht auch offline.'
+            : 'Für dieses Gebet gibt es keine Koran-Rezitation — ohne deine Aufnahme bleibt nur die Computerstimme. Sprich es hier Vers für Vers ein; die Kinder hören ab sofort dich.'}
+          {' '}<b>{done} von {item.parts.length}</b> eingesprochen.
+        </div>
+        {item.parts.map(function (p, i) {
+          return <PartRecorder key={i} item={item} part={p} i={i} audio={audio}/>;
+        })}
+      </div>
+    );
+  }
+
+  /* ==============================================================
      TEIL E — Die Detailseite einer Sure
      ============================================================== */
   function ItemDetail({ item, onBack }) {
     const [, force] = useState(0);
     const [step, setStep] = useState(null);
-    const [tab, setTab] = useState('weg');   // weg | text | warum
+    const [tab, setTab] = useState('weg');   // weg | text | warum | ton
     const audio = useAudio(item);
     useEffect(function () { return window.Hifz.onChange(function () { force(function (x) { return x + 1; }); }); }, []);
+    useEffect(function () { return window.QuranVoice ? window.QuranVoice.onChange(function () { force(function (x) { return x + 1; }); }) : undefined; }, []);
+    const teacher = istLehrkraft();
 
     const st = window.Hifz.itemState(item.id);
     const next = window.Hifz.nextStep(item.id);
@@ -1127,7 +1290,16 @@
           <button className={'sur-tab' + (tab === 'weg' ? ' is-active' : '')} onClick={function () { setTab('weg'); }}>🪜 Dein Weg</button>
           <button className={'sur-tab' + (tab === 'text' ? ' is-active' : '')} onClick={function () { setTab('text'); }}>📖 Text</button>
           <button className={'sur-tab' + (tab === 'warum' ? ' is-active' : '')} onClick={function () { setTab('warum'); }}>💛 Warum</button>
+          {teacher && <button className={'sur-tab' + (tab === 'ton' ? ' is-active' : '')} onClick={function () { setTab('ton'); }}>🎙️ Ton</button>}
         </div>
+
+        {/* Lehrkraft-Hinweis: Gebet läuft noch mit der Computerstimme */}
+        {teacher && tab !== 'ton' && !item.audioStart && partsRecorded(item) < item.parts.length && (
+          <div className="hz-tonbanner">
+            🗣 Dieses Gebet läuft noch {partsRecorded(item) > 0 ? 'teilweise ' : ''}mit der <b>Computerstimme</b>.
+            <button className="btn btn-primary" onClick={function () { setTab('ton'); }}>🎙️ Jetzt selbst einsprechen</button>
+          </div>
+        )}
 
         {tab === 'weg' && (
           <div className="hz-ladder">
@@ -1193,6 +1365,8 @@
             })}
           </div>
         )}
+
+        {tab === 'ton' && teacher && <TonTab item={item} audio={audio}/>}
 
         {tab === 'warum' && (
           <>
@@ -1319,7 +1493,7 @@
 
         <div className="muted" style={{ marginTop: 16, fontSize: 12.5, lineHeight: 1.6 }}>
           🎧 Rezitation: Mischary Raschid Alafasy · Text: quran-simple (alquran.cloud) · Übersetzung: Bubenheim &amp; Elyas.
-          Die Gebete spricht die Stimme deiner Lehrkraft (Aussprache-Studio) oder die eingebaute Stimme deines Geräts.<br/>
+          Die Gebete spricht die Stimme deiner Lehrkraft — sie kann jeden Vers direkt in der Sure einsprechen (🎙️ Ton) — sonst die eingebaute Stimme deines Geräts.<br/>
           🎤 {window.Recite ? window.Recite.modeLabel() : ''} Beim Zuhören schickt Chrome den Ton kurz zu Google, Safari zu Apple —
           es wird nichts gespeichert und nichts an unseren Server geschickt. Deine Lehrkraft kann das Mikrofon im Klassenzimmer abschalten.
         </div>
@@ -1329,6 +1503,8 @@
 
   function Card({ item, onOpen }) {
     const st = window.Hifz.itemState(item.id);
+    const teacher = istLehrkraft();
+    const rec = teacher ? partsRecorded(item) : 0;
     const pct = window.Hifz.progressPct(item.id);
     const due = window.Hifz.repDue(item.id);
     const fresh = window.Hifz.freshness(item.id);
@@ -1339,7 +1515,15 @@
           <span className="hz-card-name">{item.name}</span>
           <span className="hz-card-ar" dir="rtl">{item.arName}</span>
         </div>
-        <div className="hz-card-sub">{item.deName} · {item.parts.length} {item.kind === 'sure' ? 'Verse' : 'Teile'}</div>
+        <div className="hz-card-sub">
+          {item.deName} · {item.parts.length} {item.kind === 'sure' ? 'Verse' : 'Teile'}
+          {teacher && !item.audioStart && rec < item.parts.length && (
+            <span className="hz-tts-chip" title="Läuft noch mit der Computerstimme — im 🎙️ Ton-Tab selbst einsprechen"> 🗣 Computerstimme</span>
+          )}
+          {teacher && rec >= item.parts.length && item.parts.length > 0 && (
+            <span className="hz-rec-chip" title="Komplett mit deiner Stimme eingesprochen"> 🎙️ deine Stimme</span>
+          )}
+        </div>
         <div className="hz-bar hz-bar-sm"><div className="hz-bar-fill" style={{ width: pct + '%' }}/></div>
         <div className="hz-card-foot">
           <span>{st.done ? '🏆 auswendig' : pct > 0 ? pct + '%' : 'noch nicht begonnen'}</span>

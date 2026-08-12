@@ -1,4 +1,4 @@
-# 🌙 Elif & Ba — Einrichtung & Update (Version 8.3)
+# 🌙 Elif & Ba — Einrichtung & Update (Version 8.4)
 
 **Das Wichtigste in einem Satz:** Ein Kind tippt auf *Anmelden*, schreibt seinen
 **Namen**, drückt einmal — und ist im Kurs. Kein Anmeldecode, kein Passwort,
@@ -286,6 +286,27 @@ verboten sein. Aber sie wirft nicht endlos Punkte ab:
 Oben im Quiz steht dann in Klartext „🔁 Wiederholung — halbe Punkte" bzw.
 „🔁 Nur zum Üben — keine Punkte mehr". Verbraucht wird eine Wiederholung erst
 am **Ende** einer Runde; wer abbricht, verliert seine halbe Portion nicht.
+
+### 🎙️ Gebete direkt in der Sure einsprechen (12.08.2026)
+
+Die Suren aus dem Koran haben eine echte Internet-Rezitation. Die
+**Namaz-Gebete** (Sübhâneke, Ettehiyyâtü, Salli, Bârik, Rabbenâ …) gibt es in
+keiner Koran-Aufnahme — ohne deine Stimme bleibt dort nur die Computerstimme.
+
+Deshalb siehst du als Lehrkraft jetzt direkt im Auswendiglernen:
+
+- In der **Übersicht** einen Chip „🗣 Computerstimme" an jedem Gebet, das noch
+  nicht eingesprochen ist (und „🎙️ deine Stimme", wenn alles da ist).
+- In der Sure ein **Banner** („Dieses Gebet läuft noch mit der Computerstimme")
+  mit dem Knopf **„🎙️ Jetzt selbst einsprechen"**.
+- Einen eigenen Tab **„🎙️ Ton"**: Dort steht jeder Vers mit Status, und du
+  kannst ihn **einsprechen (bis 30 Sekunden), probehören, übernehmen oder
+  verwerfen** — und jederzeit **löschen**, dann gilt wieder die Rezitation bzw.
+  Computerstimme. „▶️ So klingt es jetzt" spielt immer genau das, was die
+  Kinder hören.
+
+Deine Aufnahme spielt ab sofort **überall zuerst** — beim Zuhören, beim
+Vormachen, in jeder Stufe, auch offline. Die Kinder sehen den Ton-Tab nicht.
 
 ### Wann sich der Bereich öffnet (12.08.2026)
 
