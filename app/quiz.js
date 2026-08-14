@@ -54,17 +54,19 @@ function buildQueue(cards, topicId, opts = {}) {
     // Speed-run: alles als Blitzfrage mit knackigem 5s-Timer. Offene
     // Abruf-Karten lassen sich nicht sinnvoll timen (Antwort wäre sofort
     // sichtbar) — die laufen stattdessen mit Abruf-Hürde weiter.
-    queue = queue.map(it => (it.gen.kind === 'recall' || it.gen.kind === 'audioPick' || it.gen.kind === 'scriptPick')
+    queue = queue.map(it => (it.gen.kind === 'recall' || it.gen.kind === 'readCheck' || it.gen.kind === 'pairs' || it.gen.kind === 'build' || it.gen.kind === 'audioPick' || it.gen.kind === 'scriptPick')
       ? { ...it, mode: 'retry' }
       : { ...it, mode: 'blitz', blitzSecs: 5 });
-  } else if (!blitzOff && by.gemeistert.length && queue.length) {
+  } else if (!blitzOff && !isQuran && by.gemeistert.length && queue.length) {
     // Max. 2 Blitzfragen aus gemeisterten Karten in die Runde einstreuen —
     // nur Formate mit Optionen (MC/Lückentext/Ordnen), wie im Original.
+    // Im Koran-Kurs BEWUSST aus (13.08.2026, Nutzerwunsch "Blitzfragen kann
+    // raus") — die Kinder sollen dort ohne Uhr in Ruhe üben.
     let injected = 0;
     for (const c of sh(by.gemeistert)) {
       if (injected >= 2) break;
       const gen = window.QEngine.generate(c, topicId);
-      if (gen.kind === 'recall' || gen.kind === 'audioPick' || gen.kind === 'scriptPick') continue;
+      if (gen.kind === 'recall' || gen.kind === 'readCheck' || gen.kind === 'pairs' || gen.kind === 'build' || gen.kind === 'audioPick' || gen.kind === 'scriptPick') continue;
       queue.splice(Math.min(queue.length, 2 + injected * 3), 0, {
         card: c, mode: 'blitz', gen, blitzSecs: window.QEngine.blitzSeconds(gen),
       });
@@ -78,30 +80,12 @@ function buildQueue(cards, topicId, opts = {}) {
       card: c, mode: 'new', gen: window.QEngine.generate(c, topicId),
     }));
   }
-  // Koran (Video Typ A, ausgeweitet 06.08.2026): JEDE ganz neue Karte wird
-  // zuerst als Lehrkarte gezeigt — Buchstabe/Silbe/Wort groß, Name sofort
-  // sichtbar, Audio automatisch, "Verstanden"-Button. Erst DANACH kommt
-  // dieselbe Karte als Übung. Vorher galt das nur für Silben; bei Lektion 1
-  // war der allererste Kontakt deshalb eine Rate-Frage ohne jede Erklärung
-  // ("da gab es nichts Gescheites zu lernen").
-  if (/^quran-/.test(String(topicId || ''))) {
-    const out = [];
-    for (const it of queue) {
-      const q = String(it.card.q || '');
-      const bare = q.replace(/[\u064B-\u0652\u0670\u0640]/g, '').replace(/[^\u0600-\u06FF]/g, '');
-      const st = window.SRS ? window.SRS.getState(topicId, it.card).state : 'neu';
-      // Formen-Lektion lehrt über ihr eigenes Formen-Panel (quranforms.js) —
-      // dort keine zusätzliche Lehrkarte davor.
-      if (it.mode === 'new' && st === 'neu' && topicId !== 'quran-formen') {
-        const isSyll = /[\u064B-\u0652]/.test(q) && bare.length === 1;
-        const isLetter = !isSyll && (bare.length === 1 || bare === '\u0644\u0627'); // Lamelif z\u00E4hlt als Buchstabe
-        const teachKind = isLetter ? 'Buchstabe' : isSyll ? 'Silbe' : 'Wort';
-        out.push({ card: it.card, mode: 'teach', gen: { kind: 'teach', teachKind: teachKind, q: it.card.q, say: it.card.q, a: it.card.a } });
-      }
-      out.push(it);
-    }
-    queue = out;
-  }
+  // Lehrkarten VOR neuen Karten: wieder ABGESCHALTET (13.08.2026, Nutzerwunsch
+  // "Lehrkarten auch raus" — auf kleinen Handys musste man für jede neue Karte
+  // erst zu "Verstanden — weiter" scrollen). Neue Karten kommen jetzt direkt
+  // als Frage; der Name steht in den Antworten, 🔊 spielt den Klang, und ein
+  // Fehler beim allerersten Kontakt kostet nur eine Wiederholung.
+  // (Die Formen-Lehrkarte in Lektion 2 bleibt — sie kommt aus quranforms.js.)
   return queue;
 }
 
@@ -191,20 +175,40 @@ function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor }) {
   const doneRef = useRef(false);
   const lastRes = useRef(null);
   const echoTimer = useRef(null);
+  /* --- Zustände der drei neuen Fragetypen (13.08.2026, Nutzerwunsch:
+     Lese-Check, Paare verbinden, Wort-Baukasten — "generell überall") --- */
+  const [pairSel, setPairSel] = useState(null);     // Paare: links gewählte Silbe
+  const [pairDone, setPairDone] = useState([]);     // Paare: gelöste Paar-IDs
+  const [pairMiss, setPairMiss] = useState(0);      // Paare: Fehlversuche
+  const [pairFlash, setPairFlash] = useState(null); // Paare: kurz rot
+  const [buildN, setBuildN] = useState(0);          // Baukasten: gefüllte Plätze
+  const [buildUsed, setBuildUsed] = useState([]);   // Baukasten: verbrauchte Kacheln
+  const [buildMiss, setBuildMiss] = useState(0);
+  const [buildWob, setBuildWob] = useState(null);   // Baukasten: wackelnde Kachel
+  const [rcState, setRcState] = useState('idle');   // Lese-Check: idle | listening
+  const [rcHeard, setRcHeard] = useState('');
+  const [rcTries, setRcTries] = useState(0);
+  const [rcHelped, setRcHelped] = useState(false);  // Lesung eingeblendet
+  const [rcUseOpts, setRcUseOpts] = useState(false);// Ausweich-Auswahl statt Mikrofon
+  const [micErr, setMicErr] = useState('');
   const revealedRef = useRef(false);
   useEffect(() => { revealedRef.current = revealed; }, [revealed]);
+  // Für die automatischen Prüfungen: die aktuelle Frage einsehbar machen.
+  useEffect(() => { try { window.__lastGen = gen; } catch (e) {} }, [gen]);
   useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current); if (echoTimer.current) clearTimeout(echoTimer.current); }, []);
 
   // Lesung der Karte für die Ersatzstimme (12.08.2026): nur wenn sie wirklich
   // lateinisch ist (Namen/Umschrift) — arabische Antworten nie vorlesen lassen.
-  const genReading = (typeof gen.a === 'string' && !gen.arabicOptions && /[A-Za-zçğıöşüÇĞİÖŞÜ]/.test(gen.a)) ? gen.a : undefined;
+  // Bei den "Wo ist …?"-Fragen (arabische Antworten) liefert gen.tr die Lesung.
+  const genReading = (typeof gen.tr === 'string' && /[A-Za-zçğıöşüÇĞİÖŞÜ]/.test(gen.tr)) ? gen.tr
+    : (typeof gen.a === 'string' && !gen.arabicOptions && /[A-Za-zçğıöşüÇĞİÖŞÜ]/.test(gen.a)) ? gen.a : undefined;
   const badge = srsBadge(topicId, item);
   const correctIdxs = (gen.options || []).map((o, i) => o.c ? i : -1).filter(i => i >= 0);
   const isMulti = kind === 'mc' && gen.multi;
   // Die richtige Antwort als Text — einmal pro Render berechnet, weil sie an
   // zwei Stellen gebraucht wird: als Prompt-Grundlage für den Tutor und als
   // Auflösung. Je nach Fragetyp steckt sie woanders.
-  const answerText = (kind === 'recall' || kind === 'cloze' || kind === 'truefalse' || kind === 'teach' || kind === 'audioPick' || kind === 'scriptPick' || kind === 'formTeach' || kind === 'tilePick' || kind === 'hiPick') ? (gen.a || gen.term || '')
+  const answerText = (kind === 'recall' || kind === 'cloze' || kind === 'truefalse' || kind === 'teach' || kind === 'audioPick' || kind === 'scriptPick' || kind === 'formTeach' || kind === 'tilePick' || kind === 'hiPick' || kind === 'readCheck' || kind === 'pairs' || kind === 'build') ? (gen.a || gen.term || '')
     : kind === 'order' ? (gen.order || []).join(' → ')
     : correctIdxs.map(i => gen.options[i].t).join(', ');
   const wrongTexts = (gen.options || []).filter(o => !o.c).map(o => o.t);
@@ -309,6 +313,80 @@ function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor }) {
       setSelected([i]);
       setWrongPicks(w => [...w, i]);
       setTimeout(() => { if (!revealedRef.current) setSelected([]); }, 550);
+    }
+  };
+
+  /* ---- 🎤 Lese-Check (13.08.2026): Wort laut lesen, die App prüft mit ---- */
+  const rcStart = () => {
+    if (rcState === 'listening' || revealed || doneRef.current || !window.Recite) return;
+    setMicErr('');
+    setRcState('listening');
+    const nWords = String(gen.q || '').split(/\s+/).filter(Boolean).length || 1;
+    const maxMs = Math.max(6, Math.min(20, Math.round(nWords * 2.2 + 4))) * 1000;
+    window.Recite.listen({
+      expected: gen.q, maxMs: maxMs,
+      onDone: (text) => {
+        setRcState('idle');
+        const g = window.Recite.grade(gen.q, text || '');
+        const fluent = g.level === 'gut';
+        const okZweiter = rcTries >= 1 && g.level === 'fast';
+        if (fluent || okZweiter) {
+          setRevealed(true);
+          setRcHeard(g.heard || text || '');
+          // flüssig = sauber; "fast" im zweiten Versuch oder mit gezeigter Lesung
+          // läuft wie eine Auswahl-Frage mit Fehlversuch (Karte kommt wieder).
+          finish({ correct: true, wasWrong: wasWrong || (!fluent), usedReveal: helpUsed.reveal || rcHelped }, 1600);
+        } else {
+          setRcTries(t => t + 1);
+          setRcHeard(g.heard || text || '');
+        }
+      },
+      onError: (code) => {
+        setRcState('idle');
+        setMicErr(window.Recite.errorText ? window.Recite.errorText(code) : 'Mikrofon-Problem — versuch es nochmal.');
+      },
+    });
+  };
+
+  /* ---- 🔗 Paare verbinden (13.08.2026) ---- */
+  const pairLeft = (id) => {
+    if (revealed || doneRef.current || pairDone.includes(id)) return;
+    setPairSel(id);
+  };
+  const pairRight = (id) => {
+    if (revealed || doneRef.current || pairSel == null || pairDone.includes(id)) return;
+    if (id === pairSel) {
+      const d = [...pairDone, id];
+      setPairDone(d); setPairSel(null);
+      try { window.Sound && window.Sound.tick && window.Sound.tick(); } catch (e) {}
+      if (d.length >= (gen.pairs || []).length) {
+        setRevealed(true);
+        finish({ correct: true, wasWrong: wasWrong || pairMiss >= 2 }, 1200);
+      }
+    } else {
+      setPairMiss(m => m + 1);
+      setPairFlash('R' + id);
+      setTimeout(() => setPairFlash(null), 450);
+    }
+  };
+
+  /* ---- 🧱 Wort-Baukasten (13.08.2026) ---- */
+  const buildTap = (i) => {
+    if (revealed || doneRef.current || buildUsed.includes(i)) return;
+    const expected = (gen.clusters || [])[buildN];
+    if (gen.tiles[i] === expected) {
+      const used = [...buildUsed, i];
+      const n = buildN + 1;
+      setBuildUsed(used); setBuildN(n);
+      try { window.Sound && window.Sound.tick && window.Sound.tick(); } catch (e) {}
+      if (n >= gen.clusters.length) {
+        setRevealed(true);
+        finish({ correct: true, wasWrong: wasWrong || buildMiss >= 2 }, 1600);
+      }
+    } else {
+      setBuildMiss(m => m + 1);
+      setBuildWob(i);
+      setTimeout(() => setBuildWob(null), 420);
     }
   };
 
@@ -448,13 +526,15 @@ function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor }) {
   // Quran-Progress-Wortlaut (Videos): Der Aufdeck-Button heißt je nach Lektion
   // "Errate den Buchstaben / die Silbe / das Wort" — sonst neutral.
   const isGuessKind = kind === 'recall' || kind === 'hiPick';
-  const gateLabel = !isGuessKind ? 'Optionen anzeigen'
+  const gateLabel = (kind === 'pairs' || kind === 'build' || kind === 'readCheck') ? 'Weiter'
+    : !isGuessKind ? 'Optionen anzeigen'
     : kind === 'hiPick' ? 'Errate den Buchstaben'
-    : /^quran-(harfler|formen|mahrec)/.test(String(topicId||'')) ? 'Errate den Buchstaben'
-    : /^quran-(ustun|esre|otre)/.test(String(topicId||'')) ? 'Errate die Silbe'
-    : isQuranCard ? 'Errate das Wort'
+    : isQuranCard ? 'Errate das Wort'   /* Abruf gibt es im Koran-Kurs nur noch für Wörter (13.08.2026) */
     : 'Antwort aufdecken';
-  const cardLabelText = kind === 'hiPick' ? 'Errate den hervorgehobenen Buchstaben'
+  const cardLabelText = kind === 'pairs' ? 'Verbinde die Paare'
+    : kind === 'build' ? 'Baue das Wort'
+    : kind === 'readCheck' ? 'Lies laut vor'
+    : kind === 'hiPick' ? 'Errate den hervorgehobenen Buchstaben'
     : isQuranCard
     ? (/^quran-(harfler|formen|mahrec)/.test(String(topicId||'')) ? 'Buchstabe' : 'Arabisch')
     : 'Frage';
@@ -728,8 +808,92 @@ function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor }) {
         </>
       )}
 
+      {/* 🎤 Lese-Check (13.08.2026): Wort laut lesen — geprüft wie beim
+          Suren-Nachsprechen. Flüssig = sauber gelöst; mit gezeigter Lesung
+          oder erst im zweiten Anlauf kommt die Karte später noch einmal. */}
+      {!gate && kind === 'readCheck' && !rcUseOpts && (
+        <>
+          {rcHelped && !revealed && (
+            <div className="qp-answrap">
+              <div className="qp-cardlabel qp-cardlabel-slim">Lesung</div>
+              <div className="qp-ansfield">{gen.a}</div>
+            </div>
+          )}
+          {!revealed && (
+            <>
+              <div className="qp-gatespacer"/>
+              {!!rcHeard && <div className="qp-rcheard">Verstanden: „{rcHeard}“ — fast! Lies es noch einmal in Ruhe.</div>}
+              {!!micErr && <div className="qp-rcheard">{micErr}</div>}
+              <button className={'qp-mic' + (rcState === 'listening' ? ' is-live' : '')} onClick={rcStart}>🎤</button>
+              <div className="qp-micnote">{rcState === 'listening' ? '● Ich höre zu — lies jetzt laut vor' : 'Antippen und das Wort laut vorlesen'}</div>
+              <div className="row" style={{ gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+                {!rcHelped && <button className="btn btn-ghost" onClick={() => setRcHelped(true)}>👀 Lesung zeigen</button>}
+                {(rcTries >= 2 || !!micErr) && gen.options && (
+                  <button className="btn btn-ghost" onClick={() => setRcUseOpts(true)}>🔤 Lieber antippen</button>
+                )}
+              </div>
+            </>
+          )}
+          {revealed && (
+            <div className="qp-rcheard is-ok">✓ <b>{gen.a}</b>{rcHeard ? <span className="muted"> · verstanden: „{rcHeard}“</span> : null}</div>
+          )}
+        </>
+      )}
+
+      {/* 🔗 Paare verbinden (13.08.2026): links Arabisch, rechts die Lesung. */}
+      {!gate && kind === 'pairs' && (
+        <>
+          <div className="qp-pairwrap">
+            <div className="qp-paircol">
+              {(gen.left || []).map(p => (
+                <button key={'l' + p.id} data-p={p.id} dir="rtl"
+                        className={'qp-pair qp-pair-ar' + (pairDone.includes(p.id) ? ' is-done' : pairSel === p.id ? ' is-sel' : '')}
+                        onClick={() => pairLeft(p.id)}>{p.ar}</button>
+              ))}
+            </div>
+            <div className="qp-paircol">
+              {(gen.right || []).map(p => (
+                <button key={'r' + p.id} data-p={p.id}
+                        className={'qp-pair' + (pairDone.includes(p.id) ? ' is-done' : '') + (pairFlash === 'R' + p.id ? ' is-bad' : '')}
+                        onClick={() => pairRight(p.id)}>{p.tr}</button>
+              ))}
+            </div>
+          </div>
+          {!revealed && (
+            <div className="qp-hintbox">
+              {pairSel == null ? 'Tippe links eine Karte an — und dann rechts, was dazugehört.' : 'Und jetzt rechts das Passende!'}
+              {pairMiss > 0 ? ' · ' + pairMiss + (pairMiss === 1 ? ' Fehlversuch' : ' Fehlversuche') : ''}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* 🧱 Wort-Baukasten (13.08.2026): Lesung steht oben (gen.q), das Wort
+          wird aus Silben-Kacheln von rechts nach links zusammengebaut. */}
+      {!gate && kind === 'build' && (
+        <>
+          <div className="qp-buildslots" dir="rtl">
+            {(gen.clusters || []).map((c, i) => (
+              <span key={i} className={'qp-slot' + (i < buildN ? ' is-filled' : '')}>{i < buildN ? c : ''}</span>
+            ))}
+          </div>
+          {revealed
+            ? <div className="qp-hintbox">✓ <b dir="rtl" style={{ fontSize: 24 }}>{gen.ar}</b> &nbsp;=&nbsp; <b>{gen.a}</b></div>
+            : <div className="qp-hintbox">Tippe die Silben <b>in der richtigen Reihenfolge</b> an — Arabisch baut von <b>rechts nach links</b>.{buildMiss > 0 ? ' · ' + buildMiss + (buildMiss === 1 ? ' Fehlversuch' : ' Fehlversuche') : ''}</div>}
+          {!revealed && (
+            <div className="qp-buildtiles">
+              {(gen.tiles || []).map((t, i) => (
+                <button key={i} dir="rtl"
+                        className={'qp-btile' + (buildUsed.includes(i) ? ' is-used' : '') + (buildWob === i ? ' is-wob' : '')}
+                        onClick={() => buildTap(i)}>{t}</button>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
       {/* MC / Lückentext-Optionen */}
-      {!gate && (kind === 'mc' || kind === 'cloze') && (
+      {!gate && (kind === 'mc' || kind === 'cloze' || (kind === 'readCheck' && rcUseOpts)) && (
         <div className="options">
           {gen.options.map((o, i) => {
             const isSel = selected.includes(i);
@@ -829,11 +993,10 @@ function QuizScreen({ go, stackName, questionStyle, questions, topicId, roundSiz
   const data = raw.filter(q => (q.options && q.options.length > 0) || (q.a && q.a.trim()));
 
   const [phase, setPhase] = useState('quiz'); // quiz | roundEnd | streak
-  // Regel-Intro (Video "Kurze Vokale"): beim allerersten Start einer
-  // Koran-Lektion zuerst die Regel zeigen; später über ℹ️ erneut abrufbar.
-  const [introOpen, setIntroOpen] = useState(() =>
-    /^quran-/.test(String(topicId || '')) && window.QuranIntro &&
-    window.QuranIntro.has(topicId) && !window.QuranIntro.seen(topicId));
+  // Regel-Intro: startet NICHT mehr automatisch (13.08.2026, Nutzerwunsch
+  // "das Regelintro kann raus" — auf kleinen Handys nur ein Umweg).
+  // Über den ℹ️-Knopf in der Kopfzeile bleibt es freiwillig abrufbar.
+  const [introOpen, setIntroOpen] = useState(false);
   const [round, setRound] = useState(1);
   /* 🔁 Wiederholungs-Punkte (11.08.2026, siehe app/replay.js): Der Faktor wird
      EINMAL beim Betreten der Lektion bestimmt und gilt für die ganze Sitzung.

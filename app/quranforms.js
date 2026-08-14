@@ -174,8 +174,11 @@
       return { kind: 'formTeach', q: base, say: say, a: name, forms: formsOf(card.q) };
     }
 
+    /* "Errate den hervorgehobenen Buchstaben" (hiPick) ist RAUS (13.08.2026,
+       Nutzerwunsch: keine Selbst-Bewertung mehr in Stapel 2) — es bleiben die
+       drei prüfbaren Übungen: Kachel-Klick, Formen-Wahl, Form→Name. */
     const r = Math.random();
-    if (r < 0.30) {
+    if (r < 0.40) {
       const f = findWordFor(base);
       if (f) {
         return {
@@ -186,16 +189,7 @@
         };
       }
     }
-    if (r < 0.55) {
-      const f = findWordFor(base);
-      if (f) {
-        return {
-          kind: 'hiPick', q: f.word.ar, say: say, a: name,
-          clusters: f.word.cls.slice(), target: f.target, wordTr: f.word.tr,
-        };
-      }
-    }
-    if (r < 0.78) {
+    if (r < 0.72) {
       const fx = formPos(base, name);
       if (fx) return fx;
     }

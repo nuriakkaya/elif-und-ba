@@ -502,6 +502,64 @@ und dem Erraten der markierten Form gibt es jetzt:
 Der Anteil der Abruf-Karten („erst selbst denken, dann aufdecken") ist im
 ganzen Kurs leicht erhöht.
 
+## ✨ Drei neue Fragetypen (13.08.2026, Version 8.8)
+
+Auf Wunsch der Lehrkraft („Nummer 1, 2 und 3 — generell überall") sind drei
+neue, **prüfbare** Übungsformen im ganzen Koran-Kurs eingebaut:
+
+**🎤 Lese-Check** (Wort-Lektionen): Das Wort steht groß da, das Kind liest es
+**laut** vor — der Browser hört zu und prüft mit (dieselbe Technik wie beim
+Suren-Nachsprechen). Flüssig gelesen = sauber gelöst mit vollen Punkten;
+„👀 Lesung zeigen" oder erst der zweite Anlauf zählt wie eine Auswahl-Frage
+mit Fehlversuch (Karte kommt wieder). Kann das Gerät nicht zuhören, erscheint
+der Lese-Check gar nicht erst; hakt das Mikrofon, bietet die Karte
+„🔤 Lieber antippen" als Ausweich-Auswahl an.
+
+**🔗 Paare verbinden** (überall): Vier Karten derselben Lektion — links
+Arabisch, rechts die Lesung bzw. der Name. Links antippen, rechts das
+Passende. Die falschen Kandidaten sind wie immer Verwechsel-Geschwister.
+Bis zu ein Fehlversuch bleibt sauber, ab zwei kommt die Karte später erneut.
+
+**🧱 Wort-Baukasten** (Wort-Lektionen): Die Lesung steht oben („ke · te · be"),
+das Kind baut das arabische Wort aus Silben-Kacheln zusammen — von **rechts
+nach links**, wie Arabisch wirklich funktioniert. Zwei Kacheln sind Fallen
+aus der Verwechsel-Familie. Am Ende erscheint das fertige Wort samt Ton.
+
+Der Mix pro Karte: Buchstaben/Silben ≈ 35 % „Wo ist …?", 20 % Paare, Rest
+Auswahl · Wörter ≈ 28 % „Errate das Wort", je ~18 % Lese-Check und Baukasten,
+~14 % Paare, Rest Auswahl. Alle drei passen ohne Scrollen auf kleine Handys.
+
+## 🧹 Schlanker Fragen-Mix + kleine Handys (13.08.2026, Version 8.7)
+
+Auf Wunsch der Lehrkraft wurde der Fragen-Mix im Koran-Kurs ausgemistet und
+das Layout für kleine Handys überarbeitet:
+
+**Raus sind:**
+
+- das **Regel-Intro** vor jeder Lektion (über ℹ️ in der Kopfzeile weiterhin
+  freiwillig abrufbar),
+- die **Lehrkarten** vor jeder neuen Karte (neue Karten kommen direkt als
+  Frage — der Name steht in den Antworten, 🔊 spielt den Klang). Die
+  **Formen-Lehrkarte in Lektion 2 bleibt**,
+- der **Abruf für Buchstaben und einzelne Silben** („Errate den Buchstaben/
+  die Silbe" mit Ja/Vage/Nein). Für **echte Wörter bleibt „Errate das Wort"
+  überall erhalten** — laut lesen ist der Kern der Wort-Lektionen,
+- die **Blitzfragen** im Koran-Kurs (in eigenen Stapeln gibt es sie weiter),
+- **beide Hör-Auswahlen** der Silben-Lektionen („passendes Audio wählen" und
+  „richtige Schrift wählen") — sie hingen an der unzuverlässigen
+  Computerstimme,
+- in Lektion 2 das selbstbewertete „Errate den hervorgehobenen Buchstaben".
+
+**Neu dafür:** Die Silben-Lektionen arbeiten jetzt wie Lektion 1 — zusätzlich
+zur Auswahl-Frage gibt es **„Wo ist ‚be'?"**: Die Lesung steht da, gewählt
+wird unter fünf Silben mit gleicher Harekat, die falschen sind
+Geschwister-Silben (تَ ثَ نَ يَ zu بَ). 🔊 auf der Karte spielt den Klang.
+
+**Kleine Handys:** Auf kurzen Displays (unter ~760 px Höhe) schrumpfen
+Fragekarte, Schrift und Antwort-Knöpfe automatisch so weit, dass **alles ohne
+Scrollen** auf den Bildschirm passt — Bestätigen/Weiter sind immer sofort
+erreichbar. Geprüft bis hinunter zu 320 × 568 (altes iPhone SE).
+
 ## 🗂 Suren & Gebete direkt in „Meine Stapel" (12.08.2026)
 
 Die Kinder müssen nicht mehr suchen: Unter **Meine Stapel** steht jetzt der

@@ -86,26 +86,6 @@
 
   const ORDER_RX = /ordnen|reihenfolge|sortier|von unten nach oben|von oben nach unten|in welcher folge|schritte in/i;
 
-  /* -------- Silben-Varianten (Koran) --------
-     Gleiche Basis, drei Harekat (بَ/بِ/بُ) — das Verwechslungs-Training der
-     Vokale aus dem Vorbild-Video. Labels kommen aus den ECHTEN Karten der
-     drei Silben-Lektionen (be/bi/bü); nur wenn alle drei existieren, wird
-     eine Hör-Übung generiert. */
-  function syllableVariants(base, q) {
-    const H = [['\u064E', 'quran-ustun'], ['\u0650', 'quran-esre'], ['\u064F', 'quran-otre']];
-    const out = [];
-    for (const [mark, tid] of H) {
-      const t = (window.QURAN_TOPICS || []).find(x => x.id === tid);
-      const hit = t && t.blocks[0].quiz.find(x => x.q === base + mark);
-      if (!hit) return null;
-      out.push({ ar: base + mark, t: hit.a });
-    }
-    const variants = shuffle(out);
-    const correct = variants.findIndex(v => v.ar === q);
-    if (correct < 0) return null;
-    return { variants: variants, correct: correct };
-  }
-
   /* -------- Distraktoren-Pools pro Thema (gecached) --------
      Distraktoren kommen bevorzugt aus dem GLEICHEN Block (fachlich
      verwandt und daher plausibel — genau wie im Original beobachtet),
@@ -229,6 +209,101 @@
     return out;
   }
 
+  /* Falsche GLYPHEN zu einer Silben-Karte (13.08.2026): gleiche Harekat,
+     anderer Grundbuchstabe — Verwechsel-Geschwister zuerst. Ersetzt die
+     beiden Hör-Auswahlen: "Wo ist be?" funktioniert ohne Computerstimme. */
+  function quranSisterGlyphs(card, topicId, n) {
+    const strip = s => String(s).replace(/[\u064B-\u0652\u0670\u0640]/g, '').replace(/[^\u0600-\u06FF]/g, '');
+    const bare = strip(card.q);
+    const base = bare[0];
+    const fam = familyOf(base) || [];
+    const topic = (window.QURAN_TOPICS || []).concat(window.QURAN_EXTRA_TOPICS || []).find(t => t.id === topicId);
+    if (!topic) return [];
+    const sisters = [], rest = [];
+    topic.blocks.forEach(b => (b.quiz || []).forEach(c => {
+      const cb = strip(c.q);
+      if (cb.length !== bare.length || cb === bare) return;
+      if (String(c.q).replace(cb[0], '') !== String(card.q).replace(base, '')) return; // gleiche Harekat-Form
+      if (c.q === card.q) return;
+      (fam.indexOf(cb[0]) >= 0 ? sisters : rest).push(c.q);
+    }));
+    const out = [];
+    shuffle(sisters).concat(shuffle(rest)).forEach(g => {
+      if (out.length < n && out.indexOf(g) < 0 && g !== card.q) out.push(g);
+    });
+    return out;
+  }
+
+  /* ---- 🔗 Paare verbinden (13.08.2026, Nutzerwunsch "Nummer 2, überall"):
+     vier Karten derselben Lektion — die aktuelle plus drei Nachbarn, die
+     Verwechsel-Geschwister zuerst. Links Arabisch, rechts die Lesung. ---- */
+  function quranPairsGen(card, topicId, a) {
+    const strip = s => String(s).replace(/[\u064B-\u0652\u0670\u0640]/g, '').replace(/[^\u0600-\u06FF]/g, '');
+    const kurz = c => String(c.a || '').length <= 26 && strip(c.q).length <= 12;
+    if (!kurz(card)) return null;
+    const topic = (window.QURAN_TOPICS || []).concat(window.QURAN_EXTRA_TOPICS || []).find(t => t.id === topicId);
+    if (!topic) return null;
+    const alle = [];
+    topic.blocks.forEach(b => (b.quiz || []).forEach(c => { if (c.q && c.a) alle.push(c); }));
+    const base = strip(card.q)[0];
+    const fam = familyOf(base) || [];
+    const usedQ = { }; usedQ[card.q] = 1;
+    const usedA = { }; usedA[String(a).toLowerCase()] = 1;
+    const sis = [], rest = [];
+    alle.forEach(c => {
+      if (usedQ[c.q] || !kurz(c)) return;
+      const cb = strip(c.q);
+      ((cb[0] && fam.indexOf(cb[0]) >= 0) ? sis : rest).push(c);
+    });
+    const picked = [card];
+    shuffle(sis).concat(shuffle(rest)).forEach(c => {
+      const al = String(c.a).toLowerCase();
+      if (picked.length < 4 && !usedQ[c.q] && !usedA[al]) { picked.push(c); usedQ[c.q] = 1; usedA[al] = 1; }
+    });
+    if (picked.length < 4) return null;
+    const pairs = picked.map((c, i) => ({ id: i, ar: c.q, tr: c.a }));
+    return {
+      kind: 'pairs', generated: true, q: 'Welche Paare gehören zusammen?', a, say: card.q, tr: a,
+      pairs: pairs, left: shuffle(pairs), right: shuffle(pairs),
+    };
+  }
+
+  /* ---- 🧱 Wort-Baukasten (13.08.2026, "Nummer 3"): Lesung steht da, das Wort
+     wird aus Silben-Kacheln zusammengebaut — plus zwei Fallen-Kacheln aus der
+     Verwechsel-Familie (gleiche Harekat, anderer Grundbuchstabe). ---- */
+  function quranBuildGen(card, a) {
+    if (!window.QuranForms || !window.QuranForms.splitClusters) return null;
+    const q = String(card.q || '');
+    if (/\s/.test(q)) return null;                       // nur einzelne Wörter
+    const cls = window.QuranForms.splitClusters(q);
+    if (!cls || cls.length < 2 || cls.length > 6) return null;
+    const traps = [];
+    shuffle(cls.slice()).forEach(c => {
+      if (traps.length >= 2) return;
+      const alt = shuffle((familyOf(c[0]) || []).filter(x => x !== c[0]))[0];
+      if (!alt) return;
+      const t = alt + c.slice(1);
+      if (cls.indexOf(t) < 0 && traps.indexOf(t) < 0) traps.push(t);
+    });
+    return {
+      kind: 'build', generated: true, q: a, a, ar: q, say: q, tr: a,
+      clusters: cls, tiles: shuffle(cls.concat(traps)),
+    };
+  }
+
+  /* ---- 🎤 Lese-Check (13.08.2026, "Nummer 1"): Wort laut vorlesen, der
+     Browser prüft mit (dieselbe Technik wie beim Suren-Nachsprechen).
+     Nur wenn das Gerät wirklich zuhören kann — sonst greift der normale Mix.
+     Die 5er-Auswahl fährt als Ausweich-Antwort mit ("Lieber antippen"). ---- */
+  function quranReadGen(card, topicId, a) {
+    if (!window.Recite || window.Recite.mode() !== 'speech') return null;
+    const wrongs = quranNameWrongs(card, topicId, a, 4);
+    const options = wrongs.length >= 3
+      ? shuffle([{ t: a, c: true }, ...wrongs.map(t => ({ t, c: false }))])
+      : null;
+    return { kind: 'readCheck', generated: true, q: card.q, a, say: card.q, tr: a, options: options };
+  }
+
   function generate(card, topicId) {
     const pool = pools(topicId);
     const a = (card.a || '').trim();
@@ -254,7 +329,8 @@
       const uniq = [...new Set(bare.split(''))];
       const isLetterCard = !/[\u064B-\u0652]/.test(card.q) && bare.length >= 1 && uniq.length === 1 && String(a).length <= 8;
       const hf = (window.QURAN_TOPICS || []).find(t => t.id === 'quran-harfler');
-      if (isLetterCard && hf && Math.random() < 0.35) {
+      const rMix = Math.random();
+      if (isLetterCard && hf && rMix < 0.35) {
         const alle = hf.blocks[0].quiz.map(x => x.q).filter(g => g !== uniq[0]);
         const fam = (familyOf(uniq[0]) || []).filter(g => g !== uniq[0] && alle.indexOf(g) >= 0);
         const rest = shuffle(alle.filter(g => fam.indexOf(g) < 0));
@@ -267,20 +343,53 @@
           };
         }
       }
-      // 1b) Silben (Üstün/Esre/Ötre): Hör-Übungen wie im Vorbild-Video —
-      //     Typ B (Silbe sehen → Audio wählen) und Typ C (Audio hören →
-      //     Schrift wählen), je ~30 % der Auftritte.
-      if (/[\u064B-\u0652]/.test(card.q) && bare.length === 1) {
-        const v = syllableVariants(bare, card.q);
-        if (v) {
-          const r2 = Math.random();
-          if (r2 < 0.3) return { kind: 'audioPick', q: card.q, say: card.q, a, variants: v.variants, correct: v.correct };
-          if (r2 < 0.6) return { kind: 'scriptPick', q: 'Höre zu und wähle die richtige Schrift', say: card.q, a, variants: v.variants, correct: v.correct };
+      // 1a) Buchstaben: 🔗 Paare verbinden (Buchstabe ↔ Name)
+      if (isLetterCard && rMix < 0.55) {
+        const p = quranPairsGen(card, topicId, a);
+        if (p) return p;
+      }
+      // 1b) Silben: Richtungswechsel wie bei den Buchstaben (13.08.2026,
+      //     Nutzerwunsch: beide Hör-Auswahlen raus — sie hingen an der
+      //     Computerstimme). Die Lesung steht da ("Wo ist be?"), gewählt
+      //     wird unter fünf Silben mit gleicher Harekat — die falschen sind
+      //     Geschwister-Silben. 🔊 auf der Karte spielt den Klang weiter ab.
+      const isSyllCard = /[\u064B-\u0652]/.test(card.q) && bare.length === 1;
+      if (isSyllCard && rMix < 0.35) {
+        const glyphs = quranSisterGlyphs(card, topicId, 4);
+        if (glyphs.length >= 3) {
+          return {
+            kind: 'mc', multi: false, generated: true, arabicOptions: true,
+            q: 'Wo ist \u201E' + a + '\u201C?', a: card.q, say: card.q, tr: a,
+            options: shuffle([{ t: card.q, c: true }, ...glyphs.map(t => ({ t, c: false }))]),
+          };
         }
       }
-      // 2) Active-Recall-Schwerpunkt: gut ein Drittel reiner Abruf
-      //    ("ansehen → laut sagen → aufdecken → ehrlich bewerten").
-      if (Math.random() < 0.35) return { kind: 'recall', q: card.q, a };
+      // 1c) Silben: 🔗 Paare verbinden (Silbe ↔ Lesung)
+      if (isSyllCard && rMix < 0.55) {
+        const p = quranPairsGen(card, topicId, a);
+        if (p) return p;
+      }
+      // 2) Abruf NUR noch für echte Wörter (13.08.2026: "Errate das Wort
+      //    überall behalten" — für einzelne Buchstaben und Silben ist er raus,
+      //    dort gibt es nur noch prüfbare Auswahl-Fragen).
+      const isWordCard = bare.length >= 2 && bare !== '\u0644\u0627';
+      if (isWordCard) {
+        const spaced = /\s/.test(String(card.q));
+        const isExtra = topicId === 'quran-vokabeln' || topicId === 'quran-gebete';
+        if (rMix < 0.28) return { kind: 'recall', q: card.q, a };
+        if (!spaced && !isExtra && rMix < 0.46) {
+          const rc = quranReadGen(card, topicId, a);          // 🎤 Lese-Check
+          if (rc) return rc;
+        }
+        if (!spaced && rMix < 0.64) {
+          const bd = quranBuildGen(card, a);                  // 🧱 Wort-Baukasten
+          if (bd) return bd;
+        }
+        if (rMix < 0.78) {
+          const p = quranPairsGen(card, topicId, a);          // 🔗 Paare
+          if (p) return p;
+        }
+      }
       // 3) Sonst: Auswahl-Frage mit VERWECHSEL-Antworten und 5 Optionen.
       if (a) {
         const wrongs = quranNameWrongs(card, topicId, a, 4);
