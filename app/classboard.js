@@ -11,11 +11,15 @@
    auch ein Kind, das später dazukommt, diese Woche vorne stehen;
    niemand ist dauerhaft abgehängt.
 
-   Vier Bausteine:
+   Fünf Bausteine:
      1. 🎯 Klassenziel   — was die Klasse zusammen geschafft hat
      2. 🔥 Diese Woche   — Rangliste nach Punkten der letzten 7 Tage
-     3. 🏆 Auswendig     — wer wie viele Suren auswendig kann
-     4. 💪 Anfeuern      — ein Zeichen an eine Mitschülerin schicken
+     3. ⭐ Gesamt        — Rangliste nach ALLEN Punkten seit Tag 1
+        (14.08.2026, Nutzerwunsch: „Kaan hatte doch 42000?" — die
+        Wochen-Tafel hatte für Verwirrung gesorgt; jetzt sieht jedes
+        Kind beide Sichten und nichts wirkt „weggenommen")
+     4. 🏆 Auswendig     — wer wie viele Suren auswendig kann
+     5. 💪 Anfeuern      — ein Zeichen an eine Mitschülerin schicken
         (nur 💪 👏 🔥 🤲, kein freier Text — so kann hier niemand
         etwas Gemeines schreiben; drei Zurufe pro Tag und Person)
 
@@ -148,8 +152,9 @@
     const list = (board || []).filter(function (b) { return !b.teacher; });
     const meRow = list.filter(function (b) { return b.n === myName; })[0] || null;
     const byWeek = list.slice().sort(function (a, b) { return b.w7 - a.w7 || b.xp - a.xp; });
+    const byTotal = list.slice().sort(function (a, b) { return b.xp - a.xp || b.w7 - a.w7; });
     const byHifz = list.slice().sort(function (a, b) { return b.hzd - a.hzd || b.hzv - a.hzv || b.xp - a.xp; });
-    const rows = tab === 'woche' ? byWeek : byHifz;
+    const rows = tab === 'woche' ? byWeek : tab === 'gesamt' ? byTotal : byHifz;
     const myPos = byWeek.map(function (b) { return b.n; }).indexOf(myName);
 
     /* Klassenziel: was haben alle zusammen geschafft? */
@@ -233,6 +238,7 @@
             {/* 3) Tafeln */}
             <div className="sur-tabs" style={{ margin: '12px 0 8px' }}>
               <button className={'sur-tab' + (tab === 'woche' ? ' is-active' : '')} onClick={function () { setTab('woche'); }}>🔥 Diese Woche</button>
+              <button className={'sur-tab' + (tab === 'gesamt' ? ' is-active' : '')} onClick={function () { setTab('gesamt'); }}>⭐ Gesamt</button>
               <button className={'sur-tab' + (tab === 'auswendig' ? ' is-active' : '')} onClick={function () { setTab('auswendig'); }}>🏆 Auswendig</button>
             </div>
 
@@ -247,6 +253,8 @@
                     <span className="cb-val">
                       {tab === 'woche'
                         ? <>{b.w7} XP {b.streak > 0 ? <em>🔥{b.streak}</em> : null}</>
+                        : tab === 'gesamt'
+                        ? <>{b.xp} XP <em>Level {b.lvl}</em></>
                         : <>{b.hzd} 🏆 <em>{b.hzv} Verse</em></>}
                     </span>
                     {!mine && (
@@ -269,6 +277,7 @@
 
             <div className="muted" style={{ fontSize: 12, marginTop: 10, lineHeight: 1.6 }}>
               Die Wochen-Tafel zählt nur die letzten 7 Tage — wer neu dazukommt, kann sofort vorne mitspielen.
+              Unter ⭐ Gesamt zählen alle Punkte seit dem ersten Tag; dort geht nie etwas verloren.
               Anfeuern geht dreimal am Tag pro Mitschüler, und es sind nur diese vier Zeichen möglich.
             </div>
           </>

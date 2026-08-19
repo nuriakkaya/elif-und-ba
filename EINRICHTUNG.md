@@ -579,10 +579,12 @@ sehen dort einander — aber nur das, was anspornt, nichts Persönliches.
 einer Koranklasse soll nicht der Beste gewinnen, sondern jeder weiterkommen —
 deshalb zuerst das, was alle zusammen schaffen.
 
-**2. Die Wochen-Tafel zählt nur die letzten 7 Tage**, nicht die Gesamtpunkte.
-Wer neu dazukommt oder eine Woche gefehlt hat, kann sofort wieder vorne
-mitspielen; niemand ist dauerhaft abgehängt. Daneben gibt es die Tafel
-**🏆 Auswendig** — wer wie viele Suren kann.
+**2. Drei Tafeln.** **🔥 Diese Woche** zählt nur die letzten 7 Tage, nicht die
+Gesamtpunkte — wer neu dazukommt oder eine Woche gefehlt hat, kann sofort
+wieder vorne mitspielen; niemand ist dauerhaft abgehängt. **⭐ Gesamt** (neu in
+8.9) zeigt daneben alle Punkte seit dem ersten Tag samt Level — dort geht nie
+etwas „verloren", falls ein Kind sich über die sinkende Wochenzahl wundert.
+Und **🏆 Auswendig** zeigt, wer wie viele Suren kann.
 
 **3. Ein persönlicher Anstupser.** Direkt über der Tafel steht, wer unmittelbar
 vor dem Kind liegt: *„👀 Deniz ist diese Woche nur 140 XP vor dir — eine Runde,
