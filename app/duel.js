@@ -272,10 +272,9 @@ function DuelScreen({ ctx }) {
 
         <div className="card" style={{ padding: 16, marginTop: 12 }}>
           <div style={{ fontWeight: 800, marginBottom: 6 }}>Oder mit Code beitreten</div>
-          <div className="row" style={{ gap: 8 }}>
+          <div className="code-reihe">
             <input ref={codeRef} value={joinCode} onChange={e => setJoinCode(e.target.value.toUpperCase().slice(0, 4))}
-                   placeholder="z. B. K7QM" maxLength={4}
-                   style={{ flex: 1, padding: '12px 14px', borderRadius: 12, border: '1px solid var(--line)', background: 'var(--surface)', font: 'inherit', fontSize: 20, fontWeight: 800, letterSpacing: 4, textAlign: 'center' }} />
+                   placeholder="z. B. K7QM" maxLength={4} className="code-feld" />
             <button className="btn btn-primary" disabled={joinCode.length !== 4 || busy} onClick={() => join(joinCode)}>Beitreten</button>
           </div>
         </div>

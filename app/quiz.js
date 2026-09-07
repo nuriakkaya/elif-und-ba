@@ -1473,7 +1473,7 @@ function RoundEnd({ go, stackName, topicId, data, log, roundXp, roundCoins, onNe
     left: Math.random() * 100,
     delay: Math.random() * 0.9,
     dur: 2.2 + Math.random() * 1.6,
-    color: ['#F6C445', '#7A7BF5', '#F2789F', '#6FCF97', '#56CCF2'][i % 5],
+    color: ['#F0B84E', '#0E6B57', '#D9962B', '#2E9E6B', '#12866C', '#FDF4E5'][i % 6],
     rot: Math.random() * 360,
   }))).current;
   const rows = [
@@ -1483,6 +1483,24 @@ function RoundEnd({ go, stackName, topicId, data, log, roundXp, roundCoins, onNe
     { k: 'gemeistert', label: 'Gemeistert', emoji: '🏆' },
   ];
   const R = 52, C = 2 * Math.PI * R;
+
+  /* Die Punkte der Runde zählen sichtbar hoch — das ist der Moment, auf den
+     Kinder warten. Dazu direkt daneben: Was hat die Runde fürs Tagesziel
+     gebracht? (05.09.2026) */
+  const [xpShown, setXpShown] = useState(0);
+  useEffect(() => {
+    if (!roundXp) { setXpShown(0); return; }
+    const start = performance.now(); let raf;
+    const tick = (now) => {
+      const k = Math.min(1, (now - start) / 1300);
+      setXpShown(Math.round((1 - Math.pow(1 - k, 3)) * roundXp));
+      if (k < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [roundXp]);
+  const tagesziel = window.XP ? window.XP.streakStatus() : null;
+  const serie = window.XP ? (window.XP.state().streakDays || 0) : 0;
 
   return (
     <div className="quiz-shell roundend">
@@ -1501,10 +1519,23 @@ function RoundEnd({ go, stackName, topicId, data, log, roundXp, roundCoins, onNe
       </div>
       <div className="quiz-stage" style={{ overflow: 'auto' }}>
         <div className="stage-inner" style={{ gap: 16, paddingBottom: 110 }}>
-          <div className="roundend-title">Runde<br/><span className="roundend-title-accent">abgeschlossen!</span></div>
-          <div className="row" style={{ justifyContent: 'center', gap: 8 }}>
-            <span className="pill" style={{ background: 'var(--success-soft, #E7F7EE)', color: 'var(--success, #1B8A5A)', fontWeight: 800 }}>+{roundXp} XP</span>
-            <span className="pill">+{roundCoins} 🪙</span>
+          {window.Hudhud && (
+            <div className="re-vogel">
+              <window.Hudhud size={124} mood="cheer"/>
+            </div>
+          )}
+          <div className="roundend-title">Maschallah!<br/><span className="roundend-title-accent">Runde geschafft</span></div>
+          <div className="re-xp">
+            <b>+{xpShown}</b><span>XP</span>
+          </div>
+          <div className="row" style={{ justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+            {roundCoins > 0 && <span className="pill">+{roundCoins} 🪙</span>}
+            {serie > 0 && <span className="pill re-pill-feuer">🔥 {serie} {serie === 1 ? 'Tag' : 'Tage'}</span>}
+            {tagesziel && (
+              <span className={'pill ' + (tagesziel.secured ? 're-pill-ziel-ok' : 're-pill-ziel')}>
+                {tagesziel.secured ? '✅ Tagesziel geschafft' : '🎯 noch ' + tagesziel.needed + ' bis zum Tagesziel'}
+              </span>
+            )}
           </div>
           {window.Replay && window.Replay.factor(topicId, data) < 1 && (
             <div className="muted" style={{ textAlign: 'center', fontSize: 13, maxWidth: 420, lineHeight: 1.55 }}>
@@ -1605,7 +1636,7 @@ function StreakScreen({ streakDays, freezeUsed, onNext }) {
               🧊 Ein Serien-Freeze hat einen verpassten Tag gerettet
             </div>
           )}
-          <Axolotl size={150} />
+          {window.Hudhud ? <window.Hudhud size={132} mood="cheer"/> : <Axolotl size={150} />}
           <div className="streak-week">
             {days.map((d) => (
               <div key={d.key} className="streak-day">
@@ -1774,7 +1805,7 @@ function TestScreen({ go, stackName, questions, topicId, count, userId }) {
         <div className="quiz-stage" style={{ display: 'grid', placeItems: 'center' }}>
           <div className="card flat" style={{ maxWidth: 440, padding: '34px 28px', textAlign: 'center', display: 'grid', gap: 12, justifyItems: 'center' }}>
             <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--surface-2, #F2F2F8)', display: 'grid', placeItems: 'center', fontSize: 30 }}>🔒</div>
-            <div style={{ fontFamily: 'Fraunces, serif', fontWeight: 900, fontSize: 24 }}>Übungstest</div>
+            <div style={{ fontWeight: 900, fontSize: 24 }}>Übungstest</div>
             <div className="muted">Beantworte noch <b style={{ color: 'var(--ink)' }}>{need - answered}</b> {need - answered === 1 ? 'Frage' : 'Fragen'} im Auswendig-Modus, um den Test freizuschalten.</div>
             <div style={{ width: '100%', height: 10, borderRadius: 999, background: 'var(--line)', overflow: 'hidden' }}>
               <div style={{ width: `${Math.round((answered / need) * 100)}%`, height: '100%', background: 'var(--accent)', borderRadius: 999 }} />
@@ -2486,9 +2517,9 @@ function ShareModal({ ctx }) {
       <ModalHead title="Fortschritt teilen" onClose={ctx.closeModal}/>
       <div className="modal-body" style={{display:'grid', placeItems:'center', gap:14}}>
         <div style={{background:'linear-gradient(135deg, var(--premium-a), var(--premium-b))', color:'#fff', borderRadius:24, padding:32, width:'100%', maxWidth:420, textAlign:'center', position:'relative', overflow:'hidden'}}>
-          <div style={{fontFamily:'Fraunces, serif', fontWeight:900, fontSize:42, letterSpacing:'-0.02em'}}>Locked in.</div>
+          <div style={{fontWeight:900, fontSize:42, letterSpacing:'-0.02em'}}>Locked in.</div>
           <div style={{marginTop:8, opacity:.85, fontWeight:700}}>2-Tage-Serie · 19k XP · Level 14</div>
-          <div style={{marginTop:18}}><Axolotl size={120}/></div>
+          <div style={{marginTop:18}}>{window.Hudhud ? <window.Hudhud size={110} mood="cheer"/> : <Axolotl size={120}/>}</div>
           <div style={{marginTop:10, fontWeight:800}}>@nuri.de</div>
         </div>
         <div className="row" style={{gap:10, justifyContent:'center'}}>

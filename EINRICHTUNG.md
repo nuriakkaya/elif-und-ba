@@ -502,6 +502,46 @@ und dem Erraten der markierten Form gibt es jetzt:
 Der Anteil der Abruf-Karten („erst selbst denken, dann aufdecken") ist im
 ganzen Kurs leicht erhöht.
 
+## 🎤 Tekrar: Auswendiglernen wie in der Hıfz-Schule (14.08.2026, Version 9.0)
+
+Das Suren-Auswendiglernen übernimmt die Methode aus der Hıfz-App der
+Lehrkraft — kindgerecht verpackt:
+
+**📿 Tekrar-Perlen (die neue Stufe 2).** Ein neuer Vers wird nicht mehr nur
+einmal nachgesprochen, sondern **mehrmals rezitiert** (Standard 7×). Das
+Mikrofon hört **durchgehend** zu: Jedes saubere Rezitieren (mindestens 60 %
+der Vers-Wörter erkannt) füllt eine Perle ✓ — fremde oder falsche Sätze
+zählen nicht, und die App zeigt ehrlich an, was sie verstanden hat. Alle
+Perlen voll = Stufe geschafft (+30 XP wie bisher, einmalig). Kann das Gerät
+nicht mithören, zählt das Kind selbst („Tekrar +1") — dann gibt es wie bei
+allen Selbstbestätigungen die halbe Punktzahl.
+
+**🔤 Lateinbuchstaben.** Beim Tekrar steht die Umschrift jetzt **sichtbar
+unter dem Arabischen** (abschaltbar über „ABC verstecken") — Schummeln geht
+trotzdem nicht, denn das Mikrofon prüft jedes Rezitieren. Ab Stufe 3
+(Puzzle) ist der Text wie bisher zugedeckt.
+
+**🎓 Echte Lehr-Rezitation.** Suren spielen jetzt standardmäßig mit
+**al-Ḥuṣarî Muʿallim** — der klassischen Lehr-Tilâve (langsam, deutlich, zum
+Mitsprechen). Alafasy bleibt als „flüssige" Alternative wählbar. Eigene
+Aufnahmen aus der Werkstatt haben weiterhin Vorrang vor allem.
+
+**🔗 „Wie geht es weiter?"** Bei fälligen Auffrischungen fragt die App
+zuerst einen **Übergang** ab: Vers n wird gezeigt/angehört, Vers n+1 kommt
+aus dem Kopf (+40 XP, mit Spick-Hilfe die Hälfte; ohne Mikrofon als
+Blind-Puzzle). Genau die Stellen, an denen man beim Aufsagen hängen bleibt.
+
+**❓ Klickbare Einführung.** Beim ersten Öffnen erklärt eine kurze,
+durchklickbare Bildergeschichte den Kindern das System (Zuhören → Perlen →
+Puzzle → aus dem Kopf → Krone). Über „❓ So geht's" jederzeit wieder
+abrufbar.
+
+**⚙️ Klassen-Einstellungen (Klassenzimmer).** Neu: Die Lehrkraft stellt
+**Tekrar-Ziel** (Aus/3×/5×/7×) und **Rezitations-Stimme** (Lehr-Tempo/
+flüssig) einmal ein — alle Kinder-Geräte übernehmen es automatisch beim
+nächsten App-Start. Dafür gibt es eine neue kleine Server-Route (`config`);
+einfach wie immer das komplette Paket hochladen, Netlify baut den Rest.
+
 ## ✨ Drei neue Fragetypen (13.08.2026, Version 8.8)
 
 Auf Wunsch der Lehrkraft („Nummer 1, 2 und 3 — generell überall") sind drei
@@ -691,3 +731,233 @@ dorthin war kurzzeitig blockiert.
   Site-Einstellungen muss **Blobs** verfügbar sein.
 - **Zwei Kinder heißen gleich** → das zweite Kind hängt eine Zahl an
   (z. B. „Amina 2“) oder das erste legt unter „▾ Mehr“ ein Geheimwort fest.
+
+---
+
+## Version 10.0 — „Jetzt fühlt es sich wie eine App an" (06.09.2026)
+
+Diese Version ändert nichts am Lernstoff und nichts am Punktesystem. Sie ändert,
+wie sich die App anfühlt: wie schnell sie startet, wie sie aussieht und was die
+Kinder beim Öffnen als Erstes sehen.
+
+### 1. Sie startet 15-mal schneller
+
+Bisher lud jedes Kind bei **jedem** Start rund 4,3 MB Hilfsprogramme herunter
+(Babel 3,1 MB + React-Entwicklerbau 1,2 MB) — und der Browser musste danach
+noch den kompletten App-Quelltext übersetzen. Auf einem älteren Handy dauerte
+das gut und gerne 15 bis 25 Sekunden. Gemessen im Prüfstand: **7,95 Sekunden**.
+
+Jetzt wird der Quelltext **einmal vorher** übersetzt und zu einer einzigen Datei
+`app/bundle.js` zusammengefasst. Babel fliegt ganz raus, React kommt im
+schlanken Produktionsbau. Gemessen: **0,5 Sekunden**. Statt 55 einzelner
+Dateien lädt der Browser noch eine.
+
+> **Wichtig für spätere Änderungen:** Die gut lesbaren Quelldateien liegen
+> weiterhin in `app/` — sie werden nur nicht mehr direkt geladen. Wer dort
+> etwas ändert, muss `app/bundle.js` neu erzeugen lassen. Einfach Bescheid
+> sagen, das ist ein Knopfdruck.
+
+### 2. Neue Farbwelt: warmes Papier, Smaragd und Gold
+
+Das kühle Grau-Blau ist weg. Der Hintergrund ist jetzt ein warmer Papierton,
+die Leitfarbe ein tiefes Smaragdgrün, die Belohnungsfarbe Gold. Dazu ein
+zurückhaltendes Achtstern-Muster auf den farbigen Flächen.
+
+Alle Knöpfe haben eine **fühlbare Unterkante** und sinken beim Antippen darauf
+herunter — Kinder drücken gern etwas, das nachgibt. Und die Großbuchstaben auf
+den Knöpfen sind weg: gemischte Schrift liest sich schneller.
+
+Der **Dunkelmodus** ist vollständig mitgezogen (dunkles Tannengrün statt
+Marineblau, Mint als Leitfarbe, dunkle Schrift auf hellen Flächen).
+
+### 3. Die Startseite ist jetzt „Heute"
+
+Vorher stand dort ein großes Maskottchen und darunter drei Karten. Jetzt sieht
+das Kind beim Öffnen sofort:
+
+* **Tagesziel** als Ring — wie viele richtige Antworten heute schon geschafft sind.
+* **Serie** (🔥) und die heute gesammelten Punkte.
+* **Wochenstreifen** Mo–So: erledigte Tage grün, Goldtage mit ⭐, heute umrandet.
+* Ein großer **Weiterlernen**-Knopf, der direkt in die nächste offene Lektion führt.
+
+### 4. Aus der Kachelliste wird ein Lernpfad
+
+Unter „Meine Stapel" liegen die 17 Elifba-Lektionen nicht mehr als flache
+Kacheln nebeneinander, sondern als **Weg von oben nach unten**:
+
+* erledigte Lektion → goldener Stern,
+* aktuelle Lektion → pulsiert, mit „Start"-Fähnchen und einem Ring, der den
+  Fortschritt der Lektion zeigt,
+* noch gesperrte Lektion → grau mit Schloss (Antippen erklärt, was noch fehlt).
+
+Ganz unten steht das Ziel: Wenn alle Lektionen auf 100 % stehen, öffnet sich
+das Auswendiglernen. Darunter liegen unverändert die Suren zum Auswendiglernen
+und ganz unten die eigenen Stapel.
+
+### 5. Hüdhüd, das Maskottchen
+
+Der Axolotl passte nie zum Thema. An seiner Stelle steht jetzt **Hüdhüd**, der
+kleine Wiedehopf — der Vogel aus Sure Neml, der eine Nachricht überbringt.
+Selbst gezeichnet, reines SVG (kostet keine zusätzliche Datei), und er reagiert:
+Ist das Tagesziel geschafft, freut er sich.
+
+### 6. Die arabische Schrift liegt jetzt im Paket
+
+Bisher kam „Scheherazade New" von Google. Im Schulnetz, im Flugmodus oder bei
+schlechtem Empfang stand der Korantext dann in einer beliebigen Systemschrift.
+Jetzt liegt die Schrift (frei lizenziert, OFL) im Ordner `fonts/` und wird vom
+Service Worker mitgespeichert — der Korantext sieht **immer** gleich aus, auch
+offline. Nebenbei: Es geht dadurch keine Anfrage mehr an Google.
+
+### 7. Neues App-Symbol
+
+Passend zur neuen Farbwelt: smaragdgrüner Grund, das arabische **ب**, ein
+goldener Halbmond und das Achtstern-Muster. Ersetzt den alten blauen Mond.
+
+### 8. Kleinigkeiten, die man erst merkt, wenn sie fehlen
+
+* Nichts verschwindet mehr unter der unteren Leiste — jede Seite hat unten Luft.
+* Die untere Leiste ist leicht durchscheinend und zeigt den aktiven Bereich mit
+  einem Strich an.
+* Kacheln und Antworten treten leicht versetzt ein statt schlagartig zu erscheinen.
+* Sichtbarer Tastatur-Fokus für alle, die mit Tastatur bedienen.
+* Wer im Gerät „Bewegung reduzieren" eingestellt hat, bekommt keine Animationen.
+* Der ungenutzte Supabase-Klotz (207 KB, wurde nie gebraucht) ist raus.
+
+### Was sich NICHT geändert hat
+
+Lernstoff, Fragetypen, Punkte, Tekrar-Perlen, Übergangs-Frage, Ḥuṣarî-Stimme,
+Klassen-Einstellungen, Klassenzimmer, Duell, Aussprache-Studio, Server — alles
+unverändert. Die Fortschritte der Kinder bleiben erhalten.
+
+### Version 10.1 — Feinschliff (06.09.2026)
+
+Kein neuer Stoff, nur Nacharbeit an Stellen, die nach dem großen Umbau noch
+aus der alten Farbwelt stammten:
+
+* **Über 330 alte Farbwerte** in den restlichen Bildschirmen (Suren lesen,
+  Buchstaben-Übersicht, Auswendig-Bereich, Fortschritt, Klassenzimmer) auf die
+  neue Palette gezogen — es gibt kein Marineblau und kein Lila mehr in der App.
+* **Hüdhüd überall**: auch der Ladebildschirm, die Serien-Ansicht und die
+  Teilen-Karte zeigen jetzt den Wiedehopf statt des alten Axolotls.
+* **Rundenabschluss**: Die Punkte zählen sichtbar hoch, Hüdhüd jubelt, und es
+  steht direkt dabei, was die Runde fürs Tagesziel gebracht hat.
+* **Tagesziel-Ring** zeigt bei Erfolg einen Haken statt „145 von 5".
+* **Kleine Handys (320 × 568)**: Der Knopf „Weiterlernen" ist jetzt ohne
+  Scrollen erreichbar; Tagesziel, Wochenstreifen und Lernpfad sind dort enger
+  gesetzt.
+* **Eingabefelder, Haken und Schieber** in der Hausfarbe; im Duell passte der
+  Knopf „Beitreten" auf schmalen Geräten nicht neben das Code-Feld — behoben.
+* **Stufen-Wappen** auf der Fortschritts-Seite ist smaragdgrün statt lila; die
+  Schrift „Fraunces", die nie im Paket lag, ist durch die Hausschrift ersetzt.
+* Automatische Prüfung erweitert: Die App wird jetzt auch **ohne Internet**
+  gestartet und geprüft (Service Worker, arabische Schrift, Startseite).
+
+### Version 10.2 — letzte Ecken (06.09.2026)
+
+* **Profil-Kopfzeile** war auf dem Handy zerquetscht (Name, Knopf und Zahnrad
+  auf drei Zeilen, teils abgeschnitten) — sitzt jetzt sauber.
+* **Bildschirmwechsel** gleiten sanft ein, statt zu springen.
+* **Gesperrte Wegpunkte im Dunkelmodus** waren praktisch unsichtbar — jetzt lesbar.
+* **Haken statt „145 von 5"**: Wer über das Tagesziel hinausschießt, sieht ✓.
+* Der Prüfstand versteht jetzt alle Kartenarten (auch Paare) und läuft
+  zuverlässig durch; fünf Läufe hintereinander grün.
+
+### Version 10.3 — „Das wackelt noch" (06.09.2026)
+
+Neu auf der Seite **Fortschritt**: eine Karte, die zusammenfasst, an welchen
+Karten das Kind immer wieder scheitert — quer über alle freigeschalteten
+Lektionen.
+
+* Der Karteikasten zählt seit Längerem mit, wie oft eine Karte danebengeht.
+  Diese Zahl stand bisher nur versteckt in der jeweiligen Lektion.
+* Jetzt steht dort pro Lektion: **Name, die betroffenen Buchstaben im Original,
+  die Anzahl** und ein Knopf **Üben**, der eine Runde nur mit genau diesen
+  Karten startet.
+* Geübt wird immer innerhalb einer Lektion — so wird der Fortschritt sauber
+  der richtigen Lektion gutgeschrieben.
+* Die Karte erscheint nur, wenn es wirklich etwas zu üben gibt.
+
+Für die Lehrkraft ist das nebenbei die schnellste Antwort auf die Frage
+„Woran hängt das Kind gerade?" — ohne in jede Lektion einzeln zu schauen.
+
+### Version 10.4 — „Einmal alles einsprechen" (06.09.2026)
+
+Im Klassenzimmer steht im Aussprache-Studio jetzt ein Knopf **🎬 Alles
+einsprechen**. Er öffnet einen Vollbild-Modus, der dich durch **alle 612
+Stellen** führt, die die App überhaupt vorlesen kann:
+
+* 29 Buchstaben und ihre 29 Formen
+* alle Harekat-Silben (Üstün, Esre, Ötre, Cezim, Şedde, Tenvin, Dehnungen, Hemze …)
+* die 131 Wortschatz-Karten
+* alle Verse der 12 Suren und die 6 Namaz-Gebete
+
+**So läuft es ab:** Karte antippen → sprechen → **die App merkt selbst, wann du
+fertig bist** (sie hört auf die Stille danach), lädt hoch und schaltet weiter.
+Ein Tipp pro Aufnahme. Am Rechner geht alles über die Tastatur:
+`Leertaste` = aufnehmen, `→` = überspringen, `Esc` = beenden.
+
+Weitere Punkte:
+
+* **Nichts geht verloren.** Jede Aufnahme wird sofort gespeichert, und die App
+  merkt sich die Stelle. Du kannst nach 20 Stück aufhören und Tage später
+  genau dort weitermachen.
+* **Sofort im Einsatz.** Was du einsprichst, hören alle Kinder deiner Klasse ab
+  dem nächsten App-Start — auf jedem Gerät.
+* **Automatisch weiter** lässt sich abschalten; dann kannst du jede Aufnahme
+  erst anhören und mit ✅ bestätigen oder 🔁 neu machen.
+* **💾 Alle sichern** lädt sämtliche Aufnahmen in EINE Datei herunter. Aus
+  dieser Datei wird das feste Tonpaket gebaut, das dann in der App
+  mitgeliefert wird — dann funktionieren deine Aufnahmen auch offline und
+  ohne Server, genau wie die 30 mitgelieferten Buchstaben heute schon.
+
+#### Neue Einstellung: Wer hat bei den Suren Vorrang?
+
+Bisher hatte eine eigene Aufnahme **immer** Vorrang, auch bei den Koranversen.
+Das ist jetzt umschaltbar (Klassenzimmer → Auswendiglernen):
+
+* **🎓 Ḥuṣarî (Standard):** Bei den Koranversen bleibt die Lehr-Tilâve von
+  al-Ḥuṣarî Muʿallim vorn — sie ist eigens zum Nachsprechen aufgenommen.
+* **🎙️ Meine Aufnahme:** Deine eigene Stimme gilt auch bei den Suren.
+
+Für **Buchstaben, Silben, Wörter und die Gebete** gelten deine Aufnahmen
+immer — unabhängig von dieser Einstellung.
+
+#### Nebenbei repariert
+
+Über 50 Stellen im Programm benutzten Farbnamen, die es in der neuen Palette
+gar nicht gab (`--muted`, `--success-soft`, `--rose-2` …). Sie fielen still auf
+ihre eingebauten Ersatzwerte zurück — und die waren noch blaugrau aus der alten
+Farbwelt. Jetzt sind alle diese Namen sauber auf die neue Palette gelegt; unter
+anderem war dadurch der Aufnahme-Knopf im Serien-Modus unsichtbar.
+
+### Version 10.5 — die Premiere-Runde (06.09.2026)
+
+Damit die Aufnahmen einmal richtig gut werden, gibt es jetzt den kompletten
+Weg raus und wieder rein:
+
+**1. Aufnehmen** — Klassenzimmer → Aussprache-Studio → 🎬 Alles einsprechen.
+
+**2. Sichern** — 💾 Alle sichern lädt alles in eine Datei. Darin steht zu jeder
+Aufnahme die laufende **Nummer** und ein fertiger Dateiname
+(`001_die-buchstaben_elif`, `002_die-buchstaben_be`, …).
+
+**3. Schneiden** — Aus der Sicherungsdatei werden einzelne **WAV-Dateien**
+(mono, 48 kHz), benannt nach Nummer, Lektion und Buchstabe. Die lassen sich in
+Premiere Pro reinziehen, entrauschen, normalisieren, zuschneiden — und wieder
+als WAV exportieren. Eine mitgelieferte `_liste.csv` zeigt zu jeder Nummer den
+arabischen Text, die Umschrift, die Lektion und die Länge.
+
+**4. Zurückspielen** — Im Studio: 📂 **Bearbeitete Aufnahmen einlesen**, alle
+Dateien auf einmal auswählen. Die App ordnet sie über die **Nummer am Anfang
+des Dateinamens** zu, rechnet sie auf ein schlankes Format herunter
+(22,05 kHz mono) und ersetzt die alten Fassungen. Ab dem nächsten App-Start
+hören alle Kinder die neue Aufnahme.
+
+> **Die einzige Regel:** Die drei Ziffern am Anfang des Dateinamens dürfen sich
+> nicht ändern. Alles danach ist frei — aus `001_die-buchstaben_elif.wav` darf
+> ruhig `001_elif_final_v3.wav` werden.
+
+Wenn alles sitzt, wird aus den bearbeiteten Dateien das **feste Tonpaket**
+gebaut, das mit der App ausgeliefert wird — dann klingt sie für jeden, der sie
+herunterlädt, gleich, auch offline und ohne Server.

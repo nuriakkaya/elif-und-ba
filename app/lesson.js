@@ -218,7 +218,7 @@ function LessonScreen({ go, stackName, topicId, blockIdx }) {
             <>
               <div className="card flat" style={{ padding: 22 }}>
                 {detail.kat && <div className="muted" style={{ fontSize: 12.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em', marginBottom: 6 }}>{detail.kat}</div>}
-                <div style={{ fontFamily: 'Fraunces, serif', fontWeight: 900, fontSize: 22, marginBottom: 8 }}>{step.card.h}</div>
+                <div style={{ fontWeight: 900, fontSize: 22, marginBottom: 8 }}>{step.card.h}</div>
                 <div style={{ lineHeight: 1.55 }}>{step.card.b}</div>
                 {Array.isArray(detail.funktion) && detail.funktion.length > 0 && (
                   <ul style={{ margin: '12px 0 0', paddingLeft: 20, lineHeight: 1.55 }}>

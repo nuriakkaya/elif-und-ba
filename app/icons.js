@@ -272,3 +272,74 @@ window.Joystick = Joystick;
 window.Target = Target;
 window.ImportTile = ImportTile;
 window.AnimalAvatar = AnimalAvatar;
+
+/* ==============================================================
+   🐦 HÜDHÜD — unser eigenes Maskottchen (05.09.2026)
+   Der Wiedehopf ist der Vogel aus Sure Neml, der eine Nachricht
+   überbringt: ein Bote, der etwas gelernt hat und es weitersagt.
+   Passt zum Thema, ist selbst gezeichnet und kostet keine Datei
+   extra — reines SVG. Stimmungen: 'happy' | 'cheer' | 'sleep'.
+   ============================================================== */
+function Hudhud({ size = 104, mood = 'happy', className }) {
+  const augen = mood === 'sleep'
+    ? (<g stroke="#22322C" strokeWidth="2.6" strokeLinecap="round" fill="none">
+         <path d="M39 42 q5 4 10 0"/><path d="M57 41 q4 3 8 0"/>
+       </g>)
+    : mood === 'cheer'
+      ? (<g stroke="#22322C" strokeWidth="3" strokeLinecap="round" fill="none">
+           <path d="M39 44 q5 -6 10 0"/><path d="M57 43 q4 -5 8 0"/>
+         </g>)
+      : (<g>
+           <circle cx="44" cy="42" r="5.2" fill="#22322C"/>
+           <circle cx="45.8" cy="40.2" r="1.8" fill="#fff"/>
+           <circle cx="61" cy="41" r="4" fill="#22322C"/>
+           <circle cx="62.4" cy="39.6" r="1.4" fill="#fff"/>
+         </g>);
+  return (
+    <svg viewBox="0 0 120 120" width={size} height={size} className={'hud ' + (className || '')}
+         role="img" aria-label="Hüdhüd, der kleine Wiedehopf">
+      <ellipse cx="62" cy="112" rx="27" ry="4.6" fill="rgba(35,28,15,.13)"/>
+      <g className="hud-fly">
+        {/* Schwanz */}
+        <path d="M80 82 L114 75 L115 86 L84 94 Z" fill="#0E6B57"/>
+        <path d="M99 80 L112 77 L112.6 81.5 L100 84.5 Z" fill="#FBEFD8"/>
+        {/* Haube — fünf Federn, gold mit dunkler Spitze */}
+        <g>
+          <path d="M34 34 C30 24 29 16 32 12 C37 15 40 24 41 33 Z" fill="#EDB04A"/>
+          <path d="M41 30 C38 19 39 11 43 7 C48 11 48 21 47 30 Z" fill="#F0B84E"/>
+          <path d="M49 28 C48 16 51 8 56 5 C60 10 59 20 56 29 Z" fill="#EDB04A"/>
+          <path d="M58 29 C59 18 63 11 68 9 C70 15 67 25 63 31 Z" fill="#F0B84E"/>
+          <path d="M65 33 C68 24 73 18 78 17 C79 24 74 32 69 36 Z" fill="#E3A238"/>
+          <g fill="#22322C">
+            <circle cx="32.5" cy="13" r="3"/><circle cx="43" cy="8" r="3"/>
+            <circle cx="56" cy="6" r="3"/><circle cx="68" cy="10" r="3"/>
+            <circle cx="78" cy="18.5" r="3"/>
+          </g>
+        </g>
+        {/* Körper */}
+        <ellipse cx="62" cy="76" rx="28" ry="26" fill="#F3D9AF"/>
+        <ellipse cx="58" cy="83" rx="18" ry="15" fill="#FDF4E5"/>
+        {/* Flügel */}
+        <g className="hud-wing">
+          <path d="M48 66 q24 -8 38 10 q-18 15 -38 5 z" fill="#0E6B57"/>
+          <path d="M56 65 q16 -3 26 9" stroke="#FBEFD8" strokeWidth="4" fill="none" strokeLinecap="round"/>
+          <path d="M52 74 q16 -1 27 7" stroke="#FBEFD8" strokeWidth="3.4" fill="none" strokeLinecap="round"/>
+        </g>
+        {/* Kopf */}
+        <circle cx="50" cy="44" r="21" fill="#FAE7CC"/>
+        <ellipse cx="56" cy="52" rx="6" ry="4" fill="rgba(214,110,92,.30)"/>
+        {augen}
+        {/* langer Schnabel — das Erkennungszeichen des Wiedehopfs */}
+        <path d="M32 45 L5 53.5 L32 53 Z" fill="#3B4A42"/>
+        {/* Beine */}
+        <g stroke="#E39B62" strokeWidth="4" strokeLinecap="round">
+          <path d="M54 100 L53 108"/><path d="M70 99 L71 107"/>
+        </g>
+        <g stroke="#E39B62" strokeWidth="3" strokeLinecap="round">
+          <path d="M48 109 L58 109"/><path d="M66 108 L76 108"/>
+        </g>
+      </g>
+    </svg>
+  );
+}
+window.Hudhud = Hudhud;

@@ -554,7 +554,46 @@
   setInterval(() => syncNow(), 5 * 60 * 1000);
   setTimeout(() => syncNow(), 1200);
 
+  /* ==============================================================
+     Klassen-Einstellungen der Lehrkraft (14.08.2026): Tekrar-Ziel und
+     Rezitations-Stimme. Die Lehrkraft speichert sie am Mini-Server,
+     die Kinder-Geräte holen sie beim Start — mit lokalem Zwischen-
+     speicher, damit auch offline etwas Sinnvolles da ist.
+     ============================================================== */
+  const CFG_KEY = 'eb_classcfg_v1';
+  function classConfig() {
+    try { const o = JSON.parse(localStorage.getItem(CFG_KEY) || 'null'); if (o && typeof o === 'object') return o; } catch (e) {}
+    return {};
+  }
+  async function refreshClassConfig() {
+    try {
+      const acc = account();
+      const code = (acc && acc.classCode) || DEFAULT_CLASS;
+      const r = await req('config', { query: { code: code } });
+      if (r && r.body && r.body.ok) {
+        try { localStorage.setItem(CFG_KEY, JSON.stringify(r.body.cfg || {})); } catch (e) {}
+        return r.body.cfg || {};
+      }
+    } catch (e) {}
+    return classConfig();
+  }
+  async function setClassConfig(cfg) {
+    try {
+      const acc = account();
+      const code = (acc && acc.classCode) || DEFAULT_CLASS;
+      const r = await req('config', { method: 'POST', body: JSON.stringify({ tpw: TEACHER_PW, code: code, cfg: cfg }) });
+      if (r && r.body && r.body.ok) {
+        try { localStorage.setItem(CFG_KEY, JSON.stringify(r.body.cfg || {})); } catch (e) {}
+        return { ok: true, cfg: r.body.cfg || {} };
+      }
+      return { ok: false, error: (r && r.body && r.body.error) || 'Speichern fehlgeschlagen' };
+    } catch (e) { return { ok: false, error: 'Keine Verbindung' }; }
+  }
+  // Beim Start einmal frisch holen (leise; der Zwischenspeicher bleibt sonst).
+  setTimeout(function () { refreshClassConfig(); }, 2500);
+
   window.SimpleSync = {
+    classConfig, refreshClassConfig, setClassConfig,
     account, status, onChange: (fn) => { listeners.push(fn); return () => { const i = listeners.indexOf(fn); if (i >= 0) listeners.splice(i, 1); }; },
     join, smartLogin, check, logout, syncNow, setClassCode,
     setPassword, hasPassword, deleteAccount,

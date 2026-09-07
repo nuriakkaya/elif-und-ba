@@ -16,7 +16,7 @@
      Einzige Ausnahme: die Aussprache-Aufnahmen (Route "media"), damit sie
      offline hörbar bleiben.
 */
-const CACHE = 'elifba-8-9';
+const CACHE = 'elifba-10-5';
 
 const PRECACHE = [
   './',
@@ -26,11 +26,12 @@ const PRECACHE = [
   'icon-512.png',
   'apple-touch-icon.png',
   'favicon-32.png',
-  'vendor/react.development.js',
-  'vendor/react-dom.development.js',
-  'vendor/babel.min.js',
-  'vendor/supabase.js',
+  'vendor/react.js',
+  'vendor/react-dom.js',
   'vendor/qrcode.min.js',
+  'app/bundle.js',
+  'fonts/scheherazade-arabic-400.woff2',
+  'fonts/scheherazade-arabic-700.woff2',
   'assets/letters.mp3',
   'assets/sounds/correct.mp3',
   'assets/sounds/wrong.mp3',

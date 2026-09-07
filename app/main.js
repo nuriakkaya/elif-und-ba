@@ -97,7 +97,7 @@ function findStack(id) {
 
 /* ============== TWEAKS DEFAULTS ============== */
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
-  "accent": "#7A7BF5",
+  "accent": "#0E6B57",
   "dark": false,
   "questionStyle": "Multiple Choice",
   "sounds": true,
@@ -278,7 +278,11 @@ function App() {
       <MobileNav ctx={ctx} />
       <main className="main" ref={mainRef} style={{maxHeight:'100vh', overflow:'auto'}}>
         <Topbar ctx={ctx} scrolled={scrolled}/>
-        <Routes ctx={ctx} />
+        {/* Der key erzwingt bei jedem Bildschirmwechsel einen Neuaufbau —
+            dadurch läuft die Einblend-Bewegung erneut (05.09.2026). */}
+        <div className="bildwechsel" key={route.screen + ':' + (route.stack || route.hifzId || '')}>
+          <Routes ctx={ctx} />
+        </div>
       </main>
       {modal && <Modals ctx={ctx} />}
       <WaveToasts/>
@@ -315,7 +319,7 @@ function WaveToasts() {
 }
 
 function hexToTint(hex, alpha) {
-  if (!hex || hex[0] !== '#') return 'rgba(122,123,245,0.12)';
+  if (!hex || hex[0] !== '#') return 'rgba(14,107,87,0.12)';
   const n = parseInt(hex.slice(1), 16);
   const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
   return `rgba(${r},${g},${b},${alpha})`;
@@ -415,7 +419,7 @@ function HifzCard({ ctx }) {
                  || (window.HIFZ_ITEMS || []).find((it) => !window.Hifz.itemState(it.id).done);
   return (
     <div className="card" style={{padding: 16, marginTop: 14,
-         borderLeft: due.length ? '5px solid #F0C33C' : undefined}}>
+         borderLeft: due.length ? '5px solid var(--gold)' : undefined}}>
       <div className="row" style={{gap: 12, alignItems: 'center', flexWrap: 'wrap'}}>
         <div style={{fontSize: 30}}>{s.done > 0 ? s.rank.icon : '🕌'}</div>
         <div style={{flex: '1 1 200px'}}>
@@ -801,23 +805,90 @@ function Home({ ctx }) {
     return firstOpen;
   })();
 
+  /* --- „Heute" (05.09.2026) ---------------------------------------------
+     Vorher stand hier ein großes Maskottchen und sonst wenig. Eine App,
+     die man täglich öffnet, muss beim Aufschlagen drei Dinge zeigen:
+     Wo stehe ich heute? Wie lange bin ich schon dran? Was ist der nächste
+     Schritt? Genau das ist jetzt die Startseite. */
+  const XPm = window.XP;
+  const tag  = XPm ? XPm.streakStatus() : { done: 0, target: 1, secured: false };
+  const gold = XPm ? XPm.goldStatus()   : { done: 0, target: 1, achieved: false };
+  const stufe = XPm ? XPm.levelInfo()   : { level: 1, title: '' };
+  const woche = XPm ? XPm.recentDays(7) : [];
+  const serie = XPm ? (XPm.state().streakDays || 0) : 0;
+  const heuteXp = XPm ? XPm.todayXp() : 0;
+  const kAcc = window.SimpleSync && window.SimpleSync.account();
+  const kName = (kAcc && kAcc.name) || '';
+  const anteil = Math.min(1, tag.target ? tag.done / tag.target : 0);
+  const rU = 2 * Math.PI * 34;
+  const laune = tag.secured ? 'cheer' : 'happy';
+
   return (
     <div className="page">
-      <div className="home-hero">
-        <div className="mascot-wrap">
-          <Axolotl size={190}/>
-          <div className="shadow"/>
+      {/* Begrüßung + Maskottchen */}
+      <div className="heute-kopf">
+        <div style={{flex: 1, minWidth: 0}}>
+          <div className="heute-gruss">Selâmün aleyküm{kName ? ', ' + kName : ''}</div>
+          <div className="heute-stufe">🌙 Stufe {stufe.level} · {stufe.title}</div>
         </div>
-        <div className="hero-title">🌙 Koran lesen lernen</div>
-        <div className="muted" style={{textAlign:'center', maxWidth:430, margin:'4px auto 0', fontSize:14.5, lineHeight:1.5}}>
-          Schritt für Schritt vom ersten Buchstaben bis zum Koranlesen — mit Elif &amp; Ba.
+        {window.Hudhud && <window.Hudhud size={92} mood={laune}/>}
+      </div>
+
+      {/* Tagesziel — der Herzschlag der App */}
+      <div className="ziel-karte">
+        <div className="ziel-ring">
+          <svg viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="34" fill="none" strokeWidth="9" className="zr-trk"/>
+            <circle cx="40" cy="40" r="34" fill="none" strokeWidth="9" strokeLinecap="round"
+                    className="zr-bar" strokeDasharray={rU} strokeDashoffset={rU * (1 - anteil)}/>
+          </svg>
+          <div className="ziel-mitte">
+            {tag.secured
+              ? <><b className="ziel-haken">✓</b><span>geschafft</span></>
+              : <><b>{tag.done}</b><span>von {tag.target}</span></>}
+          </div>
         </div>
-        {next && (
-          <button className="btn btn-primary btn-lg" style={{marginTop:14, padding:'15px 28px', fontSize:16.5}}
-                  onClick={() => { setActiveStack(next.id); go('deck'); }}>
-            ▶️ Weiterlernen: {next.name.replace(/^\d+\.\s*/, '')}{next.pct > 0 && next.pct < 100 ? ' · ' + next.pct + '%' : ''}
-          </button>
-        )}
+        <div className="ziel-text">
+          <div className="ziel-titel">{tag.secured ? '✅ Tagesziel geschafft!' : 'Dein Tagesziel'}</div>
+          <div className="ziel-sub">
+            {tag.secured
+              ? (gold.achieved
+                  ? 'Auch das Goldziel steht — stark, maschallah!'
+                  : 'Noch ' + gold.needed + ' richtige bis zum Goldtag ⭐')
+              : 'Noch ' + tag.needed + ' richtige Antworten — das schaffst du gleich.'}
+          </div>
+          <div className="ziel-reihe">
+            <span className="ziel-pill feuer">🔥 {serie} {serie === 1 ? 'Tag' : 'Tage'}</span>
+            <span className="ziel-pill punkte">✨ {heuteXp} XP heute</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Wochenstreifen */}
+      <div className="woche">
+        {woche.map(function (d, i) {
+          const cls = 'w-tag' + (d.gold ? ' ist-gold' : d.xp > 0 ? ' ist-an' : '') + (d.isToday ? ' ist-heute' : '');
+          return (
+            <div key={i} className={cls}>
+              <span className="w-nm">{d.weekday}</span>
+              <b className="w-pk">{d.gold ? '⭐' : d.xp > 0 ? '✓' : d.dayNum}</b>
+            </div>
+          );
+        })}
+      </div>
+
+      {next && (
+        <button className="weiter-knopf" onClick={() => { setActiveStack(next.id); go('deck'); }}>
+          <span className="wk-ico">▶️</span>
+          <span className="wk-txt">
+            <b>Weiterlernen</b>
+            <span>{next.name.replace(/^\d+\.\s*/, '')}{next.pct > 0 && next.pct < 100 ? ' · ' + next.pct + '%' : ''}</span>
+          </span>
+          <span className="wk-pfeil">→</span>
+        </button>
+      )}
+
+      <div className="home-hero" style={{paddingTop: 0}}>
         <InstallBanner/>
         {window.ClassBoard && <window.ClassBoard.CheerBanner ctx={ctx}/>}
         <InfinityCard ctx={ctx}/>
@@ -970,8 +1041,8 @@ function QuranProgressCard({ ctx }) {
   const doneCount = rows.filter(function (r) { return r.pct >= 100; }).length;
   return (
     <div className="card" style={{ padding: 18 }}>
-      <div className="row" style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-        <h2 style={{ margin: 0, fontSize: 20 }}>🌙 Dein Koran-Weg</h2>
+      <div className="kartenkopf">
+        <h2>🌙 Dein Koran-Weg</h2>
         <span className="pill">{doneCount}/{rows.length} Lektionen gemeistert</span>
       </div>
       <div className="qpr-grid">
@@ -1041,7 +1112,7 @@ function Progress({ ctx }) {
         <div className="level-shield">{lv.level}</div>
         <div style={{flex:1}}>
           <div className="row" style={{justifyContent:'space-between'}}>
-            <div style={{fontFamily:'Fraunces, serif', fontWeight:900, fontSize:26}}>{lv.title}</div>
+            <div style={{fontWeight:900, fontSize:26}}>{lv.title}</div>
             <div className="muted">Level {lv.level + 1}: <b style={{color:'var(--ink)'}}>{xp ? xp.fmt(lv.nextAt) : lv.nextAt} XP</b></div>
           </div>
           <div className="xp-bar"><div className="fill" style={{width: `${Math.round(lv.progress * 100)}%`}}/></div>
@@ -1054,6 +1125,7 @@ function Progress({ ctx }) {
 
       {/* 🌙 Koran-Weg (Nachtausbau P4): alle 18 Lektionen + Suren + Extras auf einen Blick */}
       <QuranProgressCard ctx={ctx}/>
+      <WackeltCard ctx={ctx}/>
 
       {/* 🤝 Unsere Klasse (11.08.2026): gemeinsames Ziel, Wochen-Tafel,
           Auswendig-Tafel und „Anfeuern" — siehe app/classboard.js. */}
@@ -1237,6 +1309,76 @@ function DayCell({ weekday, dayNum, xp, isToday, gold }) {
 }
 
 /* ============== DECKS GRID ============== */
+
+/* ============================================================================
+   🛤️ DER LERNPFAD (05.09.2026)
+   Vorher lagen die 18 Lektionen als flache Kacheln nebeneinander — man sah
+   nicht, dass man auf einer Reise ist. Jetzt schlängelt sich ein Weg von
+   oben nach unten: erledigt (Stern), dran (pulsiert, „Start"), noch zu.
+   Kinder sehen sofort: hier bin ich, das ist als Nächstes dran.
+   ========================================================================== */
+function LernPfad({ ctx }) {
+  const { go, setActiveStack } = ctx;
+  const zickzack = [0, 1, 2, 1, 0, -1, -2, -1];   // seitlicher Versatz, wiederholt sich
+  const halte = QURAN_CHILDREN.map(function (c, i) {
+    const info = window.QuranCourse ? window.QuranCourse.progressInfo(c.id) : { unlocked: true };
+    const pct = (window.SRS && window.SRS.progressPct) ? window.SRS.progressPct(c.id, flatQuiz(c.topic)) : 0;
+    return { c: c, i: i, offen: !!info.unlocked, pct: pct, info: info };
+  });
+  const jetztIdx = (function () {
+    for (let k = 0; k < halte.length; k++) if (halte[k].offen && halte[k].pct < 100) return k;
+    return -1;
+  })();
+
+  return (
+    <div className="pfad">
+      {halte.map(function (h, i) {
+        const versatz = zickzack[i % zickzack.length] * 34;
+        const fertig = h.offen && h.pct >= 100;
+        const jetzt = i === jetztIdx;
+        const zu = !h.offen;
+        const klasse = 'pfad-knopf' + (fertig ? ' ist-fertig' : zu ? ' ist-zu' : '') + (jetzt ? ' ist-jetzt' : '');
+        const oeffnen = function () { if (zu) return; setActiveStack(h.c.id); go('deck'); };
+        const kurz = h.c.name.replace(/^\d+\.\s*/, '');
+        return (
+          <div className="pfad-teil" key={h.c.id}>
+            {i > 0 && (
+              <div className="pfad-luecke" style={{ transform: 'translateX(' + ((versatz + zickzack[(i - 1) % zickzack.length] * 34) / 2) + 'px)' }}>
+                <i/><i/><i/>
+              </div>
+            )}
+            <div className="pfad-halt" style={{ transform: 'translateX(' + versatz + 'px)' }}>
+              {jetzt && <span className="pfad-start">Start</span>}
+              <button className={klasse} onClick={oeffnen}
+                      aria-label={kurz + (zu ? ' — noch verschlossen' : '')}
+                      title={zu ? 'Noch ' + Math.max(0, h.info.needPrev - h.info.answeredPrev) + ' Fragen in „' + h.info.prevName + '“' : kurz}>
+                <span className="pk-zeichen">{fertig ? '★' : (i + 1)}</span>
+                {zu && <span className="pk-schloss">🔒</span>}
+                {h.offen && h.pct > 0 && h.pct < 100 && (
+                  <svg className="pk-ring" viewBox="0 0 72 72" aria-hidden="true">
+                    <circle cx="36" cy="36" r="33" fill="none" strokeWidth="5"
+                            strokeDasharray={2 * Math.PI * 33}
+                            strokeDashoffset={2 * Math.PI * 33 * (1 - h.pct / 100)}
+                            strokeLinecap="round"/>
+                  </svg>
+                )}
+              </button>
+              <span className={'pfad-name' + (zu ? ' ist-blass' : '')}>{kurz}</span>
+            </div>
+          </div>
+        );
+      })}
+      <div className="pfad-ziel">
+        <div className="pz-krone">🏆</div>
+        <div>
+          <b>Am Ende des Weges</b>
+          <div className="muted" style={{fontSize: 13}}>Wenn alle Lektionen auf 100 % stehen, öffnet sich das Auswendiglernen der Suren.</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function DecksGrid({ ctx }) {
   const { go, setActiveStack, openModal } = ctx;
   return (
@@ -1248,52 +1390,6 @@ function DecksGrid({ ctx }) {
           <button className="btn btn-primary" onClick={() => openModal('newStack')}><Icon.Plus/> Neuer Stapel</button>
         </div>
       </div>
-      <div className="deck-grid">
-        {S34A_CHILDREN.map(c => (
-          // Bewusst <div role="button"> statt <button>: enthält selbst einen "..."-Button
-          // (Kontextmenü) — verschachtelte <button>-Elemente sind ungültiges HTML
-          // (React-Warnung "validateDOMNesting"), obwohl Chrome es bisher stillschweigend
-          // gerendert hat. tabIndex/role/onKeyDown erhalten die Tastatur-Bedienbarkeit.
-          <div key={c.id} className="deck-card" role="button" tabIndex={0}
-               onClick={() => { setActiveStack(c.id); go('deck'); }}
-               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveStack(c.id); go('deck'); } }}>
-            <div className="row" style={{justifyContent:'space-between'}}>
-              <div className="swatch" style={{background: c.color}}/>
-              <button className="icon-btn" style={{width:32,height:32}} onClick={(e) => { e.stopPropagation(); openModal('stackContext', { id: c.id }); }}><Icon.More/></button>
-            </div>
-            <div className="deck-name">{c.name}</div>
-            <div className="deck-meta">{c.topic.cardCount} Karten · {c.topic.quizCount} Quizfragen</div>
-          </div>
-        ))}
-        {STACKS.filter(s => s.id !== 's34a' && s.id !== 'quran' && !/^quran-/.test(s.id) && !(s.topic && s.topic.archived)).map(s => (
-          <div key={s.id} className="deck-card" role="button" tabIndex={0}
-               onClick={() => { setActiveStack(s.id); go('deck'); }}
-               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveStack(s.id); go('deck'); } }}>
-            <div className="row" style={{justifyContent:'space-between'}}>
-              <div className="swatch" style={{background: s.color}}/>
-              <div className="row" style={{gap:6}}>
-                {s.topic && s.topic.isShared && <span className="pill" style={{fontSize:11, padding:'3px 8px'}} title="Geteilter Stapel — mehrere Mitwirkende">👥 Geteilt</span>}
-                <button className="icon-btn" style={{width:32,height:32}} onClick={(e) => { e.stopPropagation(); openModal('stackContext', { id: s.id }); }}><Icon.More/></button>
-              </div>
-            </div>
-            <div className="deck-name">{s.name}</div>
-            <div className="deck-meta">
-              {s.topic ? `${s.topic.cardCount || 0} Karten · ${s.topic.quizCount || 0} Quizfragen` : 'Noch leer'}
-            </div>
-          </div>
-        ))}
-        <button className="deck-card" style={{borderStyle:'dashed', alignItems:'center', justifyContent:'center', color:'var(--ink-mute)'}} onClick={() => openModal('newStack')}>
-          <Icon.FolderPlus/>
-          <div className="deck-name" style={{textAlign:'center'}}>Neuer Stapel</div>
-        </button>
-        {ctx.session && (
-          <button className="deck-card" style={{borderStyle:'dashed', alignItems:'center', justifyContent:'center', color:'var(--ink-mute)'}} onClick={() => openModal('joinShared')}>
-            <div style={{fontSize:28}}>👥</div>
-            <div className="deck-name" style={{textAlign:'center'}}>Geteiltem Stapel beitreten</div>
-            <div className="deck-meta">Mit 6-stelligem Code</div>
-          </button>
-        )}
-      </div>
       {QURAN_CHILDREN.length > 0 && (
         <>
           <div className="section-head" style={{marginTop:18, display:'flex', alignItems:'center', justifyContent:'space-between', gap:12, flexWrap:'wrap'}}>
@@ -1302,44 +1398,14 @@ function DecksGrid({ ctx }) {
                 ? <span className="pill" style={{fontSize:12, background:'var(--success-soft, #E7F7EE)', color:'var(--success, #1B8A5A)'}}>🔓 Lehrer-Modus: alles offen</span>
                 : <span className="muted" style={{fontWeight:500, fontSize:13}}>Lektionen schalten sich Schritt für Schritt frei</span>}
             </div>
-            <div className="row" style={{gap:8, flexWrap:'wrap'}}>
+            <div className="werkzeuge">
               <HifzButton ctx={ctx}/>
               <InfinityButton ctx={ctx}/>
               <button className="btn btn-ghost" onClick={() => go('surah')}>📖 Suren lesen &amp; hören</button>
               <button className="btn btn-ghost" onClick={() => go('quranletters')}>🔤 Buchstaben-Übersicht</button>
             </div>
           </div>
-          <div className="deck-grid">
-            {QURAN_CHILDREN.map(c => {
-              const info = window.QuranCourse ? window.QuranCourse.progressInfo(c.id) : { unlocked: true };
-              // Mini-Fortschritt je Lektion (06.08.2026): kleiner Balken + Prozent
-              // direkt auf der Kachel — füllt sich ab der ersten richtigen Antwort.
-              const pct = (window.SRS && window.SRS.progressPct) ? window.SRS.progressPct(c.id, flatQuiz(c.topic)) : 0;
-              const open = () => { if (!info.unlocked) return; setActiveStack(c.id); go('deck'); };
-              return (
-                <div key={c.id} className={'deck-card' + (info.unlocked ? '' : ' locked')} role="button" tabIndex={0}
-                     onClick={open}
-                     onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && info.unlocked) { e.preventDefault(); open(); } }}>
-                  {!info.unlocked && <div className="deck-lock">🔒</div>}
-                  <div className="row" style={{justifyContent:'space-between', alignItems:'center'}}>
-                    <div className="swatch" style={{background: c.color}}/>
-                    {info.unlocked && pct > 0 && <span className="pill" style={{fontSize:11.5, padding:'3px 9px', fontWeight:800, color: pct >= 100 ? 'var(--success, #1B8A5A)' : undefined}}>{pct >= 100 ? '🏅 100%' : pct + '%'}</span>}
-                  </div>
-                  <div className="deck-name">{c.name}</div>
-                  {info.unlocked && pct > 0 && (
-                    <div style={{height:6, borderRadius:999, background:'var(--line, #ECEBE6)', overflow:'hidden', margin:'6px 0 2px'}}>
-                      <div style={{width: pct + '%', height:'100%', borderRadius:999, background: pct >= 100 ? 'var(--success, #1B8A5A)' : 'var(--accent, #2A6BE0)', transition:'width .5s ease'}}/>
-                    </div>
-                  )}
-                  <div className="deck-meta">
-                    {info.unlocked
-                      ? (c.topic.quizCount + ' Fragen · Auswendig & Live')
-                      : ('🔒 Noch ' + (info.needPrev - info.answeredPrev) + ' Fragen in \u201E' + info.prevName + '\u201C beantworten')}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <LernPfad ctx={ctx}/>
         </>
       )}
       {/* 🕌 Suren & Gebete ZUM AUSWENDIGLERNEN direkt hier (12.08.2026,
@@ -1370,12 +1436,12 @@ function DecksGrid({ ctx }) {
                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } }}>
                     {!frei.open && <div className="deck-lock">🔒</div>}
                     <div className="row" style={{justifyContent:'space-between', alignItems:'center'}}>
-                      <span dir="rtl" style={{fontFamily:'"Amiri Quran", "Scheherazade New", serif', fontSize:22, fontWeight:700, color:'#2364A5'}}>{it.arName}</span>
+                      <span dir="rtl" style={{fontFamily:'"Amiri Quran", "Scheherazade New", serif', fontSize:22, fontWeight:700, color:'var(--brand)'}}>{it.arName}</span>
                       {frei.open && st.done
                         ? <span className="pill" style={{fontSize:11.5, padding:'3px 9px', fontWeight:800, background:'var(--success-soft, #E7F7EE)', color:'var(--success, #1B8A5A)'}}>🏆</span>
                         : frei.open && pct > 0
                           ? <span className="pill" style={{fontSize:11.5, padding:'3px 9px', fontWeight:800}}>{pct}%</span>
-                          : it.stern ? <span className="pill" style={{fontSize:11, padding:'3px 8px', background:'#FCF3D7'}} title="Für den Namaz zuerst">⭐</span> : null}
+                          : it.stern ? <span className="pill" style={{fontSize:11, padding:'3px 8px', background:'var(--gold-soft)'}} title="Für den Namaz zuerst">⭐</span> : null}
                     </div>
                     <div className="deck-name">{it.name}</div>
                     {frei.open && pct > 0 && !st.done && (
@@ -1447,6 +1513,56 @@ function DecksGrid({ ctx }) {
           </div>
         </>
       )}
+      <div className="section-head" style={{marginTop:22}}>
+        <div className="title">📚 Eigene Stapel</div>
+      </div>
+      <div className="deck-grid">
+        {S34A_CHILDREN.map(c => (
+          // Bewusst <div role="button"> statt <button>: enthält selbst einen "..."-Button
+          // (Kontextmenü) — verschachtelte <button>-Elemente sind ungültiges HTML
+          // (React-Warnung "validateDOMNesting"), obwohl Chrome es bisher stillschweigend
+          // gerendert hat. tabIndex/role/onKeyDown erhalten die Tastatur-Bedienbarkeit.
+          <div key={c.id} className="deck-card" role="button" tabIndex={0}
+               onClick={() => { setActiveStack(c.id); go('deck'); }}
+               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveStack(c.id); go('deck'); } }}>
+            <div className="row" style={{justifyContent:'space-between'}}>
+              <div className="swatch" style={{background: c.color}}/>
+              <button className="icon-btn" style={{width:32,height:32}} onClick={(e) => { e.stopPropagation(); openModal('stackContext', { id: c.id }); }}><Icon.More/></button>
+            </div>
+            <div className="deck-name">{c.name}</div>
+            <div className="deck-meta">{c.topic.cardCount} Karten · {c.topic.quizCount} Quizfragen</div>
+          </div>
+        ))}
+        {STACKS.filter(s => s.id !== 's34a' && s.id !== 'quran' && !/^quran-/.test(s.id) && !(s.topic && s.topic.archived)).map(s => (
+          <div key={s.id} className="deck-card" role="button" tabIndex={0}
+               onClick={() => { setActiveStack(s.id); go('deck'); }}
+               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveStack(s.id); go('deck'); } }}>
+            <div className="row" style={{justifyContent:'space-between'}}>
+              <div className="swatch" style={{background: s.color}}/>
+              <div className="row" style={{gap:6}}>
+                {s.topic && s.topic.isShared && <span className="pill" style={{fontSize:11, padding:'3px 8px'}} title="Geteilter Stapel — mehrere Mitwirkende">👥 Geteilt</span>}
+                <button className="icon-btn" style={{width:32,height:32}} onClick={(e) => { e.stopPropagation(); openModal('stackContext', { id: s.id }); }}><Icon.More/></button>
+              </div>
+            </div>
+            <div className="deck-name">{s.name}</div>
+            <div className="deck-meta">
+              {s.topic ? `${s.topic.cardCount || 0} Karten · ${s.topic.quizCount || 0} Quizfragen` : 'Noch leer'}
+            </div>
+          </div>
+        ))}
+        <button className="deck-card" style={{borderStyle:'dashed', alignItems:'center', justifyContent:'center', color:'var(--ink-mute)'}} onClick={() => openModal('newStack')}>
+          <Icon.FolderPlus/>
+          <div className="deck-name" style={{textAlign:'center'}}>Neuer Stapel</div>
+        </button>
+        {ctx.session && (
+          <button className="deck-card" style={{borderStyle:'dashed', alignItems:'center', justifyContent:'center', color:'var(--ink-mute)'}} onClick={() => openModal('joinShared')}>
+            <div style={{fontSize:28}}>👥</div>
+            <div className="deck-name" style={{textAlign:'center'}}>Geteiltem Stapel beitreten</div>
+            <div className="deck-meta">Mit 6-stelligem Code</div>
+          </button>
+        )}
+      </div>
+
     </div>
   );
 }
@@ -1543,6 +1659,62 @@ function PublicDecks({ ctx }) {
             </div>
           )}
         </>
+      )}
+    </div>
+  );
+}
+
+
+/* ============================================================================
+   🎯 „DAS WACKELT NOCH" (06.09.2026)
+   Der Karteikasten weiß längst, an welchen Karten ein Kind immer wieder
+   scheitert (app/srs.js → weakCards). Bisher stand das nur versteckt in der
+   jeweiligen Lektion. Auf der Fortschritts-Seite steht es jetzt gebündelt:
+   Welche Lektionen wackeln, wie viele Karten — und ein Knopf, der genau
+   diese Karten übt (pro Lektion, damit der Fortschritt sauber verbucht wird).
+   ========================================================================== */
+function WackeltCard({ ctx }) {
+  const { go, setActiveStack } = ctx;
+  const zeilen = useMemo(function () {
+    const out = [];
+    ((window.QuranCourse && window.QuranCourse.ordered()) || []).forEach(function (t) {
+      const info = window.QuranCourse.progressInfo(t.id);
+      if (!info.unlocked) return;
+      const weak = (window.SRS && window.SRS.weakCards) ? window.SRS.weakCards(t.id, flatQuiz(t)) : [];
+      if (weak.length) out.push({ id: t.id, name: t.name.replace(/^\d+\.\s*/, ''), weak: weak });
+    });
+    return out.sort(function (a, b) { return b.weak.length - a.weak.length; });
+  }, []);
+  if (!zeilen.length) return null;
+  const gesamt = zeilen.reduce(function (n, z) { return n + z.weak.length; }, 0);
+  const ueben = function (z) { setActiveStack(z.id); go('quiz', { questions: z.weak.map(function (e) { return e.q; }) }); };
+  return (
+    <div className="card" style={{ padding: 18 }}>
+      <div className="kartenkopf">
+        <h2>🎯 Das wackelt noch</h2>
+        <span className="pill">{gesamt} {gesamt === 1 ? 'Karte' : 'Karten'}</span>
+      </div>
+      <div className="muted" style={{ fontSize: 13.5, marginTop: -4, marginBottom: 10, lineHeight: 1.45 }}>
+        Diese Karten gehen immer wieder schief. Sie kommen in jeder Runde ohnehin
+        zuerst dran — hier kannst du sie gezielt üben.
+      </div>
+      {zeilen.slice(0, 4).map(function (z) {
+        const proben = z.weak.slice(0, 4).map(function (e) { return e.q.q; }).join('  ');
+        return (
+          <div key={z.id} className="wackel-zeile">
+            <div className="wz-mitte">
+              <div className="wz-name">{z.name}</div>
+              <div className="wz-proben" dir="rtl">{proben}</div>
+            </div>
+            <span className="wz-zahl">{z.weak.length}</span>
+            <button className="btn btn-ghost btn-sm wz-knopf" onClick={function () { ueben(z); }}>Üben</button>
+          </div>
+        );
+      })}
+      {zeilen.length > 4 && (
+        <div className="muted" style={{ fontSize: 12.5, marginTop: 8 }}>
+          … und {zeilen.length - 4} weitere {zeilen.length - 4 === 1 ? 'Lektion' : 'Lektionen'}.
+        </div>
       )}
     </div>
   );
@@ -3065,10 +3237,10 @@ function Profile({ ctx }) {
   const friendLabel = session ? `${friendCount === null ? '…' : friendCount} Freunde` : '14 Freunde (Demo)';
   return (
     <div className="page">
-      <div className="card" style={{display:'flex', alignItems:'center', gap:16, padding:20}}>
-        <AnimalAvatar kind={(profile && profile.avatar) || '🦔'} size={84}/>
-        <div style={{flex:1}}>
-          <h1 style={{fontSize:24}}>{displayName}</h1>
+      <div className="card profilkopf">
+        <AnimalAvatar kind={(profile && profile.avatar) || '🦔'} size={72}/>
+        <div className="pk-mitte">
+          <h1 style={{fontSize:22}}>{displayName}</h1>
           <div className="muted">
             {displayHandle} · {friendLabel}
             {session && <> · {followCounts.followers} Follower · {followCounts.following} Folge ich</>}
@@ -3082,7 +3254,7 @@ function Profile({ ctx }) {
         ) : (
           <button className="btn btn-primary" onClick={() => ctx.openModal('auth')}>Anmelden</button>
         )}
-        <button className="btn btn-ghost" onClick={() => ctx.go('settings')}>⚙️</button>
+        <button className="btn btn-ghost pk-zahnrad" title="Einstellungen" onClick={() => ctx.go('settings')}>⚙️</button>
       </div>
       <div className="tabs">
         {[['feed','Feed'],['stats','Statistiken'],['stapel','Stapel'],['schule','Schule']].map(([k,l]) => (
@@ -4102,7 +4274,7 @@ function SchoolTab({ ctx, myId }) {
 function NotFound({ ctx }) {
   return (
     <div className="page" style={{maxWidth:520, textAlign:'center'}}>
-      <h1 style={{fontSize:56, fontFamily:'Fraunces, serif'}}>Ups!</h1>
+      <h1 style={{fontSize:56, }}>Ups!</h1>
       <div className="muted">Dieser Bildschirm existiert nicht.</div>
       <div className="card flat" style={{fontFamily:'monospace'}}>gizmo.ai/404</div>
       <button className="btn btn-primary" onClick={() => ctx.go('home')}>Geh zurück</button>
@@ -4119,6 +4291,260 @@ function NotFound({ ctx }) {
    selbst auf (MediaRecorder). Upload → Netlify Blobs; ab dann hören
    ALLE Kinder auf allen Geräten genau diese Aussprache (app/quranvoice.js
    spielt Lehrer-Aufnahmen mit höchster Priorität, offline-gecacht). */
+
+/* ============================================================================
+   🎬 SERIEN-AUFNAHME (06.09.2026)
+   Nutzerwunsch: „Ich nehme mir die Zeit und spreche einmal alles ein."
+   612 Einzel-Aufnahmen schafft man nur, wenn jede Aufnahme EIN Tipp ist.
+   Deshalb: Karte zeigen → tippen → sprechen → die App merkt selbst, wann du
+   fertig bist (Stille-Erkennung), lädt hoch und schaltet weiter. Am Rechner
+   geht alles auch mit der Leertaste.
+   Die Stelle wird gemerkt — du kannst jederzeit aufhören und weitermachen.
+   ========================================================================== */
+const SERIE_POS = 'eb_serie_pos_v1';
+
+
+/* ============================================================================
+   TONDATEIEN RAUS UND WIEDER REIN (06.09.2026)
+   Nutzerwunsch: einmal alles einsprechen, die Dateien EINZELN und benannt
+   herausholen, in Premiere Pro sauber schneiden — und die bearbeiteten
+   Dateien wieder zurückgeben, damit sie für alle der Standard werden.
+
+   Damit die Zuordnung den Umweg über Premiere heil übersteht, trägt jede
+   Datei vorne ihre laufende Nummer: 001_..., 002_... Diese Nummer ist der
+   Schlüssel; alles andere im Namen darf sich ändern.
+   ========================================================================== */
+function tonSlug(txt) {
+  const karte = { 'ä':'ae','ö':'oe','ü':'ue','ß':'ss','â':'a','î':'i','û':'u','ı':'i','ş':'s','ğ':'g','ç':'c','é':'e','ʿ':'','ʾ':'' };
+  return String(txt || '')
+    .toLowerCase()
+    .replace(/[äöüßâîûışğçéʿʾ]/g, (c) => (karte[c] !== undefined ? karte[c] : c))
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 38) || 'ton';
+}
+function tonNummer(n) { return ('00' + (n + 1)).slice(-3); }
+
+/* Rohton → schlanke WAV-Datei (22,05 kHz, mono, 16 Bit).
+   Sprache braucht nicht mehr; so bleibt jede Aufnahme klein genug für den
+   Server und klingt trotzdem sauber. */
+async function alsWav(blob, ziel) {
+  const rate = ziel || 22050;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  // Uralte Browser ohne Web-Audio: Datei unverändert nehmen, solange sie
+  // klein genug ist — besser als gar kein Einlesen.
+  if (!AC) { if (blob.size < 600000) return blob; throw new Error('Kein Web-Audio'); }
+  const puffer = await blob.arrayBuffer();
+  const ac = new AC();
+  const roh = await ac.decodeAudioData(puffer.slice(0));
+  try { ac.close(); } catch (e) {}
+  const laenge = Math.max(1, Math.round(roh.duration * rate));
+  const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  const oac = new OAC(1, laenge, rate);
+  const q = oac.createBufferSource(); q.buffer = roh; q.connect(oac.destination); q.start();
+  const fertig = await oac.startRendering();
+  const daten = fertig.getChannelData(0);
+  const bytes = new ArrayBuffer(44 + daten.length * 2);
+  const v = new DataView(bytes);
+  const txt = (pos, str) => { for (let i = 0; i < str.length; i++) v.setUint8(pos + i, str.charCodeAt(i)); };
+  txt(0, 'RIFF'); v.setUint32(4, 36 + daten.length * 2, true); txt(8, 'WAVE');
+  txt(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, rate, true); v.setUint32(28, rate * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  txt(36, 'data'); v.setUint32(40, daten.length * 2, true);
+  let o = 44;
+  for (let i = 0; i < daten.length; i++) {
+    const x = Math.max(-1, Math.min(1, daten[i]));
+    v.setInt16(o, x < 0 ? x * 0x8000 : x * 0x7FFF, true); o += 2;
+  }
+  return new Blob([bytes], { type: 'audio/wav' });
+}
+
+function SerienStudio({ items, onClose }) {
+  const QV = window.QuranVoice;
+  const ersteOffen = useMemo(function () {
+    for (let i = 0; i < items.length; i++) if (!QV || !QV.has(items[i].ar)) return i;
+    return 0;
+  }, [items]);
+  const [idx, setIdx] = useState(function () {
+    let g = -1;
+    try { g = parseInt(localStorage.getItem(SERIE_POS) || '-1', 10); } catch (e) {}
+    return (g >= 0 && g < items.length) ? g : ersteOffen;
+  });
+  const [phase, setPhase] = useState('bereit');   // bereit | laeuft | pruefen | sendet
+  const [auto, setAuto] = useState(true);
+  const [pegel, setPegel] = useState(0);
+  const [fehler, setFehler] = useState('');
+  const [zaehler, setZaehler] = useState(0);      // in dieser Sitzung aufgenommen
+  const recRef = useRef(null);
+  const blobRef = useRef(null);
+  const autoRef = useRef(auto);
+  autoRef.current = auto;
+
+  const it = items[idx];
+  const fertig = QV ? items.filter(function (x) { return QV.has(x.ar); }).length : 0;
+
+  useEffect(function () { try { localStorage.setItem(SERIE_POS, String(idx)); } catch (e) {} }, [idx]);
+  useEffect(function () { return function () { stoppAlles(); }; }, []);
+
+  function stoppAlles() {
+    try {
+      const r = recRef.current;
+      if (r) {
+        if (r.mr && r.mr.state === 'recording') r.mr.stop();
+        r.stream.getTracks().forEach(function (t) { t.stop(); });
+        if (r.ac && r.ac.close) r.ac.close();
+      }
+    } catch (e) {}
+    recRef.current = null;
+  }
+
+  function weiter(n) {
+    blobRef.current = null;
+    setPhase('bereit'); setFehler('');
+    setIdx(function (i) { return Math.min(items.length - 1, Math.max(0, (n === undefined ? i + 1 : n))); });
+  }
+
+  async function hochladen(blob) {
+    setPhase('sendet');
+    const r = await QV.put(it.ar, blob);
+    if (r && r.ok) { setZaehler(function (z) { return z + 1; }); weiter(); }
+    else { setFehler((r && r.error) || 'Hochladen hat nicht geklappt.'); setPhase('pruefen'); }
+  }
+
+  async function aufnehmen() {
+    setFehler('');
+    if (phase === 'laeuft') { stoppAlles(); return; }
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+    } catch (e) { setFehler('Kein Zugriff aufs Mikrofon.'); return; }
+    const mime = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', ''].find(function (m) {
+      return !m || (window.MediaRecorder && MediaRecorder.isTypeSupported(m));
+    });
+    const mr = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 64000 } : undefined);
+    const chunks = [];
+    mr.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+    mr.onstop = function () {
+      try { stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {}
+      try { if (recRef.current && recRef.current.ac && recRef.current.ac.close) recRef.current.ac.close(); } catch (e) {}
+      recRef.current = null; setPegel(0);
+      const blob = new Blob(chunks, { type: mr.mimeType || 'audio/webm' });
+      if (blob.size < 1200) { setFehler('War zu kurz — nochmal.'); setPhase('bereit'); return; }
+      blobRef.current = blob;
+      if (autoRef.current) hochladen(blob); else setPhase('pruefen');
+    };
+
+    /* Stille-Erkennung: sobald nach dem Sprechen ~0,7 s Ruhe ist, stoppt es
+       von selbst. Ohne das wäre jede Aufnahme zwei Tipps statt einem. */
+    let ac = null, gestartet = Date.now(), gesprochen = false, stillSeit = 0;
+    try {
+      ac = new (window.AudioContext || window.webkitAudioContext)();
+      const quelle = ac.createMediaStreamSource(stream);
+      const an = ac.createAnalyser(); an.fftSize = 512; quelle.connect(an);
+      const buf = new Uint8Array(an.fftSize);
+      const messen = function () {
+        if (!recRef.current || mr.state !== 'recording') return;
+        an.getByteTimeDomainData(buf);
+        let sum = 0;
+        for (let i = 0; i < buf.length; i++) { const v = (buf[i] - 128) / 128; sum += v * v; }
+        const rms = Math.sqrt(sum / buf.length);
+        setPegel(Math.min(1, rms * 7));
+        const jetzt = Date.now();
+        if (rms > 0.045) { gesprochen = true; stillSeit = 0; }
+        else if (gesprochen && !stillSeit) { stillSeit = jetzt; }
+        if (gesprochen && stillSeit && jetzt - stillSeit > 700) { try { mr.stop(); } catch (e) {} return; }
+        if (!gesprochen && jetzt - gestartet > 4500) { try { mr.stop(); } catch (e) {} return; }
+        if (jetzt - gestartet > 9000) { try { mr.stop(); } catch (e) {} return; }
+        requestAnimationFrame(messen);
+      };
+      requestAnimationFrame(messen);
+    } catch (e) {
+      setTimeout(function () { try { if (mr.state === 'recording') mr.stop(); } catch (e2) {} }, 4000);
+    }
+    recRef.current = { mr: mr, stream: stream, ac: ac };
+    mr.start();
+    setPhase('laeuft');
+  }
+
+  function anhoeren() {
+    if (blobRef.current) { const a = new Audio(URL.createObjectURL(blobRef.current)); a.play(); }
+    else if (QV && QV.has(it.ar)) QV.play(it.ar);
+  }
+
+  /* Tastatur am Rechner: Leertaste = aufnehmen/stoppen, Enter = übernehmen,
+     Pfeil rechts = überspringen, Pfeil links = zurück. */
+  useEffect(function () {
+    function taste(e) {
+      if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+      if (e.code === 'Space') { e.preventDefault(); aufnehmen(); }
+      else if (e.key === 'Enter' && phase === 'pruefen' && blobRef.current) { e.preventDefault(); hochladen(blobRef.current); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); weiter(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); weiter(idx - 1); }
+      else if (e.key === 'Escape') { stoppAlles(); onClose(); }
+    }
+    window.addEventListener('keydown', taste);
+    return function () { window.removeEventListener('keydown', taste); };
+  });
+
+  if (!it) return null;
+  const hatSchon = QV && QV.has(it.ar);
+
+  return (
+    <div className="serie">
+      <div className="serie-kopf">
+        <button className="btn btn-ghost btn-sm" onClick={function () { stoppAlles(); onClose(); }}>← Fertig für heute</button>
+        <div className="serie-stand">
+          <b>{idx + 1}</b> von {items.length}
+          <span className="muted"> · {fertig} aufgenommen</span>
+        </div>
+      </div>
+      <div className="serie-balken"><i style={{ width: (100 * fertig / Math.max(1, items.length)) + '%' }}/></div>
+
+      <div className="serie-karte">
+        <div className="serie-lektion">{it.lesson}</div>
+        <div className="serie-ar" dir="rtl">{it.ar}</div>
+        {it.label && <div className="serie-lat">{it.label}</div>}
+        {hatSchon && <div className="serie-schon">✓ dafür gibt es schon eine Aufnahme — neu sprechen ersetzt sie</div>}
+      </div>
+
+      <button className={'serie-mic' + (phase === 'laeuft' ? ' laeuft' : '')} onClick={aufnehmen}
+              disabled={phase === 'sendet'}
+              style={phase === 'laeuft' ? { transform: 'scale(' + (1 + pegel * 0.18).toFixed(3) + ')' } : null}>
+        {phase === 'sendet' ? '…' : phase === 'laeuft' ? '⏹' : '🎤'}
+      </button>
+      <div className="serie-hinweis">
+        {phase === 'laeuft' ? 'Sprich jetzt — ich stoppe von selbst, wenn du fertig bist.'
+          : phase === 'sendet' ? 'Wird gespeichert …'
+          : phase === 'pruefen' ? 'Passt es so?'
+          : 'Antippen und vorsprechen.'}
+      </div>
+      {fehler && <div className="serie-fehler">{fehler}</div>}
+
+      {phase === 'pruefen' && (
+        <div className="row" style={{ gap: 8, marginTop: 10 }}>
+          <button className="btn btn-ghost" style={{ flex: 1 }} onClick={anhoeren}>▶️ Anhören</button>
+          <button className="btn btn-ghost" style={{ flex: 1 }} onClick={aufnehmen}>🔁 Nochmal</button>
+          <button className="btn btn-primary" style={{ flex: 1.3 }} onClick={function () { hochladen(blobRef.current); }}>✅ Passt</button>
+        </div>
+      )}
+
+      <div className="serie-fuss">
+        <button className="btn btn-ghost btn-sm" onClick={function () { weiter(idx - 1); }} disabled={idx === 0}>← zurück</button>
+        <label className="serie-auto">
+          <input type="checkbox" checked={auto} onChange={function (e) { setAuto(e.target.checked); }}/>
+          <span>automatisch weiter</span>
+        </label>
+        <button className="btn btn-ghost btn-sm" onClick={function () { weiter(); }}>überspringen →</button>
+      </div>
+      <div className="serie-tipp muted">
+        Am Rechner: <b>Leertaste</b> = aufnehmen · <b>→</b> = überspringen · <b>Esc</b> = beenden.
+        Nichts geht verloren — die App merkt sich, wo du stehst.
+      </div>
+      {zaehler > 0 && <div className="serie-bilanz">🎉 {zaehler} {zaehler === 1 ? 'Aufnahme' : 'Aufnahmen'} in dieser Sitzung</div>}
+    </div>
+  );
+}
+
 function AudioStudio() {
   const [, force] = useState(0);
   const [open, setOpen] = useState(false);
@@ -4126,6 +4552,11 @@ function AudioStudio() {
   const [busyAr, setBusyAr] = useState(null);  // Upload läuft
   const [micErr, setMicErr] = useState('');
   const [showAll, setShowAll] = useState(false);
+  const [serie, setSerie] = useState(false);          // Serien-Aufnahme offen?
+  const [exp, setExp] = useState(null);               // Export-Fortschritt
+  const [imp, setImp] = useState(null);               // Import-Fortschritt
+  const [impOk, setImpOk] = useState(0);
+  const [impErr, setImpErr] = useState('');
   const recRef = useRef(null);
   useEffect(() => (window.QuranVoice ? window.QuranVoice.onChange(() => force(x => x + 1)) : undefined), []);
   useEffect(() => { if (open && window.QuranVoice) window.QuranVoice.refresh(true); }, [open]);
@@ -4153,6 +4584,7 @@ function AudioStudio() {
     return out;
   }, []);
   const QV = window.QuranVoice;
+  try { window.__studioItems = items; } catch (e) {}   // nur zum Prüfen
   const doneCount = QV ? items.filter(it => QV.has(it.ar)).length : 0;
   const shown = (showAll ? items : items.filter(it => !QV || !QV.has(it.ar))).slice(0, 400);
 
@@ -4196,13 +4628,107 @@ function AudioStudio() {
             statt der Computerstimme. Einmal gehört, funktioniert sie sogar offline.
           </div>
         </div>
-        <div className="row" style={{gap: 8, alignItems: 'center'}}>
+        <div className="row" style={{gap: 8, alignItems: 'center', flexWrap: 'wrap'}}>
           <span className="pill" style={doneCount >= items.length && items.length ? {background:'var(--success-soft, #E7F7EE)', color:'var(--success, #1B8A5A)', fontWeight:800} : {fontWeight:700}}>
             {doneCount} / {items.length} aufgenommen
           </span>
-          <button className="btn btn-primary" onClick={() => setOpen(o => !o)}>{open ? 'Schließen' : 'Öffnen'}</button>
+          <button className="btn btn-primary" onClick={() => setSerie(true)}>🎬 Alles einsprechen</button>
+          <button className="btn btn-ghost" onClick={() => setOpen(o => !o)}>{open ? 'Liste zu' : 'Liste'}</button>
         </div>
       </div>
+      {serie && <SerienStudio items={items} onClose={() => { setSerie(false); if (QV) QV.refresh(true); }}/>}
+      {doneCount > 0 && (
+        <div className="row" style={{gap: 10, alignItems: 'center', flexWrap: 'wrap', marginTop: 10,
+             paddingTop: 10, borderTop: '1px solid var(--line)'}}>
+          <div style={{flex: '1 1 220px'}}>
+            <div style={{fontWeight: 700, fontSize: 14}}>💾 Aufnahmen sichern</div>
+            <div className="muted" style={{fontSize: 12.5, lineHeight: 1.45}}>
+              Lädt alle {doneCount} Aufnahmen in EINE Datei herunter. Die kannst du aufbewahren —
+              und daraus wird das feste Tonpaket gebaut, das dann in der App mitgeliefert wird.
+            </div>
+          </div>
+          <button className="btn btn-ghost" disabled={!!exp || !!imp} onClick={async () => {
+            setExp({ n: 0, von: doneCount });
+            const raus = { app: 'elifba', v: 2, ts: Date.now(), gesamt: items.length, stimmen: [] };
+            const nurFertig = items.map((x, n) => ({ x: x, nr: n })).filter(o => QV && QV.has(o.x.ar));
+            for (let i = 0; i < nurFertig.length; i++) {
+              const it2 = nurFertig[i].x;
+              const nr = nurFertig[i].nr;
+              try {
+                const k = QV.hashKey(it2.ar);
+                const r = await fetch((window.SimpleSync && window.SimpleSync.url)
+                  ? window.SimpleSync.url('audio', { k: k }) : '/api/audio?k=' + k, { cache: 'no-store' });
+                if (r.ok) {
+                  const b = await r.blob();
+                  const b64 = await new Promise((res) => { const fr = new FileReader();
+                    fr.onload = () => res(String(fr.result).split(',')[1] || ''); fr.readAsDataURL(b); });
+                  raus.stimmen.push({
+                    nr: nr,
+                    datei: tonNummer(nr) + '_' + tonSlug(it2.lesson) + '_' + tonSlug(it2.label),
+                    ar: it2.ar, label: it2.label, lesson: it2.lesson,
+                    key: k, mime: b.type || 'audio/webm', data: b64,
+                  });
+                }
+              } catch (e) {}
+              setExp({ n: i + 1, von: nurFertig.length });
+            }
+            const datei = new Blob([JSON.stringify(raus)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(datei);
+            a.download = 'elifba-aufnahmen-' + new Date().toISOString().slice(0, 10) + '.json';
+            document.body.appendChild(a); a.click(); a.remove();
+            setExp(null);
+          }}>{exp ? exp.n + ' / ' + exp.von + ' …' : '💾 Alle sichern'}</button>
+        </div>
+      )}
+      {/* --- Bearbeitete Dateien zurückspielen (Premiere-Runde) ------------- */}
+      <div className="row" style={{gap: 10, alignItems: 'center', flexWrap: 'wrap', marginTop: 10,
+           paddingTop: 10, borderTop: '1px solid var(--line)'}}>
+        <div style={{flex: '1 1 220px'}}>
+          <div style={{fontWeight: 700, fontSize: 14}}>📂 Bearbeitete Aufnahmen einlesen</div>
+          <div className="muted" style={{fontSize: 12.5, lineHeight: 1.45}}>
+            Nach dem Schnitt in Premiere Pro: einfach alle Dateien auf einmal auswählen.
+            Zugeordnet wird über die <b>Nummer am Anfang des Dateinamens</b> (001_, 002_ …) —
+            die darf nicht verändert werden, der Rest des Namens ist egal.
+          </div>
+        </div>
+        <label className={'btn btn-ghost' + (imp ? ' is-disabled' : '')} style={{cursor: 'pointer'}}>
+          {imp ? imp.n + ' / ' + imp.von + ' …' : '📂 Dateien wählen'}
+          <input type="file" accept="audio/*,.wav,.mp3,.m4a,.aac,.webm,.ogg,.flac" multiple
+                 style={{display: 'none'}} disabled={!!imp}
+                 onChange={async (e) => {
+            const dateien = [...(e.target.files || [])];
+            e.target.value = '';
+            if (!dateien.length) return;
+            setImpErr(''); setImp({ n: 0, von: dateien.length });
+            let ok = 0; const fehler = [];
+            for (let i = 0; i < dateien.length; i++) {
+              const f = dateien[i];
+              const m = /^(\d{1,4})/.exec(f.name);
+              const nr = m ? parseInt(m[1], 10) - 1 : -1;
+              const ziel = (nr >= 0 && nr < items.length) ? items[nr] : null;
+              if (!ziel) { fehler.push(f.name + ' — keine gültige Nummer vorn'); setImp({ n: i + 1, von: dateien.length }); continue; }
+              try {
+                const wav = await alsWav(f);
+                if (wav.size > 620000) { fehler.push(f.name + ' — zu lang (über ~14 s)'); }
+                else {
+                  const r = await QV.put(ziel.ar, wav);
+                  if (r && r.ok) ok++; else fehler.push(f.name + ' — ' + ((r && r.error) || 'Server hat abgelehnt'));
+                }
+              } catch (err) { fehler.push(f.name + ' — Datei ließ sich nicht lesen'); }
+              setImp({ n: i + 1, von: dateien.length });
+            }
+            setImp(null);
+            setImpOk(ok);
+            setImpErr(fehler.length ? fehler.slice(0, 6).join(' · ') + (fehler.length > 6 ? ' · … (' + fehler.length + ' insgesamt)' : '') : '');
+            if (QV) QV.refresh(true);
+          }}/>
+        </label>
+      </div>
+      {impOk > 0 && <div style={{fontWeight: 800, color: 'var(--success)', fontSize: 13.5, marginTop: 6}}>
+        ✅ {impOk} {impOk === 1 ? 'Aufnahme' : 'Aufnahmen'} ersetzt — gilt ab sofort für die ganze Klasse.
+      </div>}
+      {!!impErr && <div style={{color: 'var(--rose)', fontWeight: 700, fontSize: 12.5, marginTop: 6, lineHeight: 1.5}}>{impErr}</div>}
       {open && (
         <div style={{marginTop: 12}}>
           <div className="row" style={{gap: 8, flexWrap: 'wrap', alignItems: 'center'}}>
@@ -4543,7 +5069,7 @@ function CardEditor({ ctx }) {
     if (!QA || !QA.sourceFor) return null;
     const src = QA.sourceFor(c.q);
     const style = src.src === 'eigen' ? { background: 'var(--success-soft, #E7F7EE)', color: 'var(--success, #1B8A5A)' }
-      : src.src === 'app' ? { background: '#E3EFFA', color: '#2364A5' }
+      : src.src === 'app' ? { background: 'var(--accent-soft)', color: 'var(--brand)' }
       : src.src === 'fehler' ? { background: '#FDE3E8', color: '#B3123A' }
       : { background: '#F2F2F5', color: '#66717b' };
     const label = src.src === 'eigen' ? '🎙️ deine Aufnahme'
@@ -4590,7 +5116,7 @@ function CardEditor({ ctx }) {
                 </span>
                 <button className="icon-btn" title="Anhören" style={{width: 34, height: 34}}
                         onClick={e => { e.stopPropagation(); QA && QA.speakText(c.q, true); }}>🔊</button>
-                {c.changedQ && <span className="pill" style={{background: '#FCF3D7', fontWeight: 800}} title="Schreibweise geändert">ابج</span>}
+                {c.changedQ && <span className="pill" style={{background: 'var(--gold-soft)', fontWeight: 800}} title="Schreibweise geändert">ابج</span>}
                 {c.changedA && <span className="pill" style={{background: 'var(--success-soft, #E7F7EE)', fontWeight: 800}}>Text</span>}
                 {hasRec && <span className="pill" title="eigene Aufnahme aktiv">🎙️</span>}
               </div>
@@ -4650,7 +5176,7 @@ function CardEditor({ ctx }) {
                     )}
                     {rec && (
                       <div className="row" style={{gap: 10, marginTop: 10, alignItems: 'center', flexWrap: 'wrap'}}>
-                        <button className="btn" style={{background: '#F02048', color: '#fff', fontWeight: 800}} onClick={stopRec}>⏹ Fertig</button>
+                        <button className="btn" style={{background: 'var(--rose)', color: '#fff', fontWeight: 800}} onClick={stopRec}>⏹ Fertig</button>
                         <span style={{fontWeight: 800, color: '#B3123A'}}>● Aufnahme läuft … {recSecs}s</span>
                         <span className="muted" style={{fontSize: 12}}>(stoppt von selbst nach 10 s)</span>
                       </div>
@@ -4720,6 +5246,77 @@ function MicSwitch() {
           {on ? 'An' : 'Aus'}
         </button>
       </div>
+    </div>
+  );
+}
+
+/* ⚙️ Klassen-Einstellungen fürs Auswendiglernen (14.08.2026, aus der
+   Hıfz-App übernommen): Tekrar-Ziel und Rezitations-Stimme. Die Lehrkraft
+   speichert am Mini-Server — alle Kinder-Geräte übernehmen es automatisch
+   beim nächsten Start. */
+function HifzSettings() {
+  const SS = window.SimpleSync;
+  const [cfg, setCfg] = useState(() => (SS && SS.classConfig ? SS.classConfig() : {}));
+  const [msg, setMsg] = useState('');
+  useEffect(() => {
+    if (SS && SS.refreshClassConfig) SS.refreshClassConfig().then(c => setCfg(c || {}));
+  }, []);
+  if (!SS || !SS.setClassConfig) return null;
+  const tekrar = [0, 3, 5, 7].indexOf(Number(cfg.tekrar)) >= 0 ? Number(cfg.tekrar) : 7;
+  const voice = cfg.voice === 'fluessig' ? 'fluessig' : 'lehr';
+  const surahVoice = cfg.surahVoice === 'lehrer' ? 'lehrer' : 'husari';
+  async function save(patch) {
+    const neu2 = Object.assign({ tekrar: tekrar, voice: voice, surahVoice: surahVoice }, patch);
+    setCfg(neu2); setMsg('… speichert');
+    const r = await SS.setClassConfig(neu2);
+    setMsg(r.ok ? '✓ gespeichert — gilt für die ganze Klasse' : '⚠️ ' + (r.error || 'Speichern fehlgeschlagen'));
+    if (r.ok && r.cfg) setCfg(r.cfg);
+  }
+  return (
+    <div className="card" style={{padding: 16, marginTop: 12}}>
+      <div style={{fontWeight: 800}}>🕌 Auswendiglernen — Klassen-Einstellungen</div>
+      <div className="muted" style={{fontSize: 13, marginTop: 2, lineHeight: 1.5}}>
+        Gilt automatisch auf allen Kinder-Geräten (beim nächsten App-Start).
+      </div>
+      <div className="row" style={{justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginTop: 10}}>
+        <div style={{flex: '1 1 240px'}}>
+          <div style={{fontWeight: 700}}>📿 Tekrar-Ziel je neuem Vers</div>
+          <div className="muted" style={{fontSize: 12.5}}>So oft wird jeder neue Vers rezitiert, bevor es weitergeht — das Mikrofon zählt die Perlen. „Aus" = einmal nachsprechen wie früher.</div>
+        </div>
+        <div className="row" style={{gap: 6}}>
+          {[0, 3, 5, 7].map(n => (
+            <button key={n} className={'btn ' + (tekrar === n ? 'btn-primary' : 'btn-ghost')}
+                    onClick={() => save({ tekrar: n })}>{n === 0 ? 'Aus' : n + '×'}</button>
+          ))}
+        </div>
+      </div>
+      <div className="row" style={{justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginTop: 10}}>
+        <div style={{flex: '1 1 240px'}}>
+          <div style={{fontWeight: 700}}>🔊 Rezitations-Stimme (Suren)</div>
+          <div className="muted" style={{fontSize: 12.5}}>🎓 Lehr-Tempo: al-Ḥuṣarî Muʿallim — langsam und deutlich, zum Mitsprechen. 🎵 Flüssig: Mischary Alafasy. Deine eigenen Aufnahmen haben immer Vorrang.</div>
+        </div>
+        <div className="row" style={{gap: 6}}>
+          <button className={'btn ' + (voice === 'lehr' ? 'btn-primary' : 'btn-ghost')} onClick={() => save({ voice: 'lehr' })}>🎓 Lehr-Tempo</button>
+          <button className={'btn ' + (voice === 'fluessig' ? 'btn-primary' : 'btn-ghost')} onClick={() => save({ voice: 'fluessig' })}>🎵 Flüssig</button>
+        </div>
+      </div>
+      <div className="row" style={{justifyContent: 'space-between', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginTop: 10}}>
+        <div style={{flex: '1 1 240px'}}>
+          <div style={{fontWeight: 700}}>🎙️ Bei den Suren zuerst …</div>
+          <div className="muted" style={{fontSize: 12.5}}>
+            Ḥuṣarî ist eigens zum Nachsprechen aufgenommen — deshalb steht er bei den Koranversen
+            standardmäßig vorn. Für Buchstaben, Silben, Wörter und die Gebete gelten deine eigenen
+            Aufnahmen immer, unabhängig von dieser Einstellung.
+          </div>
+        </div>
+        <div className="row" style={{gap: 6}}>
+          <button className={'btn ' + (surahVoice === 'husari' ? 'btn-primary' : 'btn-ghost')}
+                  onClick={() => save({ surahVoice: 'husari' })}>🎓 Ḥuṣarî</button>
+          <button className={'btn ' + (surahVoice === 'lehrer' ? 'btn-primary' : 'btn-ghost')}
+                  onClick={() => save({ surahVoice: 'lehrer' })}>🎙️ Meine Aufnahme</button>
+        </div>
+      </div>
+      {msg && <div className="muted" style={{fontSize: 12.5, marginTop: 8, fontWeight: 700}}>{msg}</div>}
     </div>
   );
 }
@@ -4957,6 +5554,7 @@ function TeacherCorner({ ctx }) {
       </div>
 
       <MicSwitch/>
+      <HifzSettings/>
 
       <SoundCheck ctx={ctx}/>
 
@@ -5220,8 +5818,8 @@ function QuizLoading({ onDone }) {
   return (
     <div className="loading-shell">
       <div style={{textAlign:'center'}}>
-        <div className="mascot-anim"><Axolotl size={160}/></div>
-        <div style={{fontFamily:'Fraunces, serif', fontWeight:900, fontSize:24, marginTop:10}}>Vorbereitung läuft…</div>
+        <div className="mascot-anim">{window.Hudhud ? <window.Hudhud size={140}/> : <Axolotl size={160}/>}</div>
+        <div style={{fontWeight:900, fontSize:24, marginTop:10}}>Vorbereitung läuft…</div>
         <div className="muted">Wähle deine Fragen aus</div>
       </div>
     </div>

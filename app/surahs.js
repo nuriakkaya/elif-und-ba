@@ -16,6 +16,17 @@
 (function () {
   const { useState, useEffect, useRef } = React;
   const AUDIO_BASE = 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/';
+  const AUDIO_HUSARY = 'https://everyayah.com/data/Husary_Muallim_128kbps/';
+  /* Rezitations-Stimme aus den Klassen-Einstellungen (14.08.2026):
+     Standard ist die Lehr-Tilâve von al-Ḥuṣarî Muʿallim. */
+  function ayahUrl(surah, i) {
+    try {
+      const c = window.SimpleSync && window.SimpleSync.classConfig ? window.SimpleSync.classConfig() : {};
+      if (c.voice === 'fluessig') return AUDIO_BASE + (surah.audioStart + i) + '.mp3';
+    } catch (e) {}
+    const p3 = (x) => ('00' + x).slice(-3);
+    return AUDIO_HUSARY + p3(surah.n) + p3(i + 1) + '.mp3';
+  }
   const DONE_KEY = 'quran_surah_done_v1';
 
   function doneMap() { try { return JSON.parse(localStorage.getItem(DONE_KEY) || '{}'); } catch (e) { return {}; } }
@@ -84,7 +95,7 @@
     };
     const playAyah = (i, thenNext) => {
       if (audioRef.current) { try { audioRef.current.pause(); } catch (e) {} }
-      const a = new Audio(AUDIO_BASE + (surah.audioStart + i) + '.mp3');
+      const a = new Audio(ayahUrl(surah, i));
       audioRef.current = a;
       setPlaying(i);
       a.onended = () => {
@@ -94,8 +105,18 @@
         }
         stopAudio();
       };
-      a.onerror = audioFail;
-      a.play().catch(audioFail);
+      // Klemmt die gewählte Stimme, einmal die jeweils andere probieren.
+      const zweiteChance = () => {
+        const b = new Audio(a.src.indexOf('everyayah') >= 0
+          ? AUDIO_BASE + (surah.audioStart + i) + '.mp3'
+          : ayahUrl(surah, i));
+        audioRef.current = b;
+        b.onended = a.onended;
+        b.onerror = audioFail;
+        b.play().catch(audioFail);
+      };
+      a.onerror = zweiteChance;
+      a.play().catch(zweiteChance);
     };
     const togglePlayAll = () => {
       if (queueRef.current) { stopAudio(); return; }
@@ -168,7 +189,7 @@
             {tab === 'learn' && (
               isDone
                 ? <button className="qp-btn" disabled style={{ opacity: .55 }}>🏆 Schon geschafft — Maschallah!</button>
-                : <button className="qp-btn" style={{ background: '#F0C33C', color: '#5a4508' }} onClick={finishMemorized}>🏆 Ich kann die Sure auswendig!</button>
+                : <button className="qp-btn" style={{ background: 'var(--gold)', color: '#5a4508' }} onClick={finishMemorized}>🏆 Ich kann die Sure auswendig!</button>
             )}
           </>
         )}

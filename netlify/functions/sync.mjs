@@ -29,7 +29,7 @@ import { pbkdf2Sync, randomBytes, timingSafeEqual } from "node:crypto";
 import { gunzipSync } from "node:zlib";
 import { Buffer } from "node:buffer";
 
-const VERSION = "8.9";
+const VERSION = "10.5";
 const TEACHER_PW = "1907";          // Lehrer-Passwort — hier zentral änderbar
 const DEFAULT_CLASS = "ALLE";       // Klasse, in die JEDES Kind automatisch kommt
 const STORE = "site:elifba-sync";   // Blobs-Store (Präfix "site:" = siteweit)
@@ -580,6 +580,41 @@ export default async (req) => {
        POST cards {tpw, q, a}           → setzen
        POST cards {tpw, q, del:true}    → zurücksetzen
     ========================================================== */
+    /* ==========================================================
+       config: Klassen-Einstellungen der Lehrkraft (14.08.2026) —
+       gilt automatisch auf allen Kinder-Geräten.
+         GET  config?code=ALLE            → { ok, cfg }
+         POST config {tpw, code, cfg}     → speichern (nur Lehrkraft)
+       cfg kennt bisher:
+         tekrar : 0|3|5|7   Wiederhol-Ziel je neuem Vers (0 = aus, Standard 7)
+         voice  : 'lehr'|'fluessig'   Rezitations-Stimme (Ḥuṣarî Muʿallim / Alafasy)
+    ========================================================== */
+    if (route === "config") {
+      const code = cleanCode(url.searchParams.get("code") || (req.method === "POST" ? "" : "")) || DEFAULT_CLASS;
+      if (req.method === "GET") {
+        const rec = (await bGet("classcfg:" + code)) || {};
+        return json({ ok: true, cfg: rec.cfg || {} });
+      }
+      if (req.method === "POST") {
+        const body = await readBody(req);
+        if (String(body.tpw || "") !== TEACHER_PW) return json({ error: "Lehrer-Passwort erforderlich" }, 403);
+        const c = cleanCode(String(body.code || "")) || DEFAULT_CLASS;
+        const inCfg = body.cfg || {};
+        const cfg = {};
+        const t = Number(inCfg.tekrar);
+        if ([0, 3, 5, 7].indexOf(t) >= 0) cfg.tekrar = t;
+        if (inCfg.voice === "lehr" || inCfg.voice === "fluessig") cfg.voice = inCfg.voice;
+        // Wer hat bei den Koranversen Vorrang: Ḥuṣarî oder die eigene Aufnahme?
+        if (inCfg.surahVoice === "husari" || inCfg.surahVoice === "lehrer") cfg.surahVoice = inCfg.surahVoice;
+        const rec = (await bGet("classcfg:" + c)) || {};
+        rec.cfg = Object.assign({}, rec.cfg || {}, cfg);
+        rec.ts = Date.now();
+        await bSet("classcfg:" + c, rec);
+        return json({ ok: true, cfg: rec.cfg });
+      }
+      return json({ error: "Methode nicht unterstützt" }, 405);
+    }
+
     if (route === "cards") {
       if (req.method === "GET") {
         const rec = (await bGet("card-overrides")) || { cards: {}, rev: 0 };

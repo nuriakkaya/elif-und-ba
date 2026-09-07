@@ -43,7 +43,41 @@
      TEIL A — Der Lernstand (rechnet, speichert, vergibt Punkte)
      ============================================================== */
   const KEY = 'eb_hifz_v1';
-  const AUDIO_BASE = 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/';
+  /* Rezitations-Stimmen (14.08.2026, aus der Hıfz-App übernommen):
+       'lehr'     = al-Ḥuṣarî Muʿallim — die klassische LEHR-Tilâve, langsam
+                    und deutlich, zum Mitsprechen gemacht (everyayah.com).
+       'fluessig' = Mischary Alafasy (islamic.network) — flüssiges Tempo.
+     Die Lehrkraft wählt im Klassenzimmer; Standard ist die Lehr-Stimme.
+     Eigene Aufnahmen der Lehrkraft haben weiterhin Vorrang vor allem. */
+  const AUDIO_ALAFASY = 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/';
+  const AUDIO_HUSARY = 'https://everyayah.com/data/Husary_Muallim_128kbps/';
+  /* Wer hat bei den KORANVERSEN Vorrang? (06.09.2026, Nutzerentscheidung)
+     Standard: die Lehr-Tilâve von al-Ḥuṣarî — sie ist eigens zum Nachsprechen
+     aufgenommen. Eigene Aufnahmen der Lehrkraft gelten weiter uneingeschränkt
+     für Buchstaben, Silben, Wörter und die Gebete; nur bei den Suren tritt
+     Ḥuṣarî davor, solange im Klassenzimmer nicht umgestellt wird. */
+  function surahVoicePref() {
+    try {
+      const c = window.SimpleSync && window.SimpleSync.classConfig ? window.SimpleSync.classConfig() : {};
+      if (c.surahVoice === 'lehrer') return 'lehrer';
+    } catch (e) {}
+    return 'husari';
+  }
+  function reciteVoice() {
+    try {
+      const c = window.SimpleSync && window.SimpleSync.classConfig ? window.SimpleSync.classConfig() : {};
+      if (c.voice === 'fluessig') return 'fluessig';
+    } catch (e) {}
+    return 'lehr';
+  }
+  function surahUrl(item, i, voice) {
+    const v = voice || reciteVoice();
+    if (v === 'lehr' && item.n) {
+      const p3 = function (x) { return ('00' + x).slice(-3); };
+      return AUDIO_HUSARY + p3(item.n) + p3(i + 1) + '.mp3';
+    }
+    return AUDIO_ALAFASY + (item.audioStart + i) + '.mp3';
+  }
 
   /* Punkte-Umbau 12.08.2026 (Nutzerwunsch wörtlich: „nicht Punkte bekommen
      beim Anhören, sondern erst, wenn sie das GESAGT haben"):
@@ -59,6 +93,7 @@
   const XP_DONE_BASE = 200;
   const XP_DONE_STEP = 100;
   const XP_REFRESH = 50;
+  const XP_TRANS = 40;                 // 🔗 "Wie geht es weiter?" in der Auffrischung
   const REP_DAYS = [1, 3, 7, 14, 30];
   /* Zeitfenster fürs Aufsagen (11.08.2026, Nutzerwunsch „das muss in einem
      bestimmten Tempo passieren, geschenkt gibt es nichts"). Grundlage: eine
@@ -103,7 +138,7 @@
   /* Ein Eintrag ist absichtlich rein aus Zahlen gebaut — dadurch kann der
      Geräte-Abgleich (app/simplesync.js) ihn ohne Sonderregel zusammenführen:
      „die höhere Zahl gewinnt" ist hier immer die richtige Antwort. */
-  function blank() { return { heard: 0, p: {}, chain: 0, done: 0, doneAt: 0, best: 0, xp: 0, rn: 0, rlast: 0, self: 0 }; }
+  function blank() { return { heard: 0, p: {}, chain: 0, done: 0, doneAt: 0, best: 0, xp: 0, rn: 0, rlast: 0, self: 0, tl: 0 }; }
   function itemState(id) {
     const st = load();
     return Object.assign(blank(), st.items[id] || {});
@@ -167,6 +202,25 @@
     if (it.heard) return { xp: 0, already: true, hoer: true };
     writeItem(id, function (x) { x.heard = 1; });
     return { xp: 0, already: false, hoer: true };
+  }
+
+  /* Tekrar-Ziel je neuem Vers (14.08.2026, aus der Hıfz-App): 7× rezitieren,
+     bevor es weitergeht — die Lehrkraft stellt 0/3/5/7 im Klassenzimmer ein
+     (0 = einmal nachsprechen wie früher). */
+  function tekrarTarget() {
+    try {
+      const c = window.SimpleSync && window.SimpleSync.classConfig ? window.SimpleSync.classConfig() : {};
+      const n = Number(c.tekrar);
+      if (n === 0) return 0;
+      if ([3, 5, 7].indexOf(n) >= 0) return n;
+    } catch (e) {}
+    return 7;
+  }
+
+  /* 🔗 Übergangs-Frage bestanden: Vers n gehört, Vers n+1 aus dem Kopf. */
+  function reachTrans(id, half) {
+    writeItem(id, function (x) { x.tl = Date.now(); });
+    return { xp: award(half ? Math.round(XP_TRANS * 0.5) : XP_TRANS, id), trans: true, half: !!half };
   }
 
   function reachChain(id, k, half) {
@@ -247,7 +301,16 @@
       if (i > 0 && i + 1 < N && (it.chain || 0) < i + 1) return { kind: 'chain', k: i + 1 };
     }
     if (!it.done) return { kind: 'whole' };
-    if (repDue(id)) return { kind: 'refresh' };
+    if (repDue(id)) {
+      /* Erst die Übergangs-Frage (einmal je Fälligkeit), dann die ganze Sure.
+         Der Startvers wechselt je Auffrischung — stabil aus dem Zähler
+         abgeleitet, damit die Anzeige nicht bei jedem Rendern springt. */
+      if (item.parts.length >= 3 && (it.tl || 0) < nextRepAt(it)) {
+        const i = ((it.rn || 0) * 3 + 1) % (item.parts.length - 1);
+        return { kind: 'trans', i: i };
+      }
+      return { kind: 'refresh' };
+    }
     return null;
   }
 
@@ -340,6 +403,8 @@
     teacherSnapshot: teacherSnapshot, onChange: onChange, resetAll: resetAll, award: award,
     courseInfo: courseInfo,
     markHeard: markHeard,
+    tekrarTarget: tekrarTarget, reachTrans: reachTrans, _surahUrl: surahUrl, _surahVoicePref: surahVoicePref,
+    XP_TRANS: XP_TRANS,
     XP_STAGE: XP_STAGE, XP_CHAIN: XP_CHAIN, XP_REFRESH: XP_REFRESH, XP_LISTEN_ALL: XP_LISTEN_ALL, KEY: KEY,
   };
 
@@ -402,9 +467,11 @@
       if (!part) return;
       setPlaying(i); setFailed('');
 
-      // 1) eigene Aufnahme
+      // 1) eigene Aufnahme — bei KORANVERSEN nur, wenn die Klasse das so
+      //    eingestellt hat (sonst hat Ḥuṣarî Vorrang). Gebete immer.
+      const eigeneErlaubt = !(item.n && item.audioStart) || surahVoicePref() === 'lehrer';
       try {
-        if (window.QuranVoice && window.QuranVoice.has(part.ar)) {
+        if (eigeneErlaubt && window.QuranVoice && window.QuranVoice.has(part.ar)) {
           const ok = window.QuranVoice.play(part.ar, {
             slow: opts.slow,
             onEnd: function (good) {
@@ -417,16 +484,27 @@
         }
       } catch (e) {}
 
-      // 2) Rezitation aus dem Internet
+      // 2) Rezitation aus dem Internet — erst die gewählte Stimme, und wenn
+      //    die klemmt, die jeweils andere; erst danach die Systemstimme.
       if (item.audioStart) {
-        const a = new Audio(AUDIO_BASE + (item.audioStart + i) + '.mp3');
-        ref.current = a;
-        if ('preservesPitch' in a) a.preservesPitch = true;
-        a.playbackRate = opts.slow ? 0.75 : 1;
-        a.onended = function () { setSource('internet'); setPlaying(-1); if (onEnd) onEnd(true); };
-        a.onerror = function () { speakFallback(part, opts, onEnd, true); };
-        const pr = a.play();
-        if (pr && pr.catch) pr.catch(function () { speakFallback(part, opts, onEnd, true); });
+        const tryNet = function (voice, nochEine) {
+          const a = new Audio(surahUrl(item, i, voice));
+          ref.current = a;
+          if ('preservesPitch' in a) a.preservesPitch = true;
+          a.playbackRate = opts.slow ? 0.75 : 1;
+          a.onended = function () { setSource('internet'); setPlaying(-1); if (onEnd) onEnd(true); };
+          let schonWeiter = false;            // onerror UND play().catch können beide feuern
+          const fail = function () {
+            if (schonWeiter) return; schonWeiter = true;
+            if (nochEine) tryNet(nochEine, null);
+            else speakFallback(part, opts, onEnd, true);
+          };
+          a.onerror = fail;
+          const pr = a.play();
+          if (pr && pr.catch) pr.catch(fail);
+        };
+        const v = reciteVoice();
+        tryNet(v, v === 'lehr' ? 'fluessig' : 'lehr');
         return;
       }
 
@@ -706,10 +784,112 @@
   const STAGE_INFO = [
     null,
     { ic: '👂', t: 'Hören & Mitlesen', s: 'Hör genau hin und lies mit. Der Klang ist der halbe Weg.' },
-    { ic: '🎤', t: 'Nachsprechen',     s: 'Jetzt du — sag es laut nach. Der Text darf dabei vor dir stehen.' },
+    { ic: '🎤', t: 'Nachsprechen',     s: 'Jetzt du — sag den Vers mehrmals laut. Jedes richtige Mal füllt eine Perle.' },
     { ic: '🧩', t: 'Wort-Puzzle',      s: 'Der Vers ist zugedeckt — bau ihn aus den Wörtern wieder auf. Spicken ist erlaubt.' },
     { ic: '🌟', t: 'Aus dem Kopf',     s: 'Der Text ist verdeckt. Sag den Vers frei auf!' },
   ];
+
+  /* 🎤 Tekrar (14.08.2026, aus der Hıfz-App): Das Mikrofon hört DURCHGEHEND
+     zu und zählt jedes saubere Rezitieren (mind. 60 % der Vers-Wörter erkannt)
+     als Perle. Ohne funktionierendes Mikrofon zählt das Kind selbst mit
+     („Tekrar +1") — dann gibt es wie immer nur die halbe Punktzahl. */
+  function TekrarBox({ expected, target, onDone }) {
+    const [count, setCount] = useState(0);
+    const [live, setLive] = useState(false);
+    const [lastOk, setLastOk] = useState(null);   // { ok, heard }
+    const [err, setErr] = useState('');
+    const [fertig, setFertig] = useState(false);
+    const ctrl = useRef(null);
+    const stopFlag = useRef(false);
+    const countRef = useRef(0);
+    const selfRef = useRef(false);
+    const mode = window.Recite ? window.Recite.mode() : 'none';
+    useEffect(function () {
+      return function () { stopFlag.current = true; if (ctrl.current && ctrl.current.abort) ctrl.current.abort(); };
+    }, []);
+    function bump(viaSelf) {
+      if (fertig || countRef.current >= target) return;
+      if (viaSelf) selfRef.current = true;
+      const c = countRef.current + 1;
+      countRef.current = c; setCount(c);
+      try { if (window.Sound) (window.Sound.tick ? window.Sound.tick() : window.Sound.correct()); } catch (e) {}
+      if (c >= target) {
+        setFertig(true);
+        stopAll();
+        try { if (window.Sound) window.Sound.correct(); } catch (e) {}
+        setTimeout(function () { onDone(selfRef.current); }, 700);
+      }
+    }
+    function loop() {
+      if (stopFlag.current || countRef.current >= target) return;
+      ctrl.current = window.Recite.listen({
+        expected: expected,
+        maxMs: 20000,
+        onDone: function (text) {
+          if (stopFlag.current || countRef.current >= target) return;
+          if (text) {
+            const g = window.Recite.grade(expected, text);
+            const ok = g.pct >= 60;
+            setLastOk({ ok: ok, heard: g.heard || text });
+            if (ok) bump(false);
+            else { try { if (window.Sound && window.Sound.wrong) window.Sound.wrong(); } catch (e) {} }
+          }
+          setTimeout(loop, 250);            // einfach weiterlauschen
+        },
+        onError: function (code) {
+          if (stopFlag.current) return;
+          setLive(false);
+          setErr(window.Recite.errorText ? window.Recite.errorText(code) : 'Mikrofon-Problem.');
+        },
+      });
+    }
+    function start() { setErr(''); setLastOk(null); stopFlag.current = false; setLive(true); loop(); }
+    function stopAll() { stopFlag.current = true; setLive(false); if (ctrl.current && ctrl.current.stop) ctrl.current.stop(); }
+
+    const perlen = [];
+    for (let k = 0; k < target; k++) {
+      perlen.push(
+        <span key={k} className={'hz-perle' + (k < count ? ' is-done' : '')}>
+          {k < count ? '✓' : (k + 1)}
+        </span>
+      );
+    }
+
+    return (
+      <div className="hz-tekrar">
+        <div className="hz-perlen">{perlen}</div>
+        {mode === 'speech' ? (
+          <>
+            <button className={'hz-mic' + (live ? ' is-live' : '')}
+                    onClick={live ? stopAll : start} disabled={fertig}>
+              <span className="hz-mic-ico">{fertig ? '🎉' : live ? '⏹' : '🎤'}</span>
+            </button>
+            <div className="hz-mic-label">
+              {fertig ? 'Alle Perlen voll — Maschallah!'
+                : live ? '● Ich höre zu — rezitier einfach immer wieder, ich zähle mit'
+                : 'Antippen — dann rezitierst du, und ich zähle jede Perle'}
+            </div>
+            {lastOk && !fertig && (
+              <div className={'hz-tekrar-echo' + (lastOk.ok ? ' is-ok' : '')}>
+                {lastOk.ok ? '✓ ' : '✗ '}Verstanden: „{lastOk.heard}“{lastOk.ok ? '' : ' — das war noch nicht der Vers. Nochmal!'}
+              </div>
+            )}
+            {err && (
+              <>
+                <div className="hz-err">{err}</div>
+                <button className="btn btn-ghost" onClick={function () { bump(true); }}>👍 Tekrar +1 (selbst zählen — halbe Punkte)</button>
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            <div className="hz-note">Dein Gerät kann gerade nicht mithören — zähl selbst ehrlich mit: Nach jedem lauten Rezitieren einmal antippen. Selbst gezählt gibt die halbe Punktzahl.</div>
+            <button className="qp-btn hz-primary" disabled={fertig} onClick={function () { bump(true); }}>🗣️ Tekrar +1 — ich habe rezitiert</button>
+          </>
+        )}
+      </div>
+    );
+  }
 
   function Practice({ item, step, onFinish, onExit }) {
     const audio = useAudio(item);
@@ -719,6 +899,8 @@
     const [heardOnce, setHeardOnce] = useState(false);
     const [peek, setPeek] = useState(false);
     const [helped, setHelped] = useState(false);  // Umschrift eingeblendet -> halbe Punkte
+    const [abcAus, setAbcAus] = useState(false);  // Tekrar: Umschrift ausgeblendet (frei wählbar)
+    const tekrarZiel = window.Hifz.tekrarTarget();
     const [reward, setReward] = useState(null);
     const [toast, setToast] = useState(null);     // kleine Zwischenmeldung statt großer Seite
     const autoPlayed = useRef(false);
@@ -727,10 +909,13 @@
 
     const isVerse = step.kind === 'verse';
     const isListen = step.kind === 'listen';
+    const isTrans = step.kind === 'trans';
     const part = isVerse ? item.parts[step.i] : null;
     const chainTo = step.kind === 'chain' ? step.k : (step.kind === 'whole' || step.kind === 'refresh' ? item.parts.length : 0);
     const chainParts = chainTo ? item.parts.slice(0, chainTo) : [];
-    const expected = isVerse ? part.ar : chainParts.map(function (p) { return p.ar; }).join(' ');
+    const expected = isVerse ? part.ar
+      : isTrans ? item.parts[step.i + 1].ar
+      : chainParts.map(function (p) { return p.ar; }).join(' ');
     const stage = isVerse ? step.stage : 4;
 
     /* KEIN Auto-Abspielen mehr (11.08.2026, „man hört nichts"): Handys und
@@ -799,6 +984,10 @@
             const r = window.Hifz.reachStage(item.id, step.i, stage, { half: half, mic: true });
             if (stage >= 4) { try { if (window.Celebrate) window.Celebrate.burst(); } catch (e) {} }
             finish(r, { pct: g.pct, slow: g.slow, helped: helped });
+          } else if (step.kind === 'trans') {
+            const r = window.Hifz.reachTrans(item.id, half);
+            try { if (window.Celebrate) window.Celebrate.burst(); } catch (e) {}
+            finish(r, { pct: g.pct, slow: g.slow, helped: helped });
           } else if (step.kind === 'chain') doneChain(g.slow || helped);
           else doneWhole(g.pct, g.slow || helped);
         }, g.slow ? 2000 : 1000);
@@ -808,6 +997,7 @@
     }
     function handleSelf() {
       if (step.kind === 'verse') { const r = window.Hifz.reachStage(item.id, step.i, stage, { self: true }); finish(r, { self: true }); }
+      else if (step.kind === 'trans') { const r = window.Hifz.reachTrans(item.id, true); finish(r, { self: true }); }
       else if (step.kind === 'chain') doneChain(true);
       else doneWhole(0, true);
     }
@@ -834,8 +1024,9 @@
       const nxt = window.Hifz.nextStep(item.id);
       return (
         <div className="hz-reward">
-          <div className="hz-reward-ico">{isListen ? '👂' : reward.whole ? (reward.refresh ? '🔁' : '🏆') : reward.chain ? '🔗' : stage >= 4 ? '🌟' : '✅'}</div>
+          <div className="hz-reward-ico">{isListen ? '👂' : reward.trans ? '🔗' : reward.whole ? (reward.refresh ? '🔁' : '🏆') : reward.chain ? '🔗' : stage >= 4 ? '🌟' : '✅'}</div>
           <h2>{isListen ? 'Gut zugehört!'
+            : reward.trans ? 'Übergang geschafft — genau da hängt man sonst!'
             : reward.whole
             ? (reward.refresh ? 'Sitzt immer noch!' : 'Maschallah — du kannst sie auswendig!')
             : reward.chain ? ('Kette geschafft: Vers 1 bis ' + reward.chain + ' am Stück!')
@@ -864,11 +1055,13 @@
     const info = STAGE_INFO[stage];
     const title = step.kind === 'verse' ? (info.ic + ' ' + info.t)
       : isListen ? '👂 Erst einmal zuhören'
+      : isTrans ? '🔗 Wie geht es weiter?'
       : step.kind === 'chain' ? '🔗 Die Kette'
       : step.kind === 'refresh' ? '🔁 Auffrischung'
       : '🏆 Die ganze ' + (item.kind === 'sure' ? 'Sure' : 'Dua');
     const sub = step.kind === 'verse' ? info.s
       : isListen ? 'Lehn dich zurück und hör die ganze ' + (item.kind === 'sure' ? 'Sure' : 'Dua') + ' einmal an. Lies dabei ruhig mit — der Klang bleibt hängen.'
+      : isTrans ? ('Hier ist Vers ' + (step.i + 1) + ' — und wie geht es weiter? Sag Vers ' + (step.i + 2) + ' aus dem Kopf!')
       : step.kind === 'chain' ? ('Sag Vers 1 bis ' + step.k + ' am Stück auf — ohne Pause dazwischen.')
       : step.kind === 'refresh' ? 'Kannst du sie noch? Einmal komplett aufsagen genügt.'
       : 'Jetzt alles am Stück — von vorne bis hinten, aus dem Kopf.';
@@ -876,7 +1069,7 @@
     /* Ab Stufe 3 ist der Vers zugedeckt — sonst wäre das Puzzle bloßes Abschreiben
        und die Leiter würde nicht schwerer, sondern nur länger. Spicken bleibt
        jederzeit möglich und kostet nichts. */
-    const hidden = !isListen && ((step.kind === 'verse' && stage >= 3 && !peek) || (step.kind !== 'verse' && !peek));
+    const hidden = !isListen && !isTrans && ((step.kind === 'verse' && stage >= 3 && !peek) || (step.kind !== 'verse' && !peek));
 
     /* ---- Zuhör-Schritt: die ganze Sure zum Mitlesen ---- */
     if (isListen) {
@@ -932,21 +1125,34 @@
           </div>
           <span className="pill">{step.kind === 'verse'
             ? (XP_STAGE[stage] > 0 ? '+' + XP_STAGE[stage] + ' XP' : '🎧 ohne Punkte')
+            : isTrans ? '+' + window.Hifz.XP_TRANS + ' XP'
             : step.kind === 'chain' ? '+' + XP_CHAIN + ' XP' : step.kind === 'refresh' ? '+' + XP_REFRESH + ' XP' : '+' + window.Hifz.completionBonus() + ' XP'}</span>
         </div>
         <div className="hz-prac-sub">{sub}</div>
 
         {/* --- Der Text --- */}
-        {/* Beim NACHSPRECHEN steht nur noch das Arabische da (Nutzerwunsch
-            11.08.2026): Wer die Umschrift mitliest, liest — er sagt nicht auf.
-            Umschrift und Deutsch gibt es in der Hör-Stufe, und auf Knopfdruck
-            als Hilfe — dann aber nur die halbe Punktzahl. */}
-        {isVerse ? (
+        {/* Stufe 2 = Tekrar (14.08.2026): Die Umschrift in unseren Buchstaben
+            steht MIT da (Nutzerwunsch „plus Lateinbuchstaben") — schummeln geht
+            nicht, denn das Mikrofon prüft jedes Rezitieren. Wer sie nicht
+            braucht, blendet sie aus. Ab Stufe 3 ist der Text zugedeckt. */}
+        {isTrans ? (
+          <>
+            <div className="hz-verse">
+              <div className="hz-trans-tag">Vers {step.i + 1}</div>
+              <div className="hz-ar" dir="rtl">{item.parts[step.i].ar}</div>
+              <div className="hz-tr">{item.parts[step.i].tr}</div>
+            </div>
+            <div className="hz-trans-next">
+              <b>Vers {step.i + 2} — sag ihn aus dem Kopf!</b>
+              <div className="hz-ar hz-trans-q" dir="rtl">{peek ? item.parts[step.i + 1].ar : '؟ ؟ ؟'}</div>
+              {peek && <div className="hz-tr">{item.parts[step.i + 1].tr}</div>}
+            </div>
+          </>
+        ) : isVerse ? (
           <div className={'hz-verse' + (hidden ? ' is-hidden' : '')}>
             <div className="hz-ar" dir="rtl">{hidden ? item.parts[step.i].w[0][0] + ' …' : part.ar}</div>
-            {!hidden && (stage === 1 || helped) && <div className="hz-tr">{part.tr}</div>}
+            {!hidden && (stage === 1 || (stage === 2 && !abcAus) || helped) && <div className="hz-tr">{part.tr}</div>}
             {!hidden && stage === 1 && <div className="hz-de">{part.de}</div>}
-            {!hidden && stage === 2 && !helped && <div className="hz-onlyar">Nur Arabisch — genau darum geht es.</div>}
             {hidden && <div className="hz-note">Nur das erste Wort steht da — der Rest kommt aus deinem Kopf.</div>}
           </div>
         ) : (
@@ -978,16 +1184,41 @@
             <div className="hz-row">
               <button className="qp-btn" onClick={function () { audio.play(step.i); }}>🔊 Vormachen</button>
               <button className="btn btn-ghost" onClick={function () { audio.play(step.i, { slow: true }); }}>🐢 Langsam</button>
-              {!helped && <button className="btn btn-ghost" onClick={function () { setHelped(true); }}>👀 Umschrift (halbe Punkte)</button>}
+              <button className="btn btn-ghost" onClick={function () { setAbcAus(!abcAus); }}>{abcAus ? '🔤 ABC zeigen' : '🔤 ABC verstecken'}</button>
+            </div>
+            {audio.failed && <div className="hz-err">🔇 {audio.failed}</div>}
+            {tekrarZiel > 0
+              ? <TekrarBox key={'tk' + step.i} expected={expected} target={tekrarZiel}
+                           onDone={function (selfCounted) { doneStage(selfCounted ? { self: true } : { mic: true }); }}/>
+              : (mode === 'none'
+                ? <>
+                    <div className="hz-note">Sag den Vers laut mit — deine Lehrkraft hat das Mikrofon ausgeschaltet. Selbst bestätigt gibt es die halbe Punktzahl.</div>
+                    <button className="qp-btn hz-primary" onClick={function () { doneStage({ self: true }); }}>✅ Ich habe ihn laut nachgesprochen</button>
+                  </>
+                : <MicButton expected={expected} limitS={window.Hifz.tempoLimit(expected)}
+                             hint="Antippen und den Vers nachsprechen"
+                             onResult={handleSpeech} onSelf={handleSelf}/>)}
+          </>
+        )}
+
+        {/* --- 🔗 Übergangs-Frage: Vers n ist da, Vers n+1 kommt aus dem Kopf --- */}
+        {isTrans && (
+          <>
+            <div className="hz-row">
+              <button className="qp-btn" onClick={function () { audio.play(step.i); }}>🔊 Vers {step.i + 1} anhören</button>
+              {!peek && <button className="btn btn-ghost" onClick={function () { setPeek(true); setHelped(true); }}>👀 Kurz spicken (halbe Punkte)</button>}
             </div>
             {audio.failed && <div className="hz-err">🔇 {audio.failed}</div>}
             {mode === 'none'
-              ? <>
-                  <div className="hz-note">Sag den Vers laut mit — deine Lehrkraft hat das Mikrofon ausgeschaltet. Selbst bestätigt gibt es die halbe Punktzahl.</div>
-                  <button className="qp-btn hz-primary" onClick={function () { doneStage({ self: true }); }}>✅ Ich habe ihn laut nachgesprochen</button>
-                </>
+              ? <WordPuzzle words={item.parts[step.i + 1].w}
+                            distractors={(function () {
+                              const other = [];
+                              item.parts.forEach(function (p, k) { if (k !== step.i + 1) p.w.forEach(function (w) { other.push(w[0]); }); });
+                              return shuffle(other).slice(0, Math.min(3, other.length));
+                            })()}
+                            onDone={function () { const r = window.Hifz.reachTrans(item.id, helped); finish(r, {}); }}/>
               : <MicButton expected={expected} limitS={window.Hifz.tempoLimit(expected)}
-                           hint="Antippen und den Vers nachsprechen"
+                           hint={'Antippen und Vers ' + (step.i + 2) + ' aufsagen'}
                            onResult={handleSpeech} onSelf={handleSelf}/>}
           </>
         )}
@@ -1024,7 +1255,7 @@
           </>
         )}
 
-        {!isVerse && (
+        {!isVerse && !isListen && !isTrans && (
           mode === 'none'
             ? <>
                 <div className="hz-note">🧩 Ohne Mikrofon: Bring die Verse in die richtige Reihenfolge. Auch das prüft die App — volle Punkte.</div>
@@ -1174,7 +1405,7 @@
     const chip = has
       ? <span className="pill" style={{ background: 'var(--success-soft, #E7F7EE)', color: 'var(--success, #1B8A5A)', fontWeight: 800 }}>🎙️ deine Aufnahme</span>
       : item.audioStart
-        ? <span className="pill" style={{ background: '#E3EFFA', color: '#2364A5', fontWeight: 800 }}>🌐 Internet-Rezitation</span>
+        ? <span className="pill" style={{ background: 'var(--accent-soft)', color: 'var(--brand)', fontWeight: 800 }}>🌐 Internet-Rezitation</span>
         : <span className="pill" style={{ background: '#FDF1E0', color: '#8a5a06', fontWeight: 800 }}>🗣 Computerstimme</span>;
 
     return (
@@ -1198,7 +1429,7 @@
         )}
         {rec && (
           <div className="hz-row" style={{ marginTop: 8, alignItems: 'center' }}>
-            <button className="btn" style={{ background: '#F02048', color: '#fff', fontWeight: 800 }} onClick={stop}>⏹ Fertig</button>
+            <button className="btn" style={{ background: 'var(--rose)', color: '#fff', fontWeight: 800 }} onClick={stop}>⏹ Fertig</button>
             <span style={{ fontWeight: 800, color: '#B3123A' }}>● Aufnahme läuft … {secs}s</span>
             <span className="muted" style={{ fontSize: 12 }}>(max. 30 s)</span>
           </div>
@@ -1300,6 +1531,7 @@
                 {next.kind === 'listen' ? '👂 Anhören & starten'
                   : next.kind === 'verse' ? '▶️ Weiter: Vers ' + (next.i + 1) + ' · ' + STAGE_INFO[next.stage].t
                   : next.kind === 'chain' ? '🔗 Kette: Vers 1–' + next.k
+                  : next.kind === 'trans' ? '🔗 Wie geht es weiter?'
                   : next.kind === 'refresh' ? '🔁 Auffrischen'
                   : '🏆 Ganze ' + (item.kind === 'sure' ? 'Sure' : 'Dua') + ' aufsagen'}
               </button>
@@ -1404,10 +1636,48 @@
   /* ==============================================================
      TEIL F — Die Übersichtsseite
      ============================================================== */
+  /* Klickbare Einführung (14.08.2026, Nutzerwunsch "klickbar einführen und
+     den Kindern erklären"): beim ersten Öffnen einmal automatisch, danach
+     jederzeit über den „❓ So geht's"-Knopf. */
+  const TOUR = [
+    { ic: '🕌', t: 'Suren auswendig lernen', s: 'Hier lernst du Suren und Gebete Schritt für Schritt auswendig — genauso, wie es die Hafızlar seit Jahrhunderten machen. Die App ist dein Lernpartner.' },
+    { ic: '👂', t: 'Schritt 1: Zuhören', s: 'Zuerst hörst du den Vers von einem echten Rezitator — im Lehr-Tempo, schön langsam und deutlich. Lies einfach mit. Zuhören ist Pflicht, gibt aber keine Punkte.' },
+    { ic: '🎤', t: 'Schritt 2: Tekrar — die Perlen', s: 'Jetzt du! Sag den Vers mehrmals laut. Das Mikrofon hört zu und macht für jedes richtige Rezitieren eine Perle grün ✓. Alle Perlen voll = Stufe geschafft! Die Umschrift in unseren Buchstaben steht dabei — Schummeln geht trotzdem nicht, das Mikrofon prüft ja mit.' },
+    { ic: '🧩', t: 'Schritt 3 und 4: Puzzle & aus dem Kopf', s: 'Dann baust du den Vers aus seinen Wörtern zusammen — und sagst ihn zum Schluss ganz ohne Text auf. Danach kommt die Kette: Vers 1 und 2 am Stück, dann 1 bis 3 … bis zur ganzen Sure!' },
+    { ic: '🏆', t: 'Punkte, Krone & „Wie geht es weiter?"', s: 'Punkte gibt es fürs Sprechen, nicht fürs Zuhören — und hier gibt es die meisten Punkte der ganzen App. Die ganze Sure aus dem Kopf bringt die Krone. Später fragt die App ab und zu: „Hier ist Vers 2 — wie geht es weiter?" So bleibt alles für immer im Kopf.' },
+  ];
+  function HifzTour({ onClose }) {
+    const [i, setI] = useState(0);
+    const last = i >= TOUR.length - 1;
+    const f = TOUR[i];
+    return (
+      <div className="content">
+        <div className="hz-tour">
+          <button className="hz-tour-x" onClick={onClose} title="Überspringen">✕</button>
+          <div className="hz-tour-ico">{f.ic}</div>
+          <h2>{f.t}</h2>
+          <p>{f.s}</p>
+          <div className="hz-tour-dots">
+            {TOUR.map(function (_, k) {
+              return <span key={k} className={k === i ? 'is-now' : k < i ? 'is-done' : ''} onClick={function () { setI(k); }}/>;
+            })}
+          </div>
+          <button className="qp-btn hz-primary" onClick={function () { last ? onClose() : setI(i + 1); }}>
+            {last ? "🚀 Los geht's!" : 'Weiter →'}
+          </button>
+          {!last && <button className="btn btn-ghost" style={{ marginTop: 6 }} onClick={onClose}>Überspringen</button>}
+        </div>
+      </div>
+    );
+  }
+
   function Screen({ ctx }) {
     const { go } = ctx;
     // Direkteinstieg aus „Meine Stapel": go('hifz', { hifzId: 'fatiha' })
     const [selId, setSelId] = useState((ctx.route && ctx.route.hifzId) || null);
+    const [tour, setTour] = useState(function () {
+      try { return !!window.Hifz.courseInfo().open && !localStorage.getItem('eb_hifz_tour_v1'); } catch (e) { return false; }
+    });
     const [, force] = useState(0);
     useEffect(function () { return window.Hifz.onChange(function () { force(function (x) { return x + 1; }); }); }, []);
 
@@ -1442,6 +1712,8 @@
         </div>
       );
     }
+    function closeTour() { try { localStorage.setItem('eb_hifz_tour_v1', '1'); } catch (e) {} setTour(false); }
+    if (tour) return <HifzTour onClose={closeTour}/>;
     if (sel) return <ItemDetail item={sel} onBack={function () { setSelId(null); }}/>;
 
     const s = window.Hifz.summary();
@@ -1457,7 +1729,10 @@
 
     return (
       <div className="content">
-        <button className="btn btn-ghost" style={{ marginBottom: 10 }} onClick={function () { go('decks'); }}>← Zurück</button>
+        <div className="row" style={{ justifyContent: 'space-between', marginBottom: 10 }}>
+          <button className="btn btn-ghost" onClick={function () { go('decks'); }}>← Zurück</button>
+          <button className="btn btn-ghost" onClick={function () { setTour(true); }}>❓ So geht's</button>
+        </div>
 
         <div className="hz-hero">
           <div className="hz-crown">{s.rank.icon}</div>
