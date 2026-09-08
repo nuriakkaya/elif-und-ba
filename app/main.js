@@ -45,7 +45,7 @@ function rebuildTopicIndex() {
   SHARED_CHILDREN.forEach(c => { S34A_BY_ID[c.id] = c.topic; });
 
   STACKS = [
-    { id: 'quran', name: 'Koran lesen – Elif & Ba', color: '#1B7A6E', hasChildren: true, children: QURAN_CHILDREN },
+    { id: 'quran', name: 'Koran lesen – Elif & Ba', color: '#6A5AE0', hasChildren: true, children: QURAN_CHILDREN },
     ...EXTRA_CHILDREN.map(c => ({ id: c.id, name: c.name, color: c.color, topic: c.topic })),
     ...CUSTOM_CHILDREN.map(c => ({ id: c.id, name: c.name, color: c.color, topic: c.topic })),
     ...SHARED_CHILDREN.map(c => ({ id: c.id, name: c.name, color: c.color, topic: c.topic })),
@@ -97,8 +97,8 @@ function findStack(id) {
 
 /* ============== TWEAKS DEFAULTS ============== */
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
-  "accent": "#0E6B57",
-  "dark": false,
+  "accent": "#6A5AE0",
+  "dark": /[?&]dunkel=1/.test(location.search),   // ?dunkel=1 startet dunkel (Prüfen/Lesezeichen)
   "questionStyle": "Multiple Choice",
   "sounds": true,
   "haptik": true
@@ -116,9 +116,18 @@ function App() {
   // apply tweak side-effects
   useEffect(() => {
     document.body.classList.toggle('theme-dark', !!tweaks.dark);
-    document.documentElement.style.setProperty('--accent', tweaks.accent);
-    // recompute accent-soft as light tint
-    document.documentElement.style.setProperty('--accent-soft', hexToTint(tweaks.accent, 0.12));
+    // (11.0) Gespeicherte Akzentfarben aus früheren Farbwelten (Smaragd 10.x,
+    // Periwinkle bis 9.x, Blau bis 6.x) gelten als „Standard" und folgen der
+    // aktuellen Palette — sonst bliebe bei Altnutzern das alte Grün kleben.
+    const alteAkzente = ['#0E6B57', '#6B6FE0', '#2A6BE0', '#6A5AE0'];
+    const akzent = (!tweaks.accent || alteAkzente.includes(String(tweaks.accent).toUpperCase())) ? '' : tweaks.accent;
+    if (akzent) {
+      document.documentElement.style.setProperty('--accent', akzent);
+      document.documentElement.style.setProperty('--accent-soft', hexToTint(akzent, 0.12));
+    } else {
+      document.documentElement.style.removeProperty('--accent');
+      document.documentElement.style.removeProperty('--accent-soft');
+    }
   }, [tweaks.dark, tweaks.accent]);
 
   // Sound-/Haptik-Einstellungen (Settings-Toggles) an das Sound-Modul weiterreichen.
@@ -129,7 +138,13 @@ function App() {
     }
   }, [tweaks.sounds, tweaks.haptik]);
 
-  const [route, setRoute] = useState({ screen: 'home' });
+  /* (11.0) Startbildschirm aus der Adresse: index.html#decks, #progress,
+     #duel, #teacher … öffnet direkt diesen Bereich. Praktisch für Lesezeichen
+     auf dem Tablet und zum Prüfen einzelner Bildschirme. */
+  const [route, setRoute] = useState(() => {
+    const h = String(location.hash || '').replace(/^#/, '').trim();
+    return /^[a-z0-9]+$/i.test(h) && h !== 'home' ? { screen: h } : { screen: 'home' };
+  });
   const [modal, setModal] = useState(null);   // { kind, ...payload }
   const [activeStack, setActiveStack] = useState((QURAN_CHILDREN[0] && QURAN_CHILDREN[0].id) || 'quran-harfler');
   const [scrolled, setScrolled] = useState(false);
@@ -590,7 +605,7 @@ function Sidebar({ ctx }) {
 
   return (
     <aside className="sidebar">
-      <div className="logo">LERN.</div>
+      <div className="logo"><MiniAxolotl size={30}/><span>Elif <i>&amp;</i> Ba</span></div>
       <nav className="nav">
         {NAV.map(n => (
           <button key={n.id} className={"nav-item " + (route.screen === n.id || (n.id==='decks' && route.screen==='deck') ? 'is-active' : '')}
@@ -602,7 +617,7 @@ function Sidebar({ ctx }) {
           </button>
         ))}
         <button className={"nav-item " + (route.screen === 'teacher' ? 'is-active' : '')} onClick={() => go('teacher')}>
-          <span className="nav-icon"><span style={{fontSize:22}}>🏫</span></span>
+          <span className="nav-icon"><Icon.School/></span>
           Klassenzimmer{teacherUnlocked ? ' 🔓' : ''}
         </button>
       </nav>
@@ -648,6 +663,10 @@ function Sidebar({ ctx }) {
           </React.Fragment>
         ))}
       </div>
+      <div className="gemeinde-fuss">
+        <GemeindeLogo size={40}/>
+        <span><b>Koran-Kurs</b>{window.GEMEINDE_NAME || 'Elif & Ba'}</span>
+      </div>
     </aside>
   );
 }
@@ -689,7 +708,7 @@ function MobileNav({ ctx }) {
         ))}
       <button className={"mn-item " + (route.screen === 'duel' ? 'is-active' : '')} onClick={() => go('duel')}>
         <span className="mn-ico" style={{position:'relative'}}>
-          <span style={{fontSize:22}}>⚔️</span>
+          <Icon.Swords/>
           {!!(window.DuelInvites && window.DuelInvites.list().length) && (
             <span style={{position:'absolute', top:-2, right:-4, width:9, height:9, borderRadius:9, background:'var(--rose, #D64545)'}}/>
           )}
@@ -697,7 +716,7 @@ function MobileNav({ ctx }) {
         Duell
       </button>
       <button className={"mn-item " + (route.screen === 'teacher' ? 'is-active' : '')} onClick={() => go('teacher')}>
-        <span className="mn-ico"><span style={{fontSize:22}}>🏫</span></span>
+        <span className="mn-ico"><Icon.School/></span>
         Klasse
       </button>
     </nav>
@@ -773,6 +792,7 @@ function Routes({ ctx }) {
     case 'deck':     return <DeckDetail ctx={ctx}/>;
     case 'profile':  return <Profile ctx={ctx}/>;
     case 'settings': return <Settings ctx={ctx}/>;
+    case 'shop':     return <Shop ctx={ctx}/>;
     case 'tutor':    return <TutorChat ctx={ctx}/>;
     case 'live':     return <LiveLobbyReal ctx={ctx}/>;
     case 'league':   return window.League ? <window.League.LeagueScreen ctx={ctx}/> : <Home ctx={ctx}/>;
@@ -817,25 +837,66 @@ function Home({ ctx }) {
   const woche = XPm ? XPm.recentDays(7) : [];
   const serie = XPm ? (XPm.state().streakDays || 0) : 0;
   const heuteXp = XPm ? XPm.todayXp() : 0;
+  const muenzen = XPm ? (XPm.state().coins || 0) : 0;
   const kAcc = window.SimpleSync && window.SimpleSync.account();
   const kName = (kAcc && kAcc.name) || '';
   const anteil = Math.min(1, tag.target ? tag.done / tag.target : 0);
   const rU = 2 * Math.PI * 34;
-  const laune = tag.secured ? 'cheer' : 'happy';
+  /* (11.0) Axi reagiert auf den Tag: jubelt, wenn das Ziel steht; schläft
+     spät abends, wenn noch nichts gemacht wurde; sonst freundlich. Dazu
+     ein kurzer Satz in der Sprechblase — das macht ihn lebendig. */
+  const stunde = new Date().getHours();
+  const spaet = stunde >= 21 || stunde < 6;
+  // Serie in Gefahr: ab dem späten Nachmittag noch nichts gemacht, aber eine
+  // Serie am Laufen — das ist der Moment, in dem Apps wie Duolingo erinnern.
+  const serieGefahr = serie > 0 && !tag.secured && stunde >= 17;
+  const laune = tag.secured ? 'cheer' : serieGefahr ? 'think' : (spaet && tag.done === 0 ? 'sleep' : 'happy');
+  const spruch = tag.secured
+    ? (gold.achieved ? 'Goldtag! Maschallah ✨' : 'Tagesziel geschafft! 🎉')
+    : serieGefahr
+      ? 'Deine ' + serie + '-Tage-Serie wartet! 🔥'
+      : tag.done === 0
+        ? (spaet ? 'Zzz… noch eine Runde?' : (kName ? 'Los geht\'s, ' + kName + '!' : 'Bereit? Los geht\'s!'))
+        : 'Nur noch ' + tag.needed + '!';
+
+  /* (11.0) Tagesaufgaben: drei kleine Ziele pro Tag, am Ende wartet die
+     Tageskiste mit Münzen. Die ersten beiden kommen aus dem XP-Modul, die
+     perfekte Runde setzt das Rundenende (localStorage, pro Tag). */
+  const heuteKey = (function () { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); })();
+  let perfektHeute = false, kisteSchonOffen = false;
+  try { perfektHeute = !!localStorage.getItem('eb_perfekt_' + heuteKey); kisteSchonOffen = !!localStorage.getItem('eb_kiste_' + heuteKey); } catch (e) {}
+  const aufgaben = [
+    { id: 'ziel', icon: '🎯', name: 'Tagesziel schaffen', sub: tag.target + ' richtige Antworten', done: Math.min(tag.done, tag.target), total: tag.target, ok: tag.secured },
+    { id: 'perfekt', icon: '✨', name: 'Eine perfekte Runde', sub: 'ohne einen einzigen Fehler', done: perfektHeute ? 1 : 0, total: 1, ok: perfektHeute },
+    { id: 'gold', icon: '⭐', name: 'Goldtag', sub: gold.target + ' richtige Antworten', done: Math.min(gold.done, gold.target), total: gold.target, ok: gold.achieved },
+  ];
+  const alleFertig = aufgaben.every(a => a.ok);
+  const [kisteZu, setKisteZu] = useState(!kisteSchonOffen);
+  const kisteOeffnen = () => {
+    if (!alleFertig || !kisteZu) return;
+    setKisteZu(false);
+    try { localStorage.setItem('eb_kiste_' + heuteKey, '1'); } catch (e) {}
+    if (window.XP) window.XP.addCoins(5);
+    window.Sound && window.Sound.chest && window.Sound.chest();
+    window.Celebrate && window.Celebrate.burst({ count: 60, duration: 2600, top: '45%' });
+  };
 
   return (
     <div className="page">
       {/* Begrüßung + Maskottchen */}
       <div className="heute-kopf">
-        <div style={{flex: 1, minWidth: 0}}>
-          <div className="heute-gruss">Selâmün aleyküm{kName ? ', ' + kName : ''}</div>
+        <div className="heute-text">
+          <div className="heute-gruss">Selâmün aleyküm{kName ? ', ' + kName : ''}!</div>
           <div className="heute-stufe">🌙 Stufe {stufe.level} · {stufe.title}</div>
         </div>
-        {window.Hudhud && <window.Hudhud size={92} mood={laune}/>}
+        <div className="axi-buehne">
+          <div className="axi-blase">{spruch}</div>
+          <Axolotl size={124} mood={laune}/>
+        </div>
       </div>
 
       {/* Tagesziel — der Herzschlag der App */}
-      <div className="ziel-karte">
+      <div className={'ziel-karte' + (serieGefahr ? ' ist-gefahr' : '')}>
         <div className="ziel-ring">
           <svg viewBox="0 0 80 80">
             <circle cx="40" cy="40" r="34" fill="none" strokeWidth="9" className="zr-trk"/>
@@ -858,7 +919,7 @@ function Home({ ctx }) {
               : 'Noch ' + tag.needed + ' richtige Antworten — das schaffst du gleich.'}
           </div>
           <div className="ziel-reihe">
-            <span className="ziel-pill feuer">🔥 {serie} {serie === 1 ? 'Tag' : 'Tage'}</span>
+            <span className={'ziel-pill feuer' + (serie > 0 ? ' ist-an' : '')}>🔥 {serie} {serie === 1 ? 'Tag' : 'Tage'}</span>
             <span className="ziel-pill punkte">✨ {heuteXp} XP heute</span>
           </div>
         </div>
@@ -887,6 +948,30 @@ function Home({ ctx }) {
           <span className="wk-pfeil">→</span>
         </button>
       )}
+
+      <div className={'aufgaben' + (alleFertig ? ' ist-fertig' : '')}>
+        <div className="aufgaben-kopf">
+          <b>Tagesaufgaben <span className="muted">{aufgaben.filter(a => a.ok).length}/{aufgaben.length}</span></b>
+          <button className="pill muenzen" onClick={() => go('shop')} title="Zum Shop">🪙 {muenzen} · Shop</button>
+        </div>
+        {aufgaben.map(a => (
+          <div key={a.id} className={'aufgabe' + (a.ok ? ' ist-ok' : '')}>
+            <span className="aufgabe-ico">{a.icon}</span>
+            <span className="aufgabe-txt">
+              <b>{a.name}</b><span>{a.sub}</span>
+              <i className="aufgabe-balken"><i style={{ width: Math.round(100 * a.done / a.total) + '%' }}/></i>
+            </span>
+            <span className="aufgabe-stand">{a.ok ? '✓' : a.done + '/' + a.total}</span>
+          </div>
+        ))}
+        <button className={'kiste' + (alleFertig && kisteZu ? ' ist-bereit' : '') + (!kisteZu ? ' ist-offen' : '')}
+                onClick={kisteOeffnen} disabled={!alleFertig || !kisteZu}>
+          <span className="kiste-ico">{kisteZu ? '🎁' : '🪙'}</span>
+          <span className="kiste-txt">{!kisteZu ? 'Tageskiste geöffnet — +5 Münzen!' : alleFertig ? 'Tageskiste öffnen!' : 'Alle drei schaffen → Tageskiste'}</span>
+        </button>
+      </div>
+
+      <WochenKarte ctx={ctx}/>
 
       <div className="home-hero" style={{paddingTop: 0}}>
         <InstallBanner/>
@@ -932,6 +1017,70 @@ function Home({ ctx }) {
         </div>
         <button className="btn btn-primary" style={{marginTop:10}} onClick={() => go('duel')}>⚔️ Duell starten</button>
       </div>
+
+      <div className="gemeinde-fuss home">
+        <GemeindeLogo size={36}/>
+        <span>Ein Koran-Kurs{window.GEMEINDE_NAME ? <> von <b>{window.GEMEINDE_NAME}</b></> : null}</span>
+      </div>
+    </div>
+  );
+}
+
+/* ============== WOCHEN-RÜCKBLICK (11.0) ==============
+   Sonntags die laufende, montags die vergangene Woche: sieben Balken, vier
+   Zahlen, ein Satz von Axi und ein Teilen-Knopf (für die Eltern-Gruppe).
+   Rückblicke sind die Schleife, die aus Tagen Gewohnheiten macht — man
+   sieht, was man geschafft hat, und will die Reihe nicht abreißen lassen.
+   ?woche=1 zeigt die Karte an jedem Tag (zum Prüfen). */
+function WochenKarte({ ctx }) {
+  const XPm = window.XP;
+  if (!XPm) return null;
+  const wt = new Date().getDay();                       // 0 = Sonntag, 1 = Montag
+  const erzwungen = /[?&]woche=1/.test(location.search);
+  if (!erzwungen && wt !== 0 && wt !== 1) return null;
+  const letzte = wt === 1 && !erzwungen;
+  const tage = letzte ? XPm.recentDays(8).slice(0, 7) : XPm.recentDays(7);
+  let perfekt = 0, goldTage = 0, aktiv = 0, summe = 0;
+  tage.forEach(function (d) {
+    summe += d.xp || 0; if (d.xp > 0) aktiv++; if (d.gold) goldTage++;
+    try { if (localStorage.getItem('eb_perfekt_' + d.key)) perfekt++; } catch (e) {}
+  });
+  const max = Math.max(1, ...tage.map(d => d.xp || 0));
+  const laune = aktiv >= 5 ? 'cheer' : aktiv >= 3 ? 'happy' : 'think';
+  const satz = aktiv >= 6 ? 'Fast jeden Tag dabei — das ist Disziplin, maschallah!'
+    : aktiv >= 3 ? aktiv + ' Tage gelernt. Nächste Woche einen mehr?'
+    : aktiv > 0 ? 'Ein Anfang! Nächste Woche packen wir drei Tage.'
+    : 'Diese Woche war ruhig. Heute ist ein guter Tag für einen Neustart.';
+  const teilen = () => {
+    const txt = 'Meine Woche bei Elif & Ba: ' + summe + ' XP, ' + aktiv + ' von 7 Tagen gelernt'
+      + (perfekt ? ', ' + perfekt + ' perfekte Runde' + (perfekt === 1 ? '' : 'n') : '') + ' 🔥';
+    if (navigator.share) navigator.share({ title: 'Elif & Ba', text: txt }).catch(() => {});
+    else if (navigator.clipboard) navigator.clipboard.writeText(txt).catch(() => {});
+  };
+  return (
+    <div className="woche-karte">
+      <div className="woche-kopf">
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="woche-titel">{letzte ? 'Deine letzte Woche' : 'Deine Woche'}</div>
+          <div className="woche-satz">{satz}</div>
+        </div>
+        <Axolotl size={72} mood={laune}/>
+      </div>
+      <div className="woche-balken">
+        {tage.map(d => (
+          <div key={d.key} className={'wb-tag' + (d.xp > 0 ? ' ist-an' : '') + (d.gold ? ' ist-gold' : '')}>
+            <i style={{ height: Math.max(6, Math.round(64 * (d.xp || 0) / max)) + 'px' }}/>
+            <span>{d.weekday}</span>
+          </div>
+        ))}
+      </div>
+      <div className="woche-zahlen">
+        <div><b>{XPm.fmt(summe)}</b><span>XP</span></div>
+        <div><b>{aktiv}<em>/7</em></b><span>Tage</span></div>
+        <div><b>{perfekt}</b><span>perfekt</span></div>
+        <div><b>{goldTage}</b><span>Goldtage</span></div>
+      </div>
+      <button className="btn btn-ghost btn-full" onClick={teilen}>📤 Woche teilen</button>
     </div>
   );
 }
@@ -1349,6 +1498,7 @@ function LernPfad({ ctx }) {
             )}
             <div className="pfad-halt" style={{ transform: 'translateX(' + versatz + 'px)' }}>
               {jetzt && <span className="pfad-start">Start</span>}
+              {jetzt && <span className="pfad-axi" aria-hidden="true"><Axolotl size={58} mood="happy"/></span>}
               <button className={klasse} onClick={oeffnen}
                       aria-label={kurz + (zu ? ' — noch verschlossen' : '')}
                       title={zu ? 'Noch ' + Math.max(0, h.info.needPrev - h.info.answeredPrev) + ' Fragen in „' + h.info.prevName + '“' : kurz}>
@@ -3313,9 +3463,22 @@ function Shop({ ctx }) {
   const FREEZE_COST = window.XP ? window.XP.STREAK_FREEZE_COST : 5;
   const REPAIR_COST = window.XP ? window.XP.STREAK_REPAIR_COST : 8;
 
+  // (11.0) Axis Kleiderschrank — app/kostuem.js
+  const [kostuemAktiv, setKostuemAktiv] = useState(() => (window.Kostuem ? window.Kostuem.active() : ''));
   const refresh = () => {
     setXpState(window.XP ? window.XP.state() : { coins: 0, streakFreezes: 0, lastBreak: null, ownedCosmetics: [] });
     setHeartsState(window.Hearts ? window.Hearts.state() : { enabled: false, hearts: 5, max: 5, tips: 0, superActive: false });
+    setKostuemAktiv(window.Kostuem ? window.Kostuem.active() : '');
+  };
+  const buyKostuem = (k) => {
+    const r = window.Kostuem.buy(k.id);
+    if (r.ok) {
+      setMsg({ text: k.name + ' gekauft — Axi trägt es schon! 🎉', ok: true });
+      window.Sound && window.Sound.bonus && window.Sound.bonus();
+      window.Celebrate && window.Celebrate.burst({ count: 30, duration: 1800, top: '40%' });
+    } else setMsg({ text: 'Nicht genug Münzen — Combos und die Tageskiste bringen welche.', ok: false });
+    refresh();
+    setTimeout(() => setMsg(null), 2600);
   };
   // Regeneration/Käufe anderswo (z.B. im Quiz) live reflektieren (Review 21.07.2026).
   useEffect(() => {
@@ -3368,13 +3531,20 @@ function Shop({ ctx }) {
       <div className="row" style={{justifyContent:'space-between'}}>
         <button className="icon-btn" onClick={() => ctx.go('home')}><Icon.Back/></button>
         <h1 style={{fontSize:22}}>Shop</h1>
-        <span className="pill"><Icon.Gem id="shop"/> {xpState.coins}</span>
+        <span className="pill"><Icon.Gem id="shopmuenzen"/> {xpState.coins}</span>
       </div>
       {msg && (
         <div className="card flat" style={{marginTop:8, padding:'10px 14px', fontWeight:700, color: msg.ok ? 'var(--mint-ink, #1c7a4f)' : 'var(--rose)'}}>
           {msg.text}
         </div>
       )}
+      <div className="muenz-quellen">
+        <b>🪙 Münzen gibt es nur fürs Lernen — kein echtes Geld.</b>
+        <span>3er-/5er-Combo <em>+1</em> · perfekte Runde <em>+2</em> · Level-Aufstieg <em>+3</em> · Tageskiste <em>+5</em></span>
+      </div>
+      {/* (11.0) Power-ups nur zeigen, wenn das Herzen-System an ist — in der
+          Klassen-Edition ist es aus, dann wären Tipps und Herzen tote Kacheln. */}
+      {heartsState.enabled && <>
       <div style={{fontWeight:800, marginTop:4}}>Power-ups</div>
       <div className="row" style={{gap:10}}>
         <span className="pill"><Icon.Key id="s1"/> {heartsState.enabled ? heartsState.tips : '∞'}</span>
@@ -3430,6 +3600,7 @@ function Shop({ ctx }) {
           </button>
         </div>
       </div>
+      </>}
 
       <div style={{fontWeight:800, marginTop:18}}>Serie</div>
       <div className="shop-grid">
@@ -3457,6 +3628,33 @@ function Shop({ ctx }) {
         </div>
       </div>
 
+      {window.Kostuem && (
+        <>
+          <div style={{fontWeight:800, marginTop:18}}>Axis Kleiderschrank</div>
+          <div className="muted" style={{fontSize:12.5, marginTop:-6, marginBottom:4}}>Kostüme für Axi — einmal gekauft, jederzeit anziehen. Überall zu sehen, wo Axi auftaucht.</div>
+          <div className="kostuem-grid">
+            <button className={'kostuem-karte' + (!kostuemAktiv ? ' ist-an' : '')} onClick={() => { window.Kostuem.wear(''); refresh(); }}>
+              <Axolotl size={78} mood="happy" kostuem=""/>
+              <b>Ohne</b><span className="muted">so wie er ist</span>
+              <span className={'kostuem-preis' + (!kostuemAktiv ? '' : ' ist-hat')}>{!kostuemAktiv ? 'Angezogen ✓' : 'Ausziehen'}</span>
+            </button>
+            {window.Kostuem.list().map((k) => {
+              const hat = window.Kostuem.hat(k.id), an = kostuemAktiv === k.id;
+              return (
+                <button key={k.id} className={'kostuem-karte' + (an ? ' ist-an' : '') + (hat ? '' : ' ist-zu')}
+                        onClick={() => { if (hat) { window.Kostuem.wear(an ? '' : k.id); refresh(); } else buyKostuem(k); }}>
+                  <Axolotl size={78} mood={an ? 'cheer' : 'happy'} kostuem={k.id}/>
+                  <b>{k.name}</b>
+                  <span className="muted">{k.hinweis}</span>
+                  <span className={'kostuem-preis' + (hat ? ' ist-hat' : '')}>
+                    {hat ? (an ? 'Angezogen ✓' : 'Anziehen') : <>{k.preis} <Icon.Gem id={'kk' + k.id}/></>}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
       <div style={{fontWeight:800, marginTop:18}}>Cosmetics</div>
       <div className="muted" style={{fontSize:12.5, marginTop:-6, marginBottom:4}}>Zusätzliche Avatare — einmal gekauft, dauerhaft wählbar unter "Profil bearbeiten"</div>
       <div className="shop-grid">
@@ -3480,14 +3678,9 @@ function Shop({ ctx }) {
         })}
       </div>
 
-      <div className="premium-banner" style={{marginTop:18}}>
-        <div style={{fontSize:42}}>🚀</div>
-        <div style={{flex:1}}>
-          <div className="ttl">Unlimited</div>
-          <div>Unbegrenzte KI-Antworten · alle Importe · Premium-Stapel</div>
-        </div>
-        <button className="btn btn-light">Upgraden</button>
-      </div>
+      {/* (11.0) Der alte „Unlimited · Upgraden"-Kasten aus der Gizmo-Hülle ist
+          weg: In dieser App gibt es kein echtes Geld — alles kostet Münzen,
+          die beim Lernen entstehen. */}
     </div>
   );
 }
@@ -5411,8 +5604,8 @@ function TeacherCorner({ ctx }) {
     return (
       <div className="page" style={{maxWidth: 440}}>
         <div className="card" style={{padding: 30, textAlign: 'center'}}>
-          <div style={{fontSize: 40}}><Icon.Lock/></div>
-          <h1 style={{fontSize: 24, marginTop: 10}}>Klassenzimmer</h1>
+          <div className="gemeinde-kopf"><GemeindeLogo size={76}/></div>
+          <h1 style={{fontSize: 24, marginTop: 10}}>🔒 Klassenzimmer</h1>
           <div className="muted" style={{marginBottom: 18}}>
             {setup ? 'Nur für Lehrkräfte — Lehrer-Passwort eingeben (oder eigene PIN festlegen).' : 'Nur für Lehrkräfte — PIN oder Lehrer-Passwort eingeben.'}
           </div>
@@ -5443,7 +5636,7 @@ function TeacherCorner({ ctx }) {
     if (sortBy === 'aktiv') return (b.ts || 0) - (a.ts || 0);
     return a.n.localeCompare(b.n, 'de');
   });
-  const pctColor = (p) => p >= 100 ? '#1B8A5A'
+  const pctColor = (p) => p >= 100 ? '#2EC46E'
     : p > 0 ? 'hsl(' + (152 - (100 - p) * 0.35) + ', ' + (34 + p * 0.38) + '%, ' + (88 - p * 0.28) + '%)'
     : 'var(--line, #eee)';
   const fmtSeen = (ts) => {
@@ -5818,7 +6011,7 @@ function QuizLoading({ onDone }) {
   return (
     <div className="loading-shell">
       <div style={{textAlign:'center'}}>
-        <div className="mascot-anim">{window.Hudhud ? <window.Hudhud size={140}/> : <Axolotl size={160}/>}</div>
+        <div className="mascot-anim"><Axolotl size={150} mood="think"/></div>
         <div style={{fontWeight:900, fontSize:24, marginTop:10}}>Vorbereitung läuft…</div>
         <div className="muted">Wähle deine Fragen aus</div>
       </div>

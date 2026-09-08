@@ -16,7 +16,7 @@
      Einzige Ausnahme: die Aussprache-Aufnahmen (Route "media"), damit sie
      offline hörbar bleiben.
 */
-const CACHE = 'elifba-10-5';
+const CACHE = 'elifba-11-0';
 
 const PRECACHE = [
   './',
@@ -30,9 +30,12 @@ const PRECACHE = [
   'vendor/react-dom.js',
   'vendor/qrcode.min.js',
   'app/bundle.js',
+  'fonts/nunito-latin.woff2',
+  'fonts/nunito-latin-ext.woff2',
   'fonts/scheherazade-arabic-400.woff2',
   'fonts/scheherazade-arabic-700.woff2',
   'assets/letters.mp3',
+  'assets/logo-gemeinde.jpg',
   'assets/sounds/correct.mp3',
   'assets/sounds/wrong.mp3',
   'assets/sounds/combo.mp3',
@@ -41,6 +44,9 @@ const PRECACHE = [
   'assets/sounds/streak.mp3',
   'assets/sounds/master.mp3',
   'assets/sounds/tick.mp3',
+  'assets/sounds/bonus.m4a',
+  'assets/sounds/perfect.m4a',
+  'assets/sounds/chest.m4a',
 ];
 
 self.addEventListener('install', (e) => {

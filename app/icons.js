@@ -5,6 +5,8 @@ const { useId } = React;
 // 2D outline icons (lucide-ish, 24px)
 const Icon = {
   Home: (p) => (<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>),
+  Swords: (p) => (<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6"/><path d="m16 16 4 4"/><path d="m19 21 2-2"/><path d="M14.5 6.5 18 3h3v3l-3.5 3.5"/><path d="m5 14 4 4"/><path d="m7 17-3 3"/><path d="m3 19 2 2"/></svg>),
+  School: (p) => (<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M14 22v-4a2 2 0 1 0-4 0v4"/><path d="m18 10 4 2v10H2V12l4-2"/><path d="M18 5v17"/><path d="m4 6 8-4 8 4"/><path d="M6 5v17"/><circle cx="12" cy="9" r="2"/></svg>),
   Flame: (p) => (<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M12 3c.5 4 4 4.5 4 8.5A4 4 0 0 1 12 16a3 3 0 0 1-3-3c0-1.5 1-2 1-3.5 0-2-1-3-3-3.5 1 3-2 4-2 7a7 7 0 0 0 14 0c0-5-4-6-5-10z"/></svg>),
   Folder: (p) => (<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>),
   Globe: (p) => (<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14 0 18M12 3c-3 3.5-3 14 0 18"/></svg>),
@@ -40,98 +42,172 @@ const Icon = {
 };
 
 /* ============= the AXOLOTL — meditating ============= */
-function Axolotl({ size = 220 }) {
-  const id = useId().replace(/:/g,'');
+/* ============= AXI, DER AXOLOTL — das Maskottchen (11.0, 07.09.2026) =============
+   Zurück zum Axolotl von früher, aber lebendig: er atmet, blinzelt, schaut sich
+   um, die Kiemen wippen, der Schwanz wedelt. Stimmungen:
+     'happy' (Standard) · 'cheer' (jubelt, Arme hoch, hüpft) · 'sad' (Kiemen
+     hängen, Träne) · 'sleep' (schläft, Zzz) · 'think' (schaut nach oben).
+   Reines SVG; die Bewegung steckt in index.html, Abschnitt „AXI, DER AXOLOTL".
+   window.Hudhud zeigt aus Kompatibilität hierher — alle alten Aufrufe laufen. */
+const AXO_INK = '#2A2352';
+function AxoKiemen({ seite, u }) {
+  const kiemen = [
+    ['M62 86 C42 70 22 72 16 88 C30 84 44 90 60 98 Z', [[22,84],[30,78],[40,76]]],
+    ['M56 106 C34 98 12 104 10 124 C24 112 40 116 56 120 Z', [[16,116],[22,106],[34,102]]],
+    ['M58 124 C40 124 22 140 26 158 C36 144 48 138 62 136 Z', [[30,150],[28,140],[36,132]]],
+  ];
   return (
-    <svg viewBox="0 0 240 240" width={size} height={size} style={{display:'block'}}>
-      <defs>
-        <linearGradient id={"body"+id} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#9587D4"/>
-          <stop offset="0.55" stopColor="#6C5BB5"/>
-          <stop offset="1" stopColor="#3F3175"/>
-        </linearGradient>
-        <linearGradient id={"belly"+id} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#C3B7E8"/>
-          <stop offset="1" stopColor="#8E7FCC"/>
-        </linearGradient>
-        <linearGradient id={"fin"+id} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#E8B5C8"/>
-          <stop offset="1" stopColor="#B8638C"/>
-        </linearGradient>
-        <radialGradient id={"cheek"+id} cx=".5" cy=".5" r=".5">
-          <stop offset="0" stopColor="#D89DB3" stopOpacity=".55"/>
-          <stop offset="1" stopColor="#D89DB3" stopOpacity="0"/>
-        </radialGradient>
-        <filter id={"sh"+id}><feGaussianBlur stdDeviation="2"/></filter>
-      </defs>
-
-      {/* back fins (gills behind head) */}
-      <g>
-        <path d="M62 78 Q40 70 38 92 Q56 86 70 96 Z" fill={`url(#fin${id})`}/>
-        <path d="M55 100 Q28 100 32 124 Q52 112 70 116 Z" fill={`url(#fin${id})`}/>
-        <path d="M178 78 Q200 70 202 92 Q184 86 170 96 Z" fill={`url(#fin${id})`}/>
-        <path d="M185 100 Q212 100 208 124 Q188 112 170 116 Z" fill={`url(#fin${id})`}/>
+    <g className={'axo-kiemen axo-kiemen-' + seite} transform={seite === 'r' ? 'matrix(-1 0 0 1 240 0)' : undefined}>
+      {kiemen.map(function (k, i) { return (
+        <g className="axo-kieme" key={i}>
+          <path d={k[0]} fill={u('kieme')}/>
+          {k[1].map(function (c, j) { return <circle key={j} cx={c[0]} cy={c[1]} r="4.2" fill="#FFB1C4"/>; })}
+        </g>
+      ); })}
+    </g>
+  );
+}
+/* Kostüme (app/kostuem.js): liegen als letzte Ebene im SVG, damit Brille über
+   den Augen und Hüte über der Rückenflosse sitzen. */
+function AxiKostuem({ id }) {
+  switch (id) {
+    case 'blume': return (<g className="axo-kostuem">
+      {[0, 72, 144, 216, 288].map(function (w) { return <ellipse key={w} cx="172" cy="62" rx="9" ry="6" fill="#FF8DA8" transform={'rotate(' + w + ' 172 62) translate(9 0)'}/>; })}
+      <circle cx="172" cy="62" r="6" fill="#F5B000"/></g>);
+    case 'schleife': return (<g className="axo-kostuem">
+      <path d="M78 58 C60 44 48 52 54 66 C60 72 72 66 78 58 Z" fill="#FF7A9E"/>
+      <path d="M78 58 C96 44 108 52 102 66 C96 72 84 66 78 58 Z" fill="#FF7A9E"/>
+      <circle cx="78" cy="58" r="6" fill="#FFB1C4"/></g>);
+    case 'brille': return (<g className="axo-kostuem" fill="none" stroke="#2A2352" strokeWidth="4.5" strokeLinecap="round">
+      <circle cx="94" cy="106" r="21"/><circle cx="146" cy="106" r="21"/>
+      <path d="M115 104 q5 -6 10 0"/><path d="M73 102 l-12 -6"/><path d="M167 102 l12 -6"/></g>);
+    case 'muetze': return (<g className="axo-kostuem">
+      <path d="M62 78 C70 30 170 30 178 78 Q120 62 62 78 Z" fill="#6A5AE0"/>
+      <path d="M60 76 Q120 58 180 76 L180 90 Q120 74 60 90 Z" fill="#DCD7FF"/>
+      <path d="M92 52 Q120 38 148 52" stroke="#DCD7FF" strokeWidth="6" fill="none" strokeLinecap="round"/>
+      <circle cx="120" cy="30" r="12" fill="#FFB1C4"/></g>);
+    case 'fes': return (<g className="axo-kostuem">
+      <path d="M90 56 L150 56 L143 20 L97 20 Z" fill="#C8102E"/>
+      <path d="M96 22 L144 22 L143 20 L97 20 Z" fill="#8F0A20"/>
+      <rect x="86" y="52" width="68" height="8" rx="4" fill="#A50D26"/>
+      <path d="M142 24 C150 20 158 26 156 40" stroke="#1E1B3A" strokeWidth="3" fill="none" strokeLinecap="round"/>
+      <circle cx="156" cy="44" r="5" fill="#1E1B3A"/></g>);
+    case 'kopfhoerer': return (<g className="axo-kostuem">
+      <path d="M58 104 C58 40 182 40 182 104" stroke="#2D2470" strokeWidth="9" fill="none" strokeLinecap="round"/>
+      <rect x="44" y="92" width="24" height="36" rx="10" fill="#2D2470"/><rect x="172" y="92" width="24" height="36" rx="10" fill="#2D2470"/>
+      <rect x="50" y="98" width="12" height="24" rx="6" fill="#8F82FF"/><rect x="178" y="98" width="12" height="24" rx="6" fill="#8F82FF"/></g>);
+    case 'krone': return (<g className="axo-kostuem">
+      <path d="M86 54 L94 20 L110 40 L120 12 L130 40 L146 20 L154 54 Z" fill="#F5B000"/>
+      <rect x="84" y="50" width="72" height="9" rx="4" fill="#C98A00"/>
+      <circle cx="120" cy="40" r="4.5" fill="#FF7A9E"/><circle cx="100" cy="46" r="3.5" fill="#3D8BFD"/><circle cx="140" cy="46" r="3.5" fill="#2EC46E"/></g>);
+    default: return null;
+  }
+}
+function Axolotl({ size = 220, mood = 'happy', className, style, kostuem }) {
+  const id = useId().replace(/:/g, '');
+  const u = (n) => `url(#${n}${id})`;
+  const m = ['cheer', 'sad', 'sleep', 'think'].includes(mood) ? mood : 'happy';
+  let augen;
+  if (m === 'cheer') {
+    augen = (<g stroke={AXO_INK} strokeWidth="5.5" strokeLinecap="round" fill="none">
+      <path d="M80 108 q14 -16 28 0"/><path d="M132 108 q14 -16 28 0"/></g>);
+  } else if (m === 'sleep') {
+    augen = (<g stroke={AXO_INK} strokeWidth="5" strokeLinecap="round" fill="none">
+      <path d="M80 108 q14 11 28 0"/><path d="M132 108 q14 11 28 0"/></g>);
+  } else {
+    augen = (<g>
+      <ellipse cx="94" cy="106" rx="16.5" ry="18.5" fill="#fff"/><ellipse cx="146" cy="106" rx="16.5" ry="18.5" fill="#fff"/>
+      <g className="axo-pupille">
+        <circle cx="96" cy="108" r="9.2" fill={AXO_INK}/><circle cx="148" cy="108" r="9.2" fill={AXO_INK}/>
+        <circle cx="99.5" cy="103.5" r="3.4" fill="#fff"/><circle cx="151.5" cy="103.5" r="3.4" fill="#fff"/>
+        <circle cx="92.5" cy="112.5" r="1.7" fill="#fff" opacity=".85"/><circle cx="144.5" cy="112.5" r="1.7" fill="#fff" opacity=".85"/>
       </g>
+      <g className="axo-lid">
+        <ellipse cx="94" cy="106" rx="17.5" ry="19.5" fill={u('kopf')}/><ellipse cx="146" cy="106" rx="17.5" ry="19.5" fill={u('kopf')}/>
+      </g>
+      {m === 'sad' && (<g>
+        <g stroke={AXO_INK} strokeWidth="4" strokeLinecap="round" fill="none"><path d="M78 94 l22 -8"/><path d="M162 94 l-22 -8"/></g>
+        <path className="axo-traene" d="M158 124 q6 9 0 14 q-6 -5 0 -14z" fill="#8FC6FF"/>
+      </g>)}
+    </g>);
+  }
+  let mund;
+  if (m === 'cheer') mund = (<g><path d="M102 134 q18 30 36 0 z" fill="#3A2C66"/><path d="M111 146 q9 9 18 0 q-9 4 -18 0z" fill="#FF8DA8"/></g>);
+  else if (m === 'sad') mund = <path d="M108 150 q12 -11 24 0" stroke={AXO_INK} strokeWidth="4.5" fill="none" strokeLinecap="round"/>;
+  else if (m === 'sleep') mund = (<g>
+    <path d="M112 142 q8 5 16 0" stroke={AXO_INK} strokeWidth="4" fill="none" strokeLinecap="round"/>
+    <text className="axo-z" x="178" y="66" fontSize="24" fontWeight="900" fill={AXO_INK}>z</text>
+    <text className="axo-z" x="196" y="44" fontSize="18" fontWeight="900" fill={AXO_INK}>z</text>
+  </g>);
+  else if (m === 'think') mund = <ellipse cx="120" cy="143" rx="6.5" ry="7" fill="#3A2C66"/>;
+  else mund = <path d="M106 139 q14 13 28 0" stroke={AXO_INK} strokeWidth="4.8" fill="none" strokeLinecap="round"/>;
 
-      {/* tail fin behind body */}
-      <path d="M120 215 Q145 220 155 200 L120 175 Q85 220 120 215 Z" fill={`url(#fin${id})`} opacity=".95"/>
-
-      {/* body (sitting) */}
-      <ellipse cx="120" cy="160" rx="64" ry="42" fill={`url(#body${id})`} />
-
-      {/* arms folded across belly */}
-      <path d="M75 150 Q70 170 90 178 Q105 180 110 168" fill={`url(#body${id})`} stroke="#3A1F70" strokeWidth="1" strokeOpacity=".25"/>
-      <path d="M165 150 Q170 170 150 178 Q135 180 130 168" fill={`url(#body${id})`} stroke="#3A1F70" strokeWidth="1" strokeOpacity=".25"/>
-
-      {/* belly */}
-      <ellipse cx="120" cy="170" rx="40" ry="22" fill={`url(#belly${id})`} />
-
-      {/* head */}
-      <ellipse cx="120" cy="105" rx="62" ry="52" fill={`url(#body${id})`} />
-
-      {/* head shine */}
-      <ellipse cx="100" cy="82" rx="22" ry="12" fill="#fff" opacity=".22"/>
-
-      {/* cheeks */}
-      <circle cx="86" cy="120" r="11" fill={`url(#cheek${id})`}/>
-      <circle cx="154" cy="120" r="11" fill={`url(#cheek${id})`}/>
-
-      {/* closed peaceful eyes */}
-      <path d="M92 110 Q100 116 108 110" stroke="#1A0F40" strokeWidth="3" fill="none" strokeLinecap="round"/>
-      <path d="M132 110 Q140 116 148 110" stroke="#1A0F40" strokeWidth="3" fill="none" strokeLinecap="round"/>
-
-      {/* smile */}
-      <path d="M110 132 Q120 140 130 132" stroke="#1A0F40" strokeWidth="3" fill="none" strokeLinecap="round"/>
-
-      {/* top fin */}
-      <path d="M100 56 Q120 28 140 56 Q130 60 120 56 Q110 60 100 56 Z" fill={`url(#fin${id})`}/>
+  return (
+    <svg viewBox="0 0 240 240" width={size} height={size} style={Object.assign({ display: 'block', overflow: 'visible' }, style || {})}
+         className={'axo axo--' + m + (className ? ' ' + className : '')} role="img" aria-label="Axi, der kleine Axolotl">
+      <defs>
+        <linearGradient id={'kopf' + id} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#A697FF"/><stop offset=".55" stopColor="#7B6BF2"/><stop offset="1" stopColor="#5646D0"/></linearGradient>
+        <linearGradient id={'arm' + id} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#8C7DF6"/><stop offset="1" stopColor="#5646D0"/></linearGradient>
+        <linearGradient id={'bauch' + id} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#E6E1FF"/><stop offset="1" stopColor="#C4B9FF"/></linearGradient>
+        <linearGradient id={'kieme' + id} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#FFB8C9"/><stop offset="1" stopColor="#FF6F97"/></linearGradient>
+      </defs>
+      <ellipse className="axo-schatten" cx="120" cy="226" rx="66" ry="8" fill="rgba(46,36,112,.14)"/>
+      <g className="axo-koerper">
+        <path className="axo-schwanz" d="M146 198 C168 214 194 208 202 186 C188 198 170 198 152 184 Z" fill={u('kieme')}/>
+        <path className="axo-arm axo-arm-l" d="M82 158 C66 162 52 180 58 198 C68 204 80 194 86 176 Z" fill={u('arm')}/>
+        <path className="axo-arm axo-arm-r" d="M158 158 C174 162 188 180 182 198 C172 204 160 194 154 176 Z" fill={u('arm')}/>
+        <ellipse cx="120" cy="178" rx="56" ry="38" fill={u('kopf')}/>
+        <ellipse cx="120" cy="188" rx="34" ry="20" fill={u('bauch')}/>
+        <ellipse cx="97" cy="213" rx="15" ry="7.5" fill="#5646D0"/><ellipse cx="143" cy="213" rx="15" ry="7.5" fill="#5646D0"/>
+        <AxoKiemen seite="l" u={u}/><AxoKiemen seite="r" u={u}/>
+        <ellipse cx="120" cy="106" rx="66" ry="58" fill={u('kopf')}/>
+        <ellipse cx="94" cy="72" rx="24" ry="12" fill="#fff" opacity=".22"/>
+        <path d="M103 54 Q120 26 137 54 Q120 49 103 54 Z" fill={u('kieme')}/>
+        <circle cx="76" cy="130" r="12" fill="#FF8DA8" opacity=".45"/><circle cx="164" cy="130" r="12" fill="#FF8DA8" opacity=".45"/>
+        {augen}
+        {mund}
+        <AxiKostuem id={kostuem !== undefined ? kostuem : (window.Kostuem ? window.Kostuem.active() : '')}/>
+      </g>
     </svg>
   );
 }
 
-/* ============= MINI AXOLOTL (for nav, KI bubble) ============= */
+/* ============= LOGO DER GEMEINDE (11.0) =============
+   Das Oval aus assets/logo-gemeinde.jpg; die Rundung schneidet den Papierrand
+   des Originals weg. Text kommt aus window.GEMEINDE_NAME (app/config.js). */
+function GemeindeLogo({ size = 40, text }) {
+  return (
+    <span className="gemeinde">
+      <img src="assets/logo-gemeinde.jpg" alt={window.GEMEINDE_NAME || 'Logo der Gemeinde'} style={{ height: size, width: 'auto' }}/>
+      {text}
+    </span>
+  );
+}
+
+/* ============= MINI-AXI (Navigation, Tutor-Blase) ============= */
 function MiniAxolotl({ size = 32 }) {
   const id = useId().replace(/:/g,'');
   return (
-    <svg viewBox="0 0 40 40" width={size} height={size}>
+    <svg viewBox="0 0 40 40" width={size} height={size} className="axo-mini" aria-hidden="true">
       <defs>
-        <linearGradient id={"mb"+id} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#9587D4"/><stop offset="1" stopColor="#4D3E96"/>
-        </linearGradient>
-        <linearGradient id={"mf"+id} x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#E8B5C8"/><stop offset="1" stopColor="#B8638C"/>
-        </linearGradient>
+        <linearGradient id={"mb"+id} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#A697FF"/><stop offset="1" stopColor="#5646D0"/></linearGradient>
+        <linearGradient id={"mf"+id} x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#FFB8C9"/><stop offset="1" stopColor="#FF6F97"/></linearGradient>
       </defs>
-      <path d="M8 22 Q3 22 4 28 Q10 26 13 28 Z" fill={`url(#mf${id})`}/>
-      <path d="M32 22 Q37 22 36 28 Q30 26 27 28 Z" fill={`url(#mf${id})`}/>
+      <path d="M9 17 Q2 15 3 22 Q9 20 12 23 Z" fill={`url(#mf${id})`}/>
+      <path d="M8 24 Q2 26 5 31 Q10 27 13 28 Z" fill={`url(#mf${id})`}/>
+      <path d="M31 17 Q38 15 37 22 Q31 20 28 23 Z" fill={`url(#mf${id})`}/>
+      <path d="M32 24 Q38 26 35 31 Q30 27 27 28 Z" fill={`url(#mf${id})`}/>
       <circle cx="20" cy="22" r="14" fill={`url(#mb${id})`}/>
-      <path d="M14 22 Q17 25 20 22" stroke="#fff" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
-      <path d="M20 22 Q23 25 26 22" stroke="#fff" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
-      <path d="M17 28 Q20 30 23 28" stroke="#fff" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
-      <path d="M14 12 Q20 6 26 12" fill={`url(#mf${id})`}/>
+      <path d="M15 9 Q20 3 25 9 Q20 8 15 9 Z" fill={`url(#mf${id})`}/>
+      <ellipse cx="15.5" cy="21" rx="3.4" ry="3.8" fill="#fff"/><ellipse cx="24.5" cy="21" rx="3.4" ry="3.8" fill="#fff"/>
+      <circle cx="16" cy="21.5" r="1.9" fill="#2A2352"/><circle cx="25" cy="21.5" r="1.9" fill="#2A2352"/>
+      <circle cx="16.7" cy="20.6" r=".7" fill="#fff"/><circle cx="25.7" cy="20.6" r=".7" fill="#fff"/>
+      <path d="M17 28 q3 2.6 6 0" stroke="#2A2352" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+      <circle cx="11.5" cy="26" r="2" fill="#FF8DA8" opacity=".5"/><circle cx="28.5" cy="26" r="2" fill="#FF8DA8" opacity=".5"/>
     </svg>
   );
 }
+
 
 /* ============= MAMMUT (Auswendig) ============= */
 function Mammoth({ size = 86 }) {
@@ -266,6 +342,8 @@ function AnimalAvatar({ kind = '🦔', size = 32, ring = '#fff' }) {
 window.Icon = Icon;
 window.Axolotl = Axolotl;
 window.MiniAxolotl = MiniAxolotl;
+window.AxiKostuem = AxiKostuem;
+window.GemeindeLogo = GemeindeLogo;
 window.Mammoth = Mammoth;
 window.Owl = Owl;
 window.Joystick = Joystick;
@@ -273,73 +351,5 @@ window.Target = Target;
 window.ImportTile = ImportTile;
 window.AnimalAvatar = AnimalAvatar;
 
-/* ==============================================================
-   🐦 HÜDHÜD — unser eigenes Maskottchen (05.09.2026)
-   Der Wiedehopf ist der Vogel aus Sure Neml, der eine Nachricht
-   überbringt: ein Bote, der etwas gelernt hat und es weitersagt.
-   Passt zum Thema, ist selbst gezeichnet und kostet keine Datei
-   extra — reines SVG. Stimmungen: 'happy' | 'cheer' | 'sleep'.
-   ============================================================== */
-function Hudhud({ size = 104, mood = 'happy', className }) {
-  const augen = mood === 'sleep'
-    ? (<g stroke="#22322C" strokeWidth="2.6" strokeLinecap="round" fill="none">
-         <path d="M39 42 q5 4 10 0"/><path d="M57 41 q4 3 8 0"/>
-       </g>)
-    : mood === 'cheer'
-      ? (<g stroke="#22322C" strokeWidth="3" strokeLinecap="round" fill="none">
-           <path d="M39 44 q5 -6 10 0"/><path d="M57 43 q4 -5 8 0"/>
-         </g>)
-      : (<g>
-           <circle cx="44" cy="42" r="5.2" fill="#22322C"/>
-           <circle cx="45.8" cy="40.2" r="1.8" fill="#fff"/>
-           <circle cx="61" cy="41" r="4" fill="#22322C"/>
-           <circle cx="62.4" cy="39.6" r="1.4" fill="#fff"/>
-         </g>);
-  return (
-    <svg viewBox="0 0 120 120" width={size} height={size} className={'hud ' + (className || '')}
-         role="img" aria-label="Hüdhüd, der kleine Wiedehopf">
-      <ellipse cx="62" cy="112" rx="27" ry="4.6" fill="rgba(35,28,15,.13)"/>
-      <g className="hud-fly">
-        {/* Schwanz */}
-        <path d="M80 82 L114 75 L115 86 L84 94 Z" fill="#0E6B57"/>
-        <path d="M99 80 L112 77 L112.6 81.5 L100 84.5 Z" fill="#FBEFD8"/>
-        {/* Haube — fünf Federn, gold mit dunkler Spitze */}
-        <g>
-          <path d="M34 34 C30 24 29 16 32 12 C37 15 40 24 41 33 Z" fill="#EDB04A"/>
-          <path d="M41 30 C38 19 39 11 43 7 C48 11 48 21 47 30 Z" fill="#F0B84E"/>
-          <path d="M49 28 C48 16 51 8 56 5 C60 10 59 20 56 29 Z" fill="#EDB04A"/>
-          <path d="M58 29 C59 18 63 11 68 9 C70 15 67 25 63 31 Z" fill="#F0B84E"/>
-          <path d="M65 33 C68 24 73 18 78 17 C79 24 74 32 69 36 Z" fill="#E3A238"/>
-          <g fill="#22322C">
-            <circle cx="32.5" cy="13" r="3"/><circle cx="43" cy="8" r="3"/>
-            <circle cx="56" cy="6" r="3"/><circle cx="68" cy="10" r="3"/>
-            <circle cx="78" cy="18.5" r="3"/>
-          </g>
-        </g>
-        {/* Körper */}
-        <ellipse cx="62" cy="76" rx="28" ry="26" fill="#F3D9AF"/>
-        <ellipse cx="58" cy="83" rx="18" ry="15" fill="#FDF4E5"/>
-        {/* Flügel */}
-        <g className="hud-wing">
-          <path d="M48 66 q24 -8 38 10 q-18 15 -38 5 z" fill="#0E6B57"/>
-          <path d="M56 65 q16 -3 26 9" stroke="#FBEFD8" strokeWidth="4" fill="none" strokeLinecap="round"/>
-          <path d="M52 74 q16 -1 27 7" stroke="#FBEFD8" strokeWidth="3.4" fill="none" strokeLinecap="round"/>
-        </g>
-        {/* Kopf */}
-        <circle cx="50" cy="44" r="21" fill="#FAE7CC"/>
-        <ellipse cx="56" cy="52" rx="6" ry="4" fill="rgba(214,110,92,.30)"/>
-        {augen}
-        {/* langer Schnabel — das Erkennungszeichen des Wiedehopfs */}
-        <path d="M32 45 L5 53.5 L32 53 Z" fill="#3B4A42"/>
-        {/* Beine */}
-        <g stroke="#E39B62" strokeWidth="4" strokeLinecap="round">
-          <path d="M54 100 L53 108"/><path d="M70 99 L71 107"/>
-        </g>
-        <g stroke="#E39B62" strokeWidth="3" strokeLinecap="round">
-          <path d="M48 109 L58 109"/><path d="M66 108 L76 108"/>
-        </g>
-      </g>
-    </svg>
-  );
-}
-window.Hudhud = Hudhud;
+/* Der Wiedehopf Huedhued (10.0) ist in Rente - alle alten Aufrufe landen bei Axi. */
+window.Hudhud = Axolotl;   // (11.0) Der Wiedehopf ist in Rente — alle Aufrufe zeigen auf Axi

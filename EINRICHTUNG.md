@@ -1,4 +1,4 @@
-# 🌙 Elif & Ba — Einrichtung & Update (Version 8.6)
+# 🌙 Elif & Ba — Einrichtung & Update (Version 11.0)
 
 **Das Wichtigste in einem Satz:** Ein Kind tippt auf *Anmelden*, schreibt seinen
 **Namen**, drückt einmal — und ist im Kurs. Kein Anmeldecode, kein Passwort,
@@ -734,6 +734,125 @@ dorthin war kurzzeitig blockiert.
 
 ---
 
+## Version 11.0 — „Axi ist da" (07.09.2026)
+
+Ein großes Design-Update. Am Lernstoff, am Punktesystem und an den Daten ändert
+sich nichts — die Kinder finden alles wieder, es sieht nur besser aus und lebt.
+
+### 1. Axi, der Axolotl — das Maskottchen ist zurück und lebendig
+
+Der Wiedehopf aus 10.0 ist in Rente. Zurück ist der lila Axolotl von früher,
+neu gezeichnet und zum ersten Mal wirklich lebendig: Er **atmet, blinzelt,
+schaut sich um**, die Kiemen wippen, der Schwanz wedelt. Und er hat Gefühle:
+
+- **Startseite:** Axi sitzt oben rechts mit einer Sprechblase („Los geht's,
+  Ayşe!", „Nur noch 3!", „Tagesziel geschafft! 🎉"). Ist das Tagesziel
+  erreicht, **jubelt** er mit den Armen in der Luft. Spät abends, wenn noch
+  nichts gemacht wurde, **schläft** er (Zzz) — bis jemand eine Runde spielt.
+- **Lernbildschirm:** Axi sitzt klein in der Kopfzeile und reagiert auf jede
+  Antwort — kurz jubeln bei richtig, ein trauriger Blick mit Träne bei falsch,
+  dann wieder freundlich.
+- **Rundenende, Serien-Bildschirm, Ladebildschirm:** überall Axi statt Vogel.
+
+Axi ist reines SVG mit CSS-Bewegung (Datei `app/icons.js`, Abschnitt „AXI"),
+keine Bilddatei, keine Bibliothek — die App bleibt so leicht wie vorher.
+„Weniger Bewegung" in den Geräte-Einstellungen wird respektiert.
+
+### 2. Neue Farbwelt: Nachthimmel & Axolotl
+
+Warmes Papier und Smaragd sind Geschichte. Zurück zum kühlen Blau-Lila von
+früher — aber satter und klarer, wie bei den großen Lern-Apps: weißer Grund
+mit einem Hauch Lavendel, **kräftiges Violett** als Leitfarbe, Gold für
+Belohnungen, Grün für richtig, Koralle (Axis Kiemen) für Wärme. Der
+Dunkelmodus ist komplett mitgezogen (tiefes Nachtblau, helles Violett).
+
+Alle Knöpfe haben eine fühlbare Unterkante und sinken beim Antippen ein,
+Karten haben 2-px-Ränder und große Rundungen, die untere Leiste am Handy
+zeigt den aktiven Bereich als farbige Pille. Auch die App-Icons auf dem
+Home-Bildschirm sind neu (Axi auf Violett).
+
+### 3. Belohnungsschleifen — warum die Kinder wiederkommen
+
+Nach dem Vorbild der großen Lern-Apps, aber fair: nichts nimmt etwas weg,
+alles kommt obendrauf.
+
+- **Sterne am Rundenende:** 3 Sterne für fehlerfrei, 2 für höchstens zwei
+  Fehler, 1 fürs Durchhalten — mit Ton und Pop, einer nach dem anderen.
+- **Perfekte Runde:** +10 XP, eigene Fanfare, Konfetti.
+- **Überraschung:** in etwa jeder vierten Runde ein Geschenk (5–25 XP). Nie
+  planbar — genau das macht es spannend.
+- **Level-Aufstieg** ist jetzt ein eigener Moment: große Karte mit Axi,
+  Fanfare, Konfetti, neuer Titel.
+- **Combo hörbar und sichtbar:** mit jeder richtigen Antwort in Folge steigt
+  der Ton ein Stück; ab drei in Folge pulsiert ein goldener Rand um den
+  ganzen Bildschirm und die Combo-Pille pocht.
+- **Tagesaufgaben auf der Startseite:** drei kleine Ziele (Tagesziel,
+  eine perfekte Runde, Goldtag). Sind alle drei geschafft, wackelt die
+  **Tageskiste** — öffnen bringt 5 Münzen.
+- **Serie in Gefahr:** ab 17 Uhr ohne Runde bekommt die Tagesziel-Karte
+  einen pulsierenden Goldrand, Axi guckt besorgt und sagt „Deine 7-Tage-Serie
+  wartet!".
+- **Drei neue Klänge** (Geschenk, perfekte Runde, Tageskiste), erzeugt mit
+  `tools/toene.py` — gleicher Glockenspiel-Charakter wie die vorhandenen.
+
+### 4. Schrift: Nunito
+
+Die runde, freundliche **Nunito** liegt jetzt im Paket (`fonts/nunito-*.woff2`,
+OFL-Lizenz, ~75 KB) und ist die Hausschrift — auch offline. Arabisch bleibt
+Scheherazade New.
+
+### 4b. Noch drei Schleifen (08.09.2026)
+
+- **Wochen-Rückblick:** sonntags die laufende, montags die vergangene Woche
+  auf der Startseite — sieben Balken, XP, Lerntage, perfekte Runden,
+  Goldtage, ein Satz von Axi und „Woche teilen" (für die Eltern-Gruppe).
+  `?woche=1` zeigt die Karte an jedem Tag.
+- **Axis Kleiderschrank (Shop):** sieben Kostüme für Münzen — Blume,
+  Schleife, Brille, Mütze, Fes, Kopfhörer, Krone. Einmal gekauft, jederzeit
+  anziehen; Axi trägt es überall. Der Shop ist über die Münzen-Pille bei den
+  Tagesaufgaben erreichbar (er war seit dem Umbau gar nicht mehr verlinkt).
+  Gespeichert wird lokal auf dem Gerät.
+- **Kein echtes Geld — nirgends.** Der alte „Unlimited · Upgraden"-Kasten
+  aus der Gizmo-Kopie ist aus dem Shop entfernt. Münzen entstehen nur beim
+  Lernen: 3er-/5er-Combo +1, perfekte Runde +2, Level-Aufstieg +3,
+  Tageskiste +5 — der Shop zeigt das oben an.
+- **Anfeuern am Rundenende:** direkt nach der Runde zwei Mitschüler:innen
+  (die mit den wenigsten Punkten der Woche zuerst) mit 💪 👏 🔥 🤲 anfeuern —
+  gleiche Regeln wie in „Unsere Klasse", nur mit Anmeldung sichtbar.
+
+### 4c. Logo der Gemeinde
+
+Das rote Oval (`assets/logo-gemeinde.jpg`) steht im Anmelde-Fenster, unten in
+der Seitenleiste am Rechner, als Fußzeile der Startseite am Handy und über der
+Klassenzimmer-Sperre. Den Namen daneben trägst du in `app/config.js` ein:
+`window.GEMEINDE_NAME = '…'` — leer heißt: nur das Logo.
+
+### 5. Kleine Reparaturen
+
+- Der Lernbildschirm stürzte ab, wenn er direkt geöffnet wurde (fehlende
+  Variable im Herzen-System). Behoben.
+- Gespeicherte Akzentfarben aus alten Farbwelten (Smaragd, Periwinkle) werden
+  als „Standard" erkannt und folgen jetzt der aktuellen Palette — sonst wäre
+  bei Altnutzern das alte Grün hängen geblieben.
+
+### 6. Für Prüfung und Lesezeichen
+
+- `index.html#decks`, `#progress`, `#duel`, `#teacher` öffnen direkt diesen
+  Bereich. `?dunkel=1` startet im Dunkelmodus.
+- `?pruef=1&phase=ende` zeigt sofort das Rundenende.
+- `?pruef=1` schreibt nach vier Sekunden eine kleine Prüfausgabe (Fehler,
+  zu breite Elemente) unten in die Seite — für automatische Bildschirmtests.
+
+### 7. Selbst bauen
+
+Der Quelltext liegt weiter in `app/`. Die Bauwerkzeuge (`tools/bauen.mjs`,
+`tools/server.mjs`, `tools/toene.py`) liegen nur im Arbeitsordner auf dem Mac,
+nicht im Hochlade-Paket — GitHub nimmt im Browser höchstens 100 Dateien auf
+einmal an, und dieses Paket bleibt bewusst darunter. Nach Änderungen:
+
+    node tools/bauen.mjs --release      # erzeugt app/bundle.js
+    node tools/server.mjs               # Test unter http://localhost:8811
+
 ## Version 10.0 — „Jetzt fühlt es sich wie eine App an" (06.09.2026)
 
 Diese Version ändert nichts am Lernstoff und nichts am Punktesystem. Sie ändert,
@@ -961,3 +1080,96 @@ hören alle Kinder die neue Aufnahme.
 Wenn alles sitzt, wird aus den bearbeiteten Dateien das **feste Tonpaket**
 gebaut, das mit der App ausgeliefert wird — dann klingt sie für jeden, der sie
 herunterlädt, gleich, auch offline und ohne Server.
+
+---
+
+## 🔗 Einmal einrichten: GitHub + Netlify (ca. 10 Minuten)
+
+Danach lädst du Updates **nie wieder** irgendwo hin — du ersetzt die Dateien
+einmal auf GitHub, und Netlify baut und veröffentlicht die Seite von selbst.
+**Nur so installiert Netlify auch den Mini-Server** (Anmelden, Geräte-Abgleich,
+Klassenzimmer). Beim Ziehen von Dateien auf die „Deploys"-Seite läuft kein
+Build — deshalb konnte es bisher gar nicht klappen.
+
+Du brauchst: einen Computer (nicht Handy), die ZIP-Datei, 10 Minuten.
+
+---
+
+## Schritt 1 — ZIP entpacken
+
+Doppelklick auf die ZIP-Datei. Es entsteht ein Ordner. Öffne ihn: Darin muss
+**`index.html` direkt** liegen (daneben `app`, `netlify`, `netlify.toml`, …).
+Diesen Ordner offen lassen.
+
+## Schritt 2 — GitHub-Konto (falls noch keins)
+
+1. **github.com** öffnen → **Sign up** → E-Mail, Passwort, Benutzername.
+2. Kostenlos, keine Zahlungsdaten. E-Mail bestätigen.
+
+## Schritt 3 — Ablage („Repository") anlegen
+
+1. Oben rechts auf **+** → **New repository**.
+2. **Repository name:** `elif-und-ba`
+3. **Public** ausgewählt lassen. Sonst nichts ankreuzen (kein README!).
+4. **Create repository**.
+
+## Schritt 4 — Dateien hochladen
+
+1. Auf der leeren Seite steht ein Link **„uploading an existing file"** —
+   darauf klicken. (Alternativ: **Add file → Upload files**.)
+2. Im entpackten Ordner **alles markieren** (Strg+A bzw. Cmd+A) — also alle
+   Dateien **und** die Ordner `app`, `vendor`, `netlify`, `assets`, `fonts`.
+3. Alles in das große Feld im Browser ziehen. Warten, bis die Liste vollständig
+   ist (98 Dateien).
+4. Unten auf **Commit changes** klicken.
+
+> Wichtig: Nicht den äußeren Ordner ziehen, sondern **seinen Inhalt**.
+> Nach dem Hochladen muss `index.html` in der Dateiliste ganz oben stehen.
+
+## Schritt 5 — Netlify mit GitHub verbinden
+
+1. **app.netlify.com** öffnen → **Add new site** → **Import an existing project**.
+2. **Deploy with GitHub** → GitHub-Konto autorisieren.
+3. Bei „Pick a repository" das eben angelegte **`elif-und-ba`** auswählen.
+4. Die Bau-Einstellungen liest Netlify aus der mitgelieferten Datei
+   `netlify.toml` — du musst nichts eintragen. Falls doch gefragt wird:
+   - **Build command:** `echo build`
+   - **Publish directory:** `.`
+   - **Functions directory:** `netlify/functions`
+5. **Deploy** klicken und warten, bis **„Published"** erscheint.
+
+## Schritt 6 — Prüfen
+
+Die neue Adresse öffnen (z. B. `zufallsname-1234.netlify.app`) und dahinter
+**`/check.html`** anhängen. Dort muss oben grün stehen:
+
+> ✅ Alles in Ordnung — Der Klassen-Server läuft (Version 8.6), Speicher: dauerhaft ✓
+
+Dann: zurück zur App, **Anmelden**, Namen eintippen — fertig. Im Klassenzimmer
+(Lehrer-Passwort `1907`) erscheint jedes Kind automatisch.
+
+## Schritt 7 — Schöne Adresse (optional)
+
+In Netlify: **Site configuration → Change site name** → z. B. `elif-be`.
+Die Adresse lautet dann `elif-be.netlify.app`. Die alte Netlify-Seite kannst
+du danach löschen (**Site configuration → Delete this site**), damit die Kinder
+nicht versehentlich die alte öffnen.
+
+---
+
+## Ab jetzt: Update in 1 Minute
+
+Neue ZIP von mir → entpacken → auf GitHub ins Repository gehen →
+**Add file → Upload files** → Inhalt hineinziehen → **Commit changes**.
+Netlify baut automatisch neu. Nach ein bis zwei Minuten ist die neue Version
+online; die App holt sie sich beim nächsten Öffnen von selbst.
+
+## Wenn etwas klemmt
+
+- **Netlify meldet „Build failed"** → im Deploy-Protokoll die letzte rote Zeile
+  kopieren und mir schicken.
+- **`/check.html` bleibt rot** → Screenshot davon schicken. Dort steht jede
+  geprüfte Adresse mit Statuscode.
+- **GitHub lädt nicht alle Dateien hoch** → die Weboberfläche schafft 100
+  Dateien pro Vorgang; dieses Paket hat bewusst nur 98. Falls doch etwas fehlt,
+  einfach nochmal **Add file → Upload files** für den fehlenden Ordner.

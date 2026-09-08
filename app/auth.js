@@ -1,4 +1,4 @@
-/* global React, Icon */
+/* global Axolotl, React, Icon */
 const { useState: useStateAuth } = React;
 
 /* ==============================================================
@@ -293,11 +293,16 @@ function AuthModal({ ctx }) {
       <ModalHead title="Anmelden" onClose={ctx.closeModal} />
       <div className="modal-body">
         <div style={{ textAlign: 'center', marginBottom: 14 }}>
-          <div style={{ fontSize: 46 }}>🌙</div>
+          {/* (11.0) Axi begrüßt — statt eines stummen Mond-Emojis */}
+          <div style={{ display: 'grid', placeItems: 'center', marginBottom: 2 }}><Axolotl size={108} mood="happy"/></div>
           <div style={{ fontWeight: 900, fontSize: 20 }}>Wie heißt du?</div>
           <div className="muted" style={{ fontSize: 13.5, marginTop: 4 }}>
             Namen eintippen und los — mehr braucht es nicht. Du bist dann sofort im Kurs
             und dein Fortschritt ist auf jedem Gerät wieder da.
+          </div>
+          <div className="gemeinde-zeile">
+            <GemeindeLogo size={40}/>
+            <span>Koran-Kurs{window.GEMEINDE_NAME ? <b>{window.GEMEINDE_NAME}</b> : null}</span>
           </div>
         </div>
         <input value={name} onChange={e => setName(e.target.value)} autoFocus
