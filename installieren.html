@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Elif &amp; Ba installieren — Koran lesen lernen</title>
+<meta name="description" content="Elif & Ba ist eine App zum Koranlesen-Lernen für Kinder. Hier steht, wie du sie in einer Minute auf Handy, Tablet oder Computer installierst.">
+<meta name="theme-color" content="#6A5AE0">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Elif &amp; Ba">
+<style>
+@font-face { font-family:'Nunito'; font-style:normal; font-weight:500 900; font-display:swap;
+  src:url('fonts/nunito-latin-ext.woff2') format('woff2'); unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family:'Nunito'; font-style:normal; font-weight:500 900; font-display:swap;
+  src:url('fonts/nunito-latin.woff2') format('woff2'); unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
+:root { --bg:#F6F5FF; --bg-2:#ECEAFB; --surface:#fff; --line:#E4E1F5; --line-2:#CFCBEA; --ink:#1E1B3A; --ink-soft:#5A567A; --ink-mute:#8B87A8;
+  --brand:#6A5AE0; --brand-2:#7F71F5; --brand-3:#5142C2; --accent-soft:#EEEBFF; --gold:#F5B000; --gold-2:#FFD35C; --gold-3:#C98A00; --gold-soft:#FFF3D1;
+  --success:#2EC46E; --success-3:#1E9A55; --success-bg:#E2F8EB; --koralle:#FF7A9E; --e-pop:cubic-bezier(.34,1.56,.64,1); }
+* { box-sizing:border-box; }
+html,body { margin:0; }
+body { background:var(--bg); color:var(--ink); font-family:'Nunito',ui-rounded,system-ui,-apple-system,sans-serif; font-size:16px; line-height:1.5; -webkit-font-smoothing:antialiased; }
+a { color:inherit; }
+.wrap { max-width:640px; margin:0 auto; padding:0 18px 60px; }
+.kopf { display:flex; align-items:center; gap:10px; padding:16px 0 4px; font-weight:800; color:var(--ink-soft); font-size:13.5px; }
+.kopf img { height:38px; border-radius:50%; box-shadow:0 3px 10px rgba(46,36,112,.18); }
+.kopf b { display:block; color:var(--ink); font-weight:900; font-size:14.5px; }
+.hero { text-align:center; padding:10px 0 8px; }
+.axi { width:min(58vw,220px); height:auto; display:block; margin:0 auto -6px; overflow:visible; animation:schweben 3.6s ease-in-out infinite; }
+@keyframes schweben { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-8px); } }
+h1 { font-size:clamp(34px,9vw,46px); font-weight:900; letter-spacing:-.03em; margin:4px 0 2px; line-height:1.05; }
+h1 i { font-style:normal; color:var(--koralle); }
+.claim { font-size:17px; font-weight:700; color:var(--ink-soft); margin:0 0 18px; }
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; border:0; cursor:pointer; font:inherit; font-weight:900; font-size:17px;
+  padding:15px 24px; border-radius:18px; text-decoration:none; transition:transform .12s, box-shadow .12s; }
+.btn-primary { background:var(--brand); color:#fff; box-shadow:0 5px 0 var(--brand-3), 0 10px 26px rgba(106,90,224,.32); }
+.btn-primary:active { transform:translateY(5px); box-shadow:0 0 0 var(--brand-3); }
+.btn-primary.bereit { background:var(--success); box-shadow:0 5px 0 var(--success-3), 0 10px 26px rgba(46,196,110,.3); animation:pochen 1.6s ease-in-out infinite; }
+@keyframes pochen { 0%,100% { transform:scale(1); } 50% { transform:scale(1.04); } }
+.btn-ghost { background:var(--surface); color:var(--ink); border:2px solid var(--line-2); box-shadow:0 4px 0 var(--line-2); }
+.btn-ghost:active { transform:translateY(4px); box-shadow:0 0 0 var(--line-2); }
+.btn-full { width:100%; }
+.knoepfe { display:grid; gap:10px; max-width:360px; margin:0 auto; }
+.stand { min-height:24px; margin-top:12px; font-weight:800; color:var(--success-3); }
+.hinweis { background:var(--gold-soft); border:2px solid var(--gold-2); border-radius:16px; padding:12px 14px; font-weight:700; color:var(--gold-3); margin:14px 0 0; text-align:left; font-size:14.5px; }
+.hinweis b { font-weight:900; }
+section { margin-top:34px; }
+h2 { font-size:22px; font-weight:900; letter-spacing:-.02em; margin:0 0 4px; }
+.unter { color:var(--ink-soft); font-weight:700; margin:0 0 14px; font-size:14.5px; }
+.tabs { display:flex; gap:4px; padding:4px; background:var(--bg-2); border-radius:999px; }
+.tab { flex:1; border:0; background:transparent; font:inherit; font-weight:800; font-size:14px; padding:10px 6px; border-radius:999px; color:var(--ink-soft); cursor:pointer; white-space:nowrap; }
+.tab.ist-an { background:var(--surface); color:var(--brand); box-shadow:0 2px 8px rgba(46,36,112,.08); }
+.panel { display:none; background:var(--surface); border:2px solid var(--line); border-radius:20px; padding:16px; margin-top:12px; }
+.panel.ist-an { display:block; animation:auf .35s ease both; }
+@keyframes auf { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+.panel h3 { margin:0 0 10px; font-size:16px; font-weight:900; }
+.schritte { list-style:none; margin:0; padding:0; display:grid; gap:12px; counter-reset:s; }
+.schritte li { display:flex; gap:12px; align-items:flex-start; }
+.nr { flex:0 0 32px; width:32px; height:32px; border-radius:50%; background:var(--brand); color:#fff; display:grid; place-items:center; font-weight:900; font-size:15px; box-shadow:0 3px 0 var(--brand-3); }
+.schritte p { margin:4px 0 0; font-weight:700; }
+.schritte b { font-weight:900; }
+.sym { display:inline-grid; place-items:center; width:26px; height:26px; border-radius:7px; background:var(--accent-soft); color:var(--brand); vertical-align:-7px; margin:0 2px; }
+.sym svg { width:17px; height:17px; }
+.klein { color:var(--ink-mute); font-size:13.5px; font-weight:700; margin:10px 0 0; }
+.warum { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.warum div { background:var(--surface); border:2px solid var(--line); border-radius:18px; padding:14px 12px; }
+.warum span { font-size:26px; display:block; margin-bottom:4px; }
+.warum b { display:block; font-weight:900; margin-bottom:2px; }
+.warum p { margin:0; font-size:13.5px; color:var(--ink-soft); font-weight:700; line-height:1.35; }
+.teilen { background:var(--surface); border:2px solid var(--line); border-radius:20px; padding:18px; text-align:center; }
+#qr { display:inline-block; padding:10px; background:#fff; border-radius:16px; border:2px solid var(--line); }
+#qr img, #qr canvas { display:block; }
+.link { font-weight:800; word-break:break-all; margin:10px 0; color:var(--brand); }
+.teilen .knoepfe { margin-top:8px; }
+footer { margin-top:40px; text-align:center; color:var(--ink-mute); font-weight:700; font-size:13px; }
+footer img { height:34px; border-radius:50%; display:block; margin:0 auto 6px; box-shadow:0 3px 10px rgba(46,36,112,.18); }
+.klasse-box { margin:16px auto 0; max-width:360px; background:var(--surface); border:2px solid var(--brand); border-radius:20px; padding:14px 16px; display:grid; gap:2px; box-shadow:0 5px 0 var(--brand-3); }
+.klasse-box b { font-size:12.5px; color:var(--ink-mute); font-weight:800; }
+.klasse-box #klasse-name { font-weight:900; font-size:17px; }
+.klasse-code { font-size:38px; font-weight:900; letter-spacing:8px; color:var(--brand); padding-left:8px; line-height:1.1; }
+.klasse-box small { font-size:12.5px; color:var(--ink-soft); font-weight:700; }
+.nur-druck { display:none; }
+@media (max-width:380px) { .tab { font-size:12.5px; } .warum { grid-template-columns:1fr; } }
+@media print {
+  body { background:#fff; } .wrap { display:none; }
+  .nur-druck { display:block; text-align:center; padding:30px 20px; font-family:'Nunito',system-ui,sans-serif; }
+  .nur-druck h1 { font-size:44px; } .nur-druck .claim { font-size:22px; }
+  .nur-druck #qr-druck { display:inline-block; margin:10px auto 20px; }
+  .nur-druck ol { text-align:left; display:inline-block; font-size:20px; font-weight:700; line-height:1.6; }
+  .nur-druck .url { font-size:22px; font-weight:900; color:#6A5AE0; margin:8px 0 18px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kopf"><img src="assets/logo-gemeinde.jpg" alt=""><span><b>Koran-Kurs</b><span class="gemeinde-name">Elif &amp; Ba</span></span></div>
+
+  <header class="hero">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" class="axi" role="img" aria-label="Axi, der Axolotl">
+  
+  <defs>
+    <linearGradient id="kopf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#AFA2FF"/><stop offset=".55" stop-color="#8273F5"/><stop offset="1" stop-color="#5D4DD6"/></linearGradient>
+    <linearGradient id="arm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9385F8"/><stop offset="1" stop-color="#5D4DD6"/></linearGradient>
+    <linearGradient id="bauch" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EEEBFF"/><stop offset="1" stop-color="#CFC6FF"/></linearGradient>
+    <linearGradient id="kieme" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFC2D1"/><stop offset="1" stop-color="#FF86A8"/></linearGradient>
+  </defs>
+  <ellipse class="axo-schatten" cx="120" cy="224" rx="60" ry="7.5" fill="rgba(46,36,112,.14)"/>
+  <g class="axo-koerper">
+    <path class="axo-arm axo-arm-l" d="M86 164 C72 166 62 180 68 194 C76 199 86 190 90 178 Z" fill="url(#arm)"/><path class="axo-arm axo-arm-r" d="M154 164 C168 166 178 180 172 194 C164 199 154 190 150 178 Z" fill="url(#arm)"/>
+    <ellipse cx="120" cy="182" rx="48" ry="34" fill="url(#kopf)"/>
+    <ellipse cx="120" cy="190" rx="30" ry="18" fill="url(#bauch)"/>
+    <ellipse cx="100" cy="212" rx="14" ry="7" fill="#5D4DD6"/><ellipse cx="140" cy="212" rx="14" ry="7" fill="#5D4DD6"/>
+    <g class="axo-kiemen axo-kiemen-l"><g class="axo-kieme"><ellipse cx="58" cy="98" rx="14" ry="9" fill="url(#kieme)" transform="rotate(-25 58 98)"/><circle cx="47" cy="93" r="5" fill="#FFB1C4"/></g><g class="axo-kieme"><ellipse cx="60" cy="120" rx="13" ry="8.5" fill="url(#kieme)" transform="rotate(10 60 120)"/><circle cx="48" cy="123" r="4.6" fill="#FFB1C4"/></g></g><g class="axo-kiemen axo-kiemen-r" transform="matrix(-1 0 0 1 240 0)"><g class="axo-kieme"><ellipse cx="58" cy="98" rx="14" ry="9" fill="url(#kieme)" transform="rotate(-25 58 98)"/><circle cx="47" cy="93" r="5" fill="#FFB1C4"/></g><g class="axo-kieme"><ellipse cx="60" cy="120" rx="13" ry="8.5" fill="url(#kieme)" transform="rotate(10 60 120)"/><circle cx="48" cy="123" r="4.6" fill="#FFB1C4"/></g></g>
+    <ellipse cx="120" cy="106" rx="70" ry="63" fill="url(#kopf)"/>
+    <ellipse cx="92" cy="70" rx="26" ry="13" fill="#fff" opacity=".22"/>
+    <path d="M110 46 q10 -14 20 0 q-10 -4 -20 0z" fill="url(#kieme)"/>
+    <ellipse cx="74" cy="132" rx="14" ry="9" fill="#FF8DA8" opacity=".5"/><ellipse cx="166" cy="132" rx="14" ry="9" fill="#FF8DA8" opacity=".5"/>
+    <g>
+      <ellipse cx="94" cy="106" rx="19" ry="21.5" fill="#fff"/><ellipse cx="146" cy="106" rx="19" ry="21.5" fill="#fff"/>
+      <g class="axo-pupille" transform="">
+        <circle cx="96" cy="109" r="11" fill="#2A2352"/><circle cx="148" cy="109" r="11" fill="#2A2352"/>
+        <circle cx="100.5" cy="103.5" r="4.2" fill="#fff"/><circle cx="152.5" cy="103.5" r="4.2" fill="#fff"/>
+        <circle cx="91.5" cy="114" r="2" fill="#fff" opacity=".9"/><circle cx="143.5" cy="114" r="2" fill="#fff" opacity=".9"/>
+      </g>
+      <g class="axo-lid" transform="translate(0 84.5) scale(1,0) translate(0 -84.5)"><ellipse cx="94" cy="106" rx="20" ry="22.5" fill="url(#kopf)"/><ellipse cx="146" cy="106" rx="20" ry="22.5" fill="url(#kopf)"/></g>
+      
+    </g>
+    <path d="M108 138 q6 8 12 0 q6 8 12 0" stroke="#2A2352" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
+    <h1>Elif <i>&amp;</i> Ba</h1>
+    <p class="claim">Koran lesen lernen — Schritt für Schritt, mit Axi.</p>
+    <div class="knoepfe">
+      <button class="btn btn-primary btn-full" id="install">📲 App installieren</button>
+      <a class="btn btn-ghost btn-full" href="./" id="oeffnen">Im Browser öffnen</a>
+    </div>
+    <div class="klasse-box" id="klasse" hidden>
+      <b>Deine Klasse</b>
+      <span id="klasse-name">Klassen-Code</span>
+      <span class="klasse-code" id="klasse-code"></span>
+      <small>Beim Anmelden: Namen eintippen — der Code ist schon drin.</small>
+    </div>
+    <div class="stand" id="stand"></div>
+    <div class="hinweis" id="inapp" hidden>Du bist gerade in <b>WhatsApp, Instagram oder einer anderen App</b>. Von dort geht Installieren nicht: Tippe oben auf <b>⋯</b> oder <b>⋮</b> und wähle <b>„In Safari öffnen"</b> (iPhone) bzw. <b>„In Chrome öffnen"</b> (Android) — dann klappt es.</div>
+  </header>
+
+  <section id="anleitung">
+    <h2>So kommt die App aufs Gerät</h2>
+    <p class="unter">Dauert eine Minute. Wähle dein Gerät — wir haben es schon vorausgewählt.</p>
+    <div class="tabs" role="tablist">
+      <button class="tab" data-g="android" role="tab">🤖 Android</button>
+      <button class="tab" data-g="ios" role="tab">🍎 iPhone &amp; iPad</button>
+      <button class="tab" data-g="pc" role="tab">💻 Computer</button>
+    </div>
+
+    <div class="panel" data-g="android">
+      <h3>Android (Chrome)</h3>
+      <ol class="schritte">
+        <li><span class="nr">1</span><p>Tippe oben auf <b>„App installieren"</b>. Chrome fragt einmal nach — <b>„Installieren"</b> antippen, fertig.</p></li>
+        <li><span class="nr">2</span><p>Kein Knopf zu sehen? Dann oben rechts auf <span class="sym"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="12" cy="19" r="2.2"/></svg></span> tippen und <b>„App installieren"</b> oder <b>„Zum Startbildschirm hinzufügen"</b> wählen.</p></li>
+        <li><span class="nr">3</span><p>Axi liegt jetzt auf dem Startbildschirm — wie jede andere App.</p></li>
+      </ol>
+      <p class="klein">Samsung-Internet: unten rechts <b>☰</b> → „Aktuelle Seite hinzufügen zu" → „Startbildschirm".</p>
+    </div>
+
+    <div class="panel" data-g="ios">
+      <h3>iPhone &amp; iPad (Safari)</h3>
+      <ol class="schritte">
+        <li><span class="nr">1</span><p>Diese Seite in <b>Safari</b> öffnen — nicht in WhatsApp oder Instagram.</p></li>
+        <li><span class="nr">2</span><p>Unten in der Mitte auf das <b>Teilen-Symbol</b> <span class="sym"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13M8 7l4-4 4 4"/><path d="M5 11v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8"/></svg></span> tippen. Auf dem iPad sitzt es oben rechts.</p></li>
+        <li><span class="nr">3</span><p>Etwas nach unten wischen und <b>„Zum Home-Bildschirm"</b> <span class="sym"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg></span> antippen.</p></li>
+        <li><span class="nr">4</span><p>Oben rechts auf <b>„Hinzufügen"</b>. Fertig — Axi ist auf deinem Home-Bildschirm.</p></li>
+      </ol>
+      <p class="klein">Apple erlaubt keinen Installieren-Knopf — darum diese vier Tipps. Danach läuft die App wie aus dem App Store: Vollbild, offline, mit deinem Fortschritt.</p>
+    </div>
+
+    <div class="panel" data-g="pc">
+      <h3>Computer</h3>
+      <ol class="schritte">
+        <li><span class="nr">1</span><p><b>Chrome oder Edge:</b> rechts in der Adressleiste auf das Installieren-Symbol <span class="sym"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M12 8v5M9.5 10.5 12 13l2.5-2.5M8 20h8"/></svg></span> klicken — oder oben auf „App installieren".</p></li>
+        <li><span class="nr">2</span><p><b>Safari (Mac):</b> Menü <b>Ablage → „Zum Dock hinzufügen"</b>.</p></li>
+        <li><span class="nr">3</span><p>Oder einfach <a href="./"><b>im Browser lernen</b></a> — geht genauso gut.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <h2>Warum installieren?</h2>
+    <div class="warum">
+      <div><span>📴</span><b>Offline lernen</b><p>Auch ohne WLAN, im Bus oder bei Oma.</p></div>
+      <div><span>⚡</span><b>Startet sofort</b><p>Kein Laden, kein Suchen im Browser.</p></div>
+      <div><span>📱</span><b>Vollbild</b><p>Keine Browserleiste — nur die App.</p></div>
+      <div><span>💾</span><b>Fortschritt bleibt</b><p>Name eintippen reicht. Kein Passwort, keine E-Mail.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Für die Klasse &amp; die Eltern-Gruppe</h2>
+    <p class="unter">Den Code scannen — oder den Link in die Gruppe schicken.</p>
+    <div class="teilen">
+      <div id="qr" aria-label="QR-Code zu dieser Seite"></div>
+      <div class="link" id="link"></div>
+      <div class="knoepfe">
+        <button class="btn btn-ghost btn-full" id="kopieren">🔗 Link kopieren</button>
+        <button class="btn btn-ghost btn-full" id="drucken">🖨️ Aushang drucken</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <img src="assets/logo-gemeinde.jpg" alt="">
+    <div><span class="gemeinde-name">Elif &amp; Ba</span> · Koran-Kurs</div>
+    <div id="version"></div>
+  </footer>
+</div>
+
+<div class="nur-druck" id="aushang">
+  <h1>Elif <i>&amp;</i> Ba</h1>
+  <p class="claim">Koran lesen lernen — Schritt für Schritt, mit Axi.</p>
+  <div id="qr-druck"></div>
+  <div class="url" id="url-druck"></div>
+  <div id="druck-klasse" hidden style="font-size:26px;font-weight:900;margin:0 0 14px">Klassen-Code: <span style="color:#6A5AE0;letter-spacing:6px" id="druck-code"></span></div>
+  <ol>
+    <li>Code mit der Kamera scannen</li>
+    <li>„App installieren" antippen (iPhone: Teilen → „Zum Home-Bildschirm")</li>
+    <li>Namen eintippen — los geht's!</li>
+  </ol>
+</div>
+
+<script src="vendor/qrcode.min.js"></script>
+<script src="app/config.js"></script>
+<script>
+(function () {
+  var ua = navigator.userAgent || '';
+  var iOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var android = /Android/i.test(ua);
+  var inApp = /FBAN|FBAV|Instagram|WhatsApp|Line\/|Twitter|TikTok|Snapchat|; wv\)/i.test(ua);
+  var standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+  var geraet = iOS ? 'ios' : android ? 'android' : 'pc';
+
+  /* Reiter */
+  var tabs = document.querySelectorAll('.tab'), panels = document.querySelectorAll('.panel');
+  function zeige(g) {
+    tabs.forEach(function (t) { t.classList.toggle('ist-an', t.dataset.g === g); t.setAttribute('aria-selected', t.dataset.g === g); });
+    panels.forEach(function (p) { p.classList.toggle('ist-an', p.dataset.g === g); });
+  }
+  tabs.forEach(function (t) { t.addEventListener('click', function () { zeige(t.dataset.g); }); });
+  zeige(geraet);
+
+  /* Installieren-Knopf: echter Dialog, wo der Browser ihn erlaubt (Android/Chrome/Edge),
+     sonst zur passenden Anleitung springen. */
+  var prompt = null, btn = document.getElementById('install'), stand = document.getElementById('stand');
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault(); prompt = e;
+    btn.classList.add('bereit'); btn.textContent = '📲 Jetzt installieren';
+  });
+  function fertig() {
+    stand.textContent = '✅ Installiert! Öffne „Elif & Ba" jetzt vom Startbildschirm.';
+    btn.hidden = true;
+  }
+  window.addEventListener('appinstalled', fertig);
+  btn.addEventListener('click', function () {
+    if (prompt) {
+      prompt.prompt();
+      prompt.userChoice.then(function (r) { if (r && r.outcome === 'accepted') fertig(); prompt = null; btn.classList.remove('bereit'); btn.textContent = '📲 App installieren'; });
+      return;
+    }
+    zeige(geraet);
+    document.getElementById('anleitung').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (iOS) stand.textContent = 'Auf dem iPhone geht es über Teilen → „Zum Home-Bildschirm" — siehe unten.';
+    else stand.textContent = 'Folge den Schritten unten — dauert eine Minute.';
+  });
+  if (standalone) { stand.textContent = '✅ Du bist schon in der App — es gibt nichts zu installieren.'; btn.hidden = true; }
+  if (inApp) document.getElementById('inapp').hidden = false;
+
+  /* Klassen-Code aus der Adresse (?klasse=1234): vom Aushang oder aus der Gruppe */
+  var klasse = '';
+  try { klasse = (new URLSearchParams(location.search).get('klasse') || '').replace(/\D/g, '').slice(0, 4); } catch (e) {}
+  if (klasse.length === 4) {
+    document.getElementById('klasse').hidden = false;
+    document.getElementById('klasse-code').textContent = klasse;
+    document.getElementById('oeffnen').href = './?klasse=' + klasse;
+    document.getElementById('druck-klasse').hidden = false;
+    document.getElementById('druck-code').textContent = klasse;
+    fetch('api/klasse?code=' + klasse, { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) {
+      if (j && j.found) document.getElementById('klasse-name').textContent = j.name + (j.teacher ? ' · ' + j.teacher : '');
+    }).catch(function () {});
+  }
+  /* QR-Code + Link (diese Seite, mit Klassen-Code, falls vorhanden) */
+  var url = location.origin + location.pathname + (klasse.length === 4 ? '?klasse=' + klasse : '');
+  document.getElementById('link').textContent = url.replace(/^https?:\/\//, '');
+  document.getElementById('url-druck').textContent = url.replace(/^https?:\/\//, '');
+  try {
+    new QRCode(document.getElementById('qr'), { text: url, width: 176, height: 176, correctLevel: QRCode.CorrectLevel.M });
+    new QRCode(document.getElementById('qr-druck'), { text: url, width: 380, height: 380, correctLevel: QRCode.CorrectLevel.M });
+  } catch (e) {}
+  document.getElementById('kopieren').addEventListener('click', function () {
+    var b = this;
+    var ok = function () { b.textContent = '✓ Kopiert'; setTimeout(function () { b.textContent = '🔗 Link kopieren'; }, 2000); };
+    if (navigator.share) { navigator.share({ title: 'Elif & Ba', text: 'Koran lesen lernen mit Axi — hier installieren:', url: url }).then(ok).catch(function () {}); return; }
+    if (navigator.clipboard) navigator.clipboard.writeText(url).then(ok).catch(function () {});
+  });
+  document.getElementById('drucken').addEventListener('click', function () { window.print(); });
+
+  /* Gemeinde-Name und Version aus app/config.js */
+  if (window.GEMEINDE_NAME) document.querySelectorAll('.gemeinde-name').forEach(function (el) { el.textContent = window.GEMEINDE_NAME; });
+  if (window.APP_VERSION) document.getElementById('version').textContent = window.APP_VERSION;
+
+  /* Service Worker: nötig, damit der Browser die App als installierbar erkennt */
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    navigator.serviceWorker.register('sw.js').catch(function () {});
+  }
+})();
+</script>
+</body>
+</html>

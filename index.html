@@ -3292,6 +3292,25 @@ input:focus, textarea:focus, select:focus { border-color: var(--brand); box-shad
 .gemeinde-fuss.home { justify-content: center; border-top: none; margin-top: 10px; text-align: center; }
 .gemeinde-fuss.home b { display: inline; }
 .gemeinde-kopf { display: grid; place-items: center; margin-bottom: 4px; }
+/* ---------- 14. Klassenzimmer mit Code (11.0) ---------- */
+.code-block { margin-top: 12px; background: var(--accent-soft); border: 2px solid var(--brand-soft-2); border-radius: 18px; padding: 12px 14px; text-align: center; }
+.code-titel { font-weight: 900; font-size: 14px; margin-bottom: 8px; }
+.code-titel .muted { font-weight: 700; font-size: 12.5px; }
+.code-eingabe { width: 100%; max-width: 200px; margin: 0 auto; display: block; text-align: center; font-size: 30px; font-weight: 900;
+  letter-spacing: 10px; padding: 8px 0 8px 10px; border-radius: 14px; border: 2px solid var(--line-2); background: var(--surface); color: var(--ink); font-family: inherit; }
+.code-eingabe::placeholder { color: var(--line-2); letter-spacing: 10px; }
+.code-eingabe:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 4px rgba(106,90,224,.18); }
+.code-stand { font-size: 12.5px; font-weight: 700; color: var(--ink-soft); margin-top: 8px; min-height: 18px; }
+.code-stand.ist-ok { color: var(--success-3); font-weight: 800; }
+.code-stand.ist-falsch { color: var(--rose-3); font-weight: 800; }
+.klassen-code { font-size: 46px; font-weight: 900; letter-spacing: 8px; color: var(--brand); margin: 6px 0 10px; padding-left: 8px; line-height: 1.1; }
+.klassen-code.klein { font-size: 26px; letter-spacing: 4px; margin: 0; padding-left: 4px; display: block; }
+.feld { display: block; font-weight: 800; font-size: 13px; color: var(--ink-soft); margin-bottom: 8px; }
+.feld input { margin-top: 4px; }
+.klassen-banner { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: var(--surface); border: 2px solid var(--line);
+  border-radius: 18px; padding: 12px 14px; }
+.klassen-banner > div:first-child b { display: block; font-size: 11.5px; color: var(--ink-mute); font-weight: 800; }
+.theme-dark .code-block { background: var(--accent-soft); }
 .muenz-quellen { background: var(--gold-soft); border: 2px solid var(--gold-2); border-radius: 16px; padding: 10px 14px; display: grid; gap: 3px; }
 .muenz-quellen b { font-weight: 900; font-size: 14px; color: var(--gold-3); }
 .muenz-quellen span { font-size: 12.5px; font-weight: 700; color: var(--ink-soft); }

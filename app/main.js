@@ -232,6 +232,13 @@ function App() {
   const go = useCallback((screen, payload = {}) => setRoute({ screen, ...payload }), []);
   const openModal = useCallback((kind, payload = {}) => setModal({ kind, ...payload }), []);
   const closeModal = useCallback(() => setModal(null), []);
+  // (11.0) Vom Aushang/QR: index.html?klasse=1234 öffnet das Anmelden mit vorausgefülltem Code.
+  useEffect(() => {
+    let p = ''; try { p = new URLSearchParams(location.search).get('klasse') || ''; } catch (e) {}
+    if (!/^\d{4}$/.test(p) || (window.SimpleSync && window.SimpleSync.account())) return undefined;
+    const t = setTimeout(() => openModal('auth'), 700);
+    return () => clearTimeout(t);
+  }, []);
 
   // bind scroll for sticky topbar shadow
   useEffect(() => {
@@ -840,6 +847,7 @@ function Home({ ctx }) {
   const muenzen = XPm ? (XPm.state().coins || 0) : 0;
   const kAcc = window.SimpleSync && window.SimpleSync.account();
   const kName = (kAcc && kAcc.name) || '';
+  const kKlasse = window.SimpleSync && window.SimpleSync.classInfo ? window.SimpleSync.classInfo() : null;
   const anteil = Math.min(1, tag.target ? tag.done / tag.target : 0);
   const rU = 2 * Math.PI * 34;
   /* (11.0) Axi reagiert auf den Tag: jubelt, wenn das Ziel steht; schläft
@@ -887,7 +895,7 @@ function Home({ ctx }) {
       <div className="heute-kopf">
         <div className="heute-text">
           <div className="heute-gruss">Selâmün aleyküm{kName ? ', ' + kName : ''}!</div>
-          <div className="heute-stufe">🌙 Stufe {stufe.level} · {stufe.title}</div>
+          <div className="heute-stufe">🌙 Stufe {stufe.level} · {stufe.title}{kKlasse ? ' · 🏫 ' + kKlasse.name : ''}</div>
         </div>
         <div className="axi-buehne">
           <div className="axi-blase">{spruch}</div>
@@ -5548,6 +5556,19 @@ function TeacherCorner({ ctx }) {
   const [showGroup, setShowGroup] = useState(false);
   const [sortBy, setSortBy] = useState('name');   // name | fortschritt | aktiv
   const [teacherAll, setTeacherAll] = useState(() => (SS ? SS.isTeacher() : false));
+  // (11.0) Wer sich mit Code + PIN als Lehrkraft angemeldet hat, ist schon ausgewiesen.
+  const klasse = SS && SS.classInfo ? SS.classInfo() : null;
+  useEffect(() => {
+    const a = SS && SS.account();
+    if (a && a.role === 'teacher' && a.pin && !teacherUnlocked) { setTeacherUnlocked(true); SS.setTeacherMode(true); setTeacherAll(true); }
+  }, []);
+  const teilenKlasse = () => {
+    if (!klasse) return;
+    const link = location.origin + location.pathname.replace(/[^/]*$/, '') + 'installieren.html?klasse=' + klasse.code;
+    const txt = 'Unser Koran-Kurs bei Elif & Ba 🌙\nKlassen-Code: ' + klasse.code + '\nApp installieren: ' + link;
+    if (navigator.share) navigator.share({ title: 'Elif & Ba', text: txt }).catch(() => {});
+    else if (navigator.clipboard) navigator.clipboard.writeText(txt).then(() => setMsg('Kopiert ✅')).catch(() => {});
+  };
   if (!CR) return null;
   const hasPin = !!CR.getPin();
 
@@ -5606,8 +5627,16 @@ function TeacherCorner({ ctx }) {
         <div className="card" style={{padding: 30, textAlign: 'center'}}>
           <div className="gemeinde-kopf"><GemeindeLogo size={76}/></div>
           <h1 style={{fontSize: 24, marginTop: 10}}>🔒 Klassenzimmer</h1>
-          <div className="muted" style={{marginBottom: 18}}>
-            {setup ? 'Nur für Lehrkräfte — Lehrer-Passwort eingeben (oder eigene PIN festlegen).' : 'Nur für Lehrkräfte — PIN oder Lehrer-Passwort eingeben.'}
+          <div className="muted" style={{marginBottom: 14}}>Nur für Lehrkräfte.</div>
+          <button className="btn btn-primary btn-full btn-lg" style={{marginBottom: 16}} onClick={() => ctx.openModal('auth')}>
+            🧑‍🏫 Klassenzimmer anlegen oder öffnen
+          </button>
+          <div className="muted" style={{fontSize: 13, marginBottom: 14, lineHeight: 1.45}}>
+            Neu: Jede Lehrkraft legt ihr eigenes Klassenzimmer an und bekommt einen <b>4-stelligen Code</b> für die Kinder.
+            Der Knopf oben führt hin. Darunter der alte Weg für die Sammelklasse:
+          </div>
+          <div className="muted" style={{marginBottom: 10, fontSize: 12.5}}>
+            {setup ? 'Lehrer-Passwort eingeben (oder eigene PIN festlegen).' : 'PIN oder Lehrer-Passwort eingeben.'}
           </div>
           <input type="password" inputMode="numeric" value={pw} placeholder={setup ? 'Lehrer-Passwort oder neue PIN' : 'PIN'}
                  onChange={e => setPw(e.target.value)} onKeyDown={e => e.key === 'Enter' && submit()}
@@ -5673,8 +5702,18 @@ function TeacherCorner({ ctx }) {
   };
   return (
     <div className="page" style={{maxWidth: 860}}>
+      {klasse && (
+        <div className="klassen-banner">
+          <div><b>Klassen-Code</b><span className="klassen-code klein">{klasse.code}</span></div>
+          <div className="muted" style={{flex: 1, minWidth: 160, fontSize: 13, lineHeight: 1.35}}>
+            <b style={{color: 'var(--ink)'}}>{klasse.name}</b> · Kinder tippen beim Anmelden Name + Code ein und erscheinen hier von selbst.
+          </div>
+          <button className="btn btn-ghost btn-sm" onClick={teilenKlasse}>📤 Teilen</button>
+          <a className="btn btn-ghost btn-sm" href={'installieren.html?klasse=' + klasse.code} target="_blank" rel="noopener">🖨️ Aushang</a>
+        </div>
+      )}
       <div className="row" style={{justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10}}>
-        <h1 style={{margin: 0}}>🏫 Klassenzimmer</h1>
+        <h1 style={{margin: 0}}>🏫 {klasse ? klasse.name : 'Klassenzimmer'}</h1>
         <button className="btn btn-ghost" onClick={() => setTeacherUnlocked(false)}>Sperren 🔒</button>
       </div>
       <input value={className} onChange={e => { setClassName(e.target.value); CR.setClassName(e.target.value); }}

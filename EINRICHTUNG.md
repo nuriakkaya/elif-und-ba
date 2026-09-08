@@ -45,10 +45,45 @@ nicht und funktioniert auch dann, wenn die App selbst noch alt ist:
 
 Adresse: deine Netlify-Adresse + `/check.html`.
 
+## 🏫 Klassenzimmer in drei Schritten (neu in 11.0)
+
+Jede Lehrkraft hat ihr eigenes Klassenzimmer — ohne Technik, ohne Passwörter
+von anderen. Es braucht nur einen **Code mit vier Ziffern**.
+
+**Als Lehrkraft (einmalig, 1 Minute):**
+
+1. App öffnen → oben rechts **„Anmelden"** → unten **„🧑‍🏫 Ich bin Lehrkraft"**.
+2. **„Neues Klassenzimmer anlegen"**: Name der Klasse (z. B. „Klasse 3b"),
+   dein Name, eine PIN (4 Ziffern, nur für dich) → **„Klassenzimmer anlegen"**.
+3. Es erscheint dein **Klassen-Code**, z. B. **4821**. Schreib ihn an die
+   Tafel, schick ihn in die Eltern-Gruppe (Knopf „Teilen") oder druck den
+   **Aushang** für die Klassentür (Knopf „Aushang" — mit QR-Code, der die
+   Kinder direkt zur App mit deinem Code führt).
+
+**Die Kinder:** App öffnen → **„Anmelden"** → **Namen** und **Code** eintippen →
+„Los geht's!". Sie sehen sofort „✅ Klasse 3b bei Frau Yılmaz" und sind drin.
+Wer über den Aushang oder den Link kommt, hat den Code schon vorausgefüllt.
+
+**Danach:** Tab **„Klasse"** → das Klassenzimmer öffnet sich ohne Passwort
+(du bist mit Code + PIN ausgewiesen). Oben steht dein Code, darunter jedes
+Kind mit seinem Stand — sobald es sich anmeldet, noch vor der ersten Karte.
+Auf einem anderen Gerät: „Anmelden" → „Ich bin Lehrkraft" → „Mein
+Klassenzimmer öffnen" → Code + PIN.
+
+**Gut zu wissen:**
+- Ein Kind kann die Klasse wechseln: „Anmelden" → Konto → neuen Code eingeben.
+- Ohne Code landet ein Kind wie bisher in der Sammelklasse.
+- Die Sammelklasse mit dem zentralen Lehrer-Passwort gibt es weiterhin
+  („Alter Weg" unter „Ich bin Lehrkraft").
+- Die PIN ist nur für dich. Vergessen? Dann einfach ein neues Klassenzimmer
+  anlegen und den Kindern den neuen Code geben — sie tippen ihn einmal ein
+  und nehmen ihren Fortschritt mit.
+
 ## 👧👦 So melden sich die Kinder an
 
 1. App öffnen → oben rechts **„Anmelden“**.
-2. **Namen eingeben** → „Los geht's! 🚀“. **Fertig.**
+2. **Namen eingeben**, darunter den **Klassen-Code** der Lehrkraft (vier
+   Ziffern; ohne Code → Sammelklasse) → „Los geht's! 🚀“. **Fertig.**
 3. Wer schon einmal da war, tippt seinen Namen einfach in der Liste
    **„Schon mal dabei gewesen?“** an — ein Fingertipp genügt.
 4. Auf einem zweiten Gerät denselben Namen eingeben → der Fortschritt ist da.
@@ -826,6 +861,24 @@ Das rote Oval (`assets/logo-gemeinde.jpg`) steht im Anmelde-Fenster, unten in
 der Seitenleiste am Rechner, als Fußzeile der Startseite am Handy und über der
 Klassenzimmer-Sperre. Den Namen daneben trägst du in `app/config.js` ein:
 `window.GEMEINDE_NAME = '…'` — leer heißt: nur das Logo.
+
+### 4d. Landingpage zum Installieren
+
+`deine-adresse.netlify.app/installieren` (auch `…/installieren.html`) ist die
+Seite für alle, die die App aufs Gerät holen sollen — Kinder, Eltern,
+Kolleg:innen. Sie erkennt das Gerät selbst:
+
+- **Android / Chrome / Edge:** echter Knopf „Jetzt installieren" (der Browser
+  fragt einmal nach), sonst die Anleitung über das ⋮-Menü.
+- **iPhone / iPad:** Apple erlaubt keinen Knopf — darum die bebilderte
+  Anleitung: Safari → Teilen → „Zum Home-Bildschirm" → „Hinzufügen".
+- **Aus WhatsApp/Instagram geöffnet:** Hinweis „In Safari/Chrome öffnen",
+  weil Installieren aus diesen Apps heraus nicht geht.
+- **QR-Code** der Seite, „Link kopieren" (öffnet am Handy das Teilen-Menü)
+  und **„Aushang drucken"** — ein A4-Blatt mit großem QR-Code und drei
+  Schritten für die Klassentür.
+
+Der Name der Gemeinde kommt aus `app/config.js` (`GEMEINDE_NAME`).
 
 ### 5. Kleine Reparaturen
 
