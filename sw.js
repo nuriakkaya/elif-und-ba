@@ -16,7 +16,7 @@
      Einzige Ausnahme: die Aussprache-Aufnahmen (Route "media"), damit sie
      offline hörbar bleiben.
 */
-const CACHE = 'elifba-11-10';
+const CACHE = 'elifba-11-11';
 
 const PRECACHE = [
   './',
@@ -128,6 +128,18 @@ self.addEventListener('fetch', (e) => {
      vendor zaehlt der Anhang nicht; fuer Toene (.bin?v=Groesse) bleibt er der
      Schluessel, damit ein neues Buendel auch neu geladen wird. (13.09.2026) */
   const ohneQuery = (APP_CODE.test(url.pathname) || isVendor) ? { ignoreSearch: true } : undefined;
+  /* WELCHE SEITE GEHOERT UNTER WELCHEN SCHLUESSEL? (14.09.2026)
+
+     Bis heute legte der Vorrat JEDE Navigation unter 'index.html' ab und gab
+     offline fuer JEDE Navigation 'index.html' zurueck. Solange es nur eine
+     Seite gab, fiel das nicht auf. Seit die Landingpage dazugekommen ist, sind
+     es zwei — und der Fehler wird sichtbar: Wer /installieren besuchte, dessen
+     App lag danach als Landingpage im Speicher; beim naechsten Start ohne Netz
+     kam die Landingpage statt des Kurses. Und umgekehrt zeigte /installieren
+     die App. Jetzt liegt jede Seite unter IHRER eigenen Adresse, und der
+     Rueckfall kennt beide. */
+  const istLanding = /^\/(installieren|yukle|start)(\.html)?$/.test(url.pathname);
+  const seitenRueckfall = istLanding ? 'installieren.html' : 'index.html';
   const netFirst = e.request.mode === 'navigate'
     || (APP_CODE.test(url.pathname) && !isVendor)
     || TON_LISTE.test(url.pathname)
@@ -139,14 +151,14 @@ self.addEventListener('fetch', (e) => {
         .then((res) => {
           if (res && res.ok) {
             const copy = res.clone();
-            caches.open(CACHE).then((c) => c.put(e.request.mode === 'navigate' ? 'index.html' : e.request, copy));
+            caches.open(CACHE).then((c) => c.put(e.request, copy));
           }
           return res;
         })
-        .catch(() => caches.match(e.request.mode === 'navigate' ? 'index.html' : e.request, ohneQuery)
-          /* Nur eine SEITE darf auf index.html zurueckfallen — ein Skript, das
-             als HTML ankommt, ist ein SyntaxError statt einer Fehlermeldung. */
-          .then((hit) => hit || (e.request.mode === 'navigate' ? caches.match('index.html') : Response.error())))
+        .catch(() => caches.match(e.request, ohneQuery)
+          /* Nur eine SEITE darf auf eine andere Seite zurueckfallen — ein Skript,
+             das als HTML ankommt, ist ein SyntaxError statt einer Fehlermeldung. */
+          .then((hit) => hit || (e.request.mode === 'navigate' ? caches.match(seitenRueckfall) : Response.error())))
     );
     return;
   }

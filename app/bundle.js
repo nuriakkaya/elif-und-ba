@@ -4910,8 +4910,8 @@ window.SURAHS_DATA = [
 
 ;
 /* ---- app/config.js ---- */
-window.APP_BUILD = "11.8";
-window.APP_VERSION = "Version 11.8 \xB7 14.09.2026";
+window.APP_BUILD = "11.9";
+window.APP_VERSION = "Version 11.9 \xB7 14.09.2026";
 window.GEMEINDE_NAME = "";
 window.APP_URL = "https://elif-be.de";
 window.SUPABASE_URL = "";
