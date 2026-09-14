@@ -133,7 +133,7 @@ async function hardReset() {
   }
 
   /* --- 3) Liegen die Pflichtdateien oben? --- */
-  var files = ['index.html', 'version.json', 'app/config.js', 'netlify.toml', '_redirects', '_headers'];
+  var files = ['index.html', 'version.json', 'app/bundle.js', 'app/config.js', 'netlify.toml', '_redirects', '_headers'];
   for (var j = 0; j < files.length; j++) {
     var rr = await head(files[j]);
     var isHtml = rr ? (rr.headers.get('content-type') || '').indexOf('text/html') >= 0 : false;

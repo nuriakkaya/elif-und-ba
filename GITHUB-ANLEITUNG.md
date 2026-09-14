@@ -32,14 +32,23 @@ Diesen Ordner offen lassen.
 
 1. Auf der leeren Seite steht ein Link **„uploading an existing file"** —
    darauf klicken. (Alternativ: **Add file → Upload files**.)
-2. Im entpackten Ordner **alles markieren** (Strg+A bzw. Cmd+A) — also alle
-   Dateien **und** die Ordner `app`, `vendor`, `netlify`, `assets`, `fonts`.
+2. Im entpackten Ordner **alles markieren** (Cmd+A bzw. Strg+A) — also alle
+   Dateien **und** die Ordner `app`, `vendor`, `netlify`, `assets`, `fonts`,
+   `media`.
 3. Alles in das große Feld im Browser ziehen. Warten, bis die Liste vollständig
-   ist (98 Dateien).
+   ist — so viele, wie das Werkzeug beim Bauen gemeldet hat (zurzeit **73 Dateien**).
 4. Unten auf **Commit changes** klicken.
 
 > Wichtig: Nicht den äußeren Ordner ziehen, sondern **seinen Inhalt**.
 > Nach dem Hochladen muss `index.html` in der Dateiliste ganz oben stehen.
+
+> **Eine Runde genügt.** GitHub nimmt 100 Dateien je Vorgang, und dieses Paket
+> hat zurzeit 73. Die über 700 Aussprachen liegen darin als 19 Bündel — eine Datei je
+> Lektion. Früher waren es einzelne Töne, und das hieß acht Runden Ziehen und
+> Ablegen; wer eine vergaß, hatte stumme Karten, ohne dass die App etwas sagte.
+
+Zum Nachzählen, ob alles oben ist: `/check.html` auf der fertigen Seite zeigt,
+wie viele Töne gefunden wurden.
 
 ## Schritt 5 — Netlify mit GitHub verbinden
 
@@ -58,7 +67,7 @@ Diesen Ordner offen lassen.
 Die neue Adresse öffnen (z. B. `zufallsname-1234.netlify.app`) und dahinter
 **`/check.html`** anhängen. Dort muss oben grün stehen:
 
-> ✅ Alles in Ordnung — Der Klassen-Server läuft (Version 8.6), Speicher: dauerhaft ✓
+> ✅ Alles in Ordnung — Der Klassen-Server läuft, Speicher: dauerhaft ✓
 
 Dann: zurück zur App, **Anmelden**, Namen eintippen — fertig. Im Klassenzimmer
 (Lehrer-Passwort `1907`) erscheint jedes Kind automatisch.
@@ -75,9 +84,13 @@ nicht versehentlich die alte öffnen.
 ## Ab jetzt: Update in 1 Minute
 
 Neue ZIP von mir → entpacken → auf GitHub ins Repository gehen →
-**Add file → Upload files** → Inhalt hineinziehen → **Commit changes**.
+**Add file → Upload files** → hineinziehen → **Commit changes**.
 Netlify baut automatisch neu. Nach ein bis zwei Minuten ist die neue Version
 online; die App holt sie sich beim nächsten Öffnen von selbst.
+
+**Wenn sich nur die App geändert hat und keine Töne**, genügt Runde 1 — die
+Tonordner müssen nur hoch, wenn neue Aufnahmen dazugekommen sind. Ich schreibe
+dir jedes Mal dazu, was sich geändert hat.
 
 ## Wenn etwas klemmt
 
@@ -86,5 +99,6 @@ online; die App holt sie sich beim nächsten Öffnen von selbst.
 - **`/check.html` bleibt rot** → Screenshot davon schicken. Dort steht jede
   geprüfte Adresse mit Statuscode.
 - **GitHub lädt nicht alle Dateien hoch** → die Weboberfläche schafft 100
-  Dateien pro Vorgang; dieses Paket hat bewusst nur 98. Falls doch etwas fehlt,
-  einfach nochmal **Add file → Upload files** für den fehlenden Ordner.
+  Dateien pro Vorgang; dieses Paket bleibt darunter. Falls doch etwas fehlt,
+  einfach nochmal **Add file → Upload files** für den fehlenden Ordner — es
+  schadet nichts, eine Runde zweimal zu machen.

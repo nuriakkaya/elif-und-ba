@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="mhGrund" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#3B2E8F"/>
+      <stop offset=".55" stop-color="#241B62"/>
+      <stop offset="1" stop-color="#150F3D"/>
+    </linearGradient>
+    <linearGradient id="mhNische" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#120C33"/>
+      <stop offset="1" stop-color="#241B62"/>
+    </linearGradient>
+    <linearGradient id="mhGold" x1="0" y1="0" x2="0.25" y2="1">
+      <stop offset="0" stop-color="#FFE39A"/>
+      <stop offset=".45" stop-color="#F5B000"/>
+      <stop offset="1" stop-color="#C98A00"/>
+    </linearGradient>
+    <linearGradient id="mhElif" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFF6DC"/>
+      <stop offset=".55" stop-color="#FFD35C"/>
+      <stop offset="1" stop-color="#F5B000"/>
+    </linearGradient>
+    <radialGradient id="mhLicht" cx="0.5" cy="0.42" r="0.42">
+      <stop offset="0" stop-color="#FFD35C" stop-opacity=".5"/>
+      <stop offset="1" stop-color="#FFD35C" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <g id="grund">
+    <rect width="512" height="512" fill="url(#mhGrund)"/>
+  </g>
+
+  <g id="zeichen">
+    <!-- Die Nische: erst die dunkle Öffnung, dann das goldene Band darum.
+         Beides derselbe Spitzbogen, das innere um die Bandbreite schmaler. -->
+    <path d="M 149.0 322.0 A 165.0 165.0 0 0 1 256.0 167.5 A 165.0 165.0 0 0 1 363.0 322.0 L 363.0 438.0 L 149.0 438.0 Z" fill="url(#mhNische)"/>
+    <ellipse cx="256.0" cy="320" rx="99" ry="122" fill="url(#mhLicht)"/>
+    <path d="M 122.0 322.0 A 192.0 192.0 0 0 1 256.0 139.0 A 192.0 192.0 0 0 1 390.0 322.0 L 390.0 438.0 L 122.0 438.0 Z" fill="url(#mhGold)" fill-rule="evenodd"/>
+    <path d="M 149.0 322.0 A 165.0 165.0 0 0 1 256.0 167.5 A 165.0 165.0 0 0 1 363.0 322.0 L 363.0 438.0 L 149.0 438.0 Z" fill="url(#mhNische)"/>
+    <ellipse cx="256.0" cy="320" rx="99" ry="122" fill="url(#mhLicht)"/>
+
+    <!-- Das Elif als Licht in der Nische — echter Umriss aus Scheherazade -->
+    <g transform="translate(222.83 406.89) scale(0.13822 -0.13822)">
+      <path d="M373 349Q373 309 359.5 249.0Q346 189 326.5 130.0Q307 71 289.5 31.5Q272 -8 263 -8Q250 -8 234.0 -1.0Q218 6 218 15Q218 23 228.5 60.5Q239 98 239 187Q239 226 229.5 302.0Q220 378 205.0 474.5Q190 571 173.0 672.0Q156 773 141.0 863.0Q126 953 116.5 1016.0Q107 1079 107 1098Q107 1139 129.0 1201.5Q151 1264 186.0 1322.5Q221 1381 260 1410Q274 1389 280.0 1360.0Q286 1331 286 1311V1212Z" fill="url(#mhElif)"/>
+    </g>
+
+    <!-- Der Nokta darunter: dasselbe Zeichen wie im anderen Entwurf, damit
+         beide Vorschläge erkennbar zur selben App gehören. -->
+    <rect x="243" y="454" width="26" height="26" rx="7" fill="#F0476A" transform="rotate(45 256 467)"/>
+  </g>
+</svg>

@@ -1,11 +1,23 @@
 <!DOCTYPE html>
-<html lang="de"><head>
+<html lang="de" translate="no" class="notranslate"><head>
 <meta charset="utf-8">
+<!-- Kein Übersetzungs-Angebot von Chrome (10.09.2026): Die App zeigt
+     arabische Schrift neben türkischer Umschrift. Chrome hielt das für
+     eine fremdsprachige Seite und legte über den Unterricht ein Banner
+     "Diese Seite übersetzen?". Übersetzt hätte es die Lesungen ohnehin
+     kaputtgemacht — "eb · ib · üb" ist kein Text, der übersetzt werden
+     darf. Die drei Angaben (html translate, class notranslate, meta)
+     schalten das Angebot in allen Chrome-Fassungen ab. -->
+<meta name="google" content="notranslate">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#6A5AE0">
-<title>Elif & Ba — Koran lernen</title>
+<title>Elif & Ba — Kuran lernen</title>
 <!-- PWA (06.08.2026): App ist installierbar — Manifest, Icons, Service Worker (Registrierung am Seitenende). -->
 <link rel="manifest" href="manifest.webmanifest">
+<!-- Die Zeichnung zuerst: Chrome und Firefox nehmen fürs Tab-Symbol lieber
+     das SVG, es bleibt in jeder Größe scharf. Safari und ältere Browser
+     überspringen sie und nehmen das PNG darunter. -->
+<link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -22,7 +34,7 @@
   src:url('fonts/nunito-latin.woff2') format('woff2'); unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 </style>
 <!-- Arabische Schrift liegt jetzt IM Paket (05.09.2026).
-     Vorher kam sie von Google — im Schulnetz oder offline blieb der Koran-
+     Vorher kam sie von Google — im Schulnetz oder offline blieb der Kuran-
      text dann in einer beliebigen Systemschrift stehen. Scheherazade New
      ist frei lizenziert (OFL) und wird vom Service Worker mitgespeichert. -->
 <style>
@@ -557,6 +569,128 @@ a { color: inherit; text-decoration: none; }
   text-align: left;
 }
 .jump-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-2); }
+
+/* --- ✅ Prüf-Modus (10.09.2026) ---------------------------------------------
+   Bewusst ruhiger und größer als der Rest der App: Hier sitzen keine Kinder,
+   sondern Hocas und Eltern, oft mit dem Handy in der Moschee. Eine Aufnahme
+   je Bildschirm, zwei große Knöpfe, sonst nichts. */
+.pf-seite { max-width: 560px; }
+.pf-leiste { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 2px 2px 8px; }
+.pf-balken { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; margin-bottom: 14px; }
+.pf-balken i { display: block; height: 100%; border-radius: 99px; background: var(--brand); transition: width .25s var(--ease); }
+.pf-karte { padding: 20px 18px; }
+.pf-kopfzeile { font-size: 19px; font-weight: 900; letter-spacing: -.02em; margin-bottom: 8px; }
+.pf-text { font-size: 14px; line-height: 1.55; margin: 0 0 10px; }
+.pf-lektion { font-size: 12.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+/* Selbst sprechen auf der Wiederholungskarte (11.09.2026, Bauplan 10).
+   Grosse Flaechen: Das benutzen Sechsjaehrige mit dem Daumen auf einem
+   Tablet, das flach auf dem Tisch liegt. */
+.qp-sprech { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 4px 0 12px; }
+.qp-sprechknopf { border: 0; border-radius: 999px; padding: 14px 28px; font-size: 17px; font-weight: 800;
+  background: var(--accent); color: #fff; cursor: pointer; box-shadow: 0 6px 16px rgba(46,36,112,.18); }
+.qp-sprechknopf.laeuft { background: #C0392B; animation: qpPuls 1.1s ease-in-out infinite; }
+@keyframes qpPuls { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+@media (prefers-reduced-motion: reduce) { .qp-sprechknopf.laeuft { animation: none; } }
+.qp-sprechlauf { font-size: 13.5px; font-weight: 700; color: #C0392B; }
+.qp-sprechvergleich { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.qp-sprechteil { border: 1px solid var(--line); background: var(--card); color: var(--ink);
+  border-radius: 999px; padding: 11px 20px; font-size: 15px; font-weight: 700; cursor: pointer; }
+.qp-sprechneu { opacity: .8; }
+.qp-sprechfehler { font-size: 12.5px; color: var(--muted); text-align: center; max-width: 320px; }
+/* Herkunft eines Tons (11.09.2026): Die 47 Aufnahmen aus dem Video sind
+   rechnerisch zugeordnet — der Pruefer soll das sehen, bevor er urteilt. */
+.pf-herkunft { margin: 6px 0 2px; padding: 8px 10px; border-radius: 10px; line-height: 1.4;
+  font-size: 12.5px; font-weight: 700; background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--ink); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); }
+.pf-filter { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 0 2px 10px; }
+.pf-filter .btn.ist-an { background: var(--accent); color: #fff; }
+.pf-filter-hinweis { font-size: 12px; }
+.pf-autoton { display: flex; align-items: center; gap: 8px; padding: 2px 2px 10px;
+  font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer; }
+.pf-autoton input { width: 18px; height: 18px; accent-color: var(--accent); }
+.pf-arabisch {
+  font-family: 'Scheherazade New', 'Noto Naskh Arabic', serif;
+  font-size: 46px; line-height: 1.5; text-align: center; color: var(--brand-ink);
+  margin: 10px 0 2px; word-break: break-word;
+}
+.theme-dark .pf-arabisch { color: var(--brand-soft-2); }
+.pf-lesung { text-align: center; font-size: 17px; font-weight: 800; color: var(--ink-soft); margin-bottom: 14px; }
+.pf-hoeren { margin-bottom: 14px; font-size: 15.5px; font-weight: 800; }
+.pf-urteil { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pf-knopf {
+  border: 2px solid var(--line-2); background: var(--surface); border-radius: 14px;
+  padding: 16px 10px; font-size: 15.5px; font-weight: 900; cursor: pointer; color: var(--ink);
+  transition: background .12s var(--ease), border-color .12s var(--ease), color .12s var(--ease);
+}
+.pf-gut:hover { border-color: var(--success); color: var(--success-3); }
+.pf-gut.ist-an { background: var(--success-bg); border-color: var(--success); color: var(--success-3); }
+.pf-anders:hover { border-color: var(--gold); color: var(--gold-3); }
+.pf-anders.ist-an { background: var(--gold-soft); border-color: var(--gold); color: var(--gold-3); }
+.pf-anders-block { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+.pf-feld { display: block; margin-bottom: 12px; }
+.pf-feld > span { display: block; font-size: 13px; font-weight: 800; margin-bottom: 5px; color: var(--ink-soft); }
+.pf-feld input, .pf-feld textarea {
+  width: 100%; padding: 11px 12px; border-radius: 11px; border: 1px solid var(--line-2);
+  background: var(--surface); color: var(--ink); font-size: 15px; font-family: inherit; resize: vertical;
+}
+.pf-feld input:focus, .pf-feld textarea:focus { outline: 2px solid var(--brand); outline-offset: 1px; }
+.pf-mikro { display: flex; gap: 8px; flex-wrap: wrap; }
+.pf-laeuft { margin-top: 9px; font-weight: 800; font-size: 13.5px; color: var(--rose); }
+.pf-fehler { margin-top: 9px; font-size: 13px; font-weight: 700; color: var(--rose-3); }
+.pf-navi { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 14px; }
+.pf-zaehler { font-size: 13px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.pf-fuss { display: grid; gap: 9px; margin-top: 18px; }
+.pf-fuss .pf-text { text-align: center; margin: 0; }
+@media (max-width: 560px) {
+  .pf-arabisch { font-size: 38px; }
+  .pf-knopf { padding: 14px 8px; font-size: 14.5px; }
+}
+
+/* --- Weitermachen ganz oben (10.09.2026) ---------------------------------
+   Die Reihe ist der erste Griff auf der Startseite. Drei Zustände:
+   die Lektion, an der man gerade ist (hervorgehoben, mit Marke), die
+   offenen davor und danach (normal), und die noch verschlossenen (blass,
+   nicht anklickbar). Die Karten sind schmaler als früher — es sollen
+   mehrere gleichzeitig zu sehen sein, damit man den Verlauf erfasst. */
+.weiter-kopf { margin: 2px 0 10px; }
+/* padding-top, weil overflow-x:auto auch oben abschneidet — die Marke
+   „Du bist hier" ragt über den Kartenrand hinaus und wäre sonst weg. */
+.weiter-reihe { grid-auto-columns: 268px; padding-top: 11px; }
+.jump-card { position: relative; }
+.jump-name { font-weight: 800; font-size: 15.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.jump-sub { font-size: 12.5px; line-height: 1.35; }
+.jump-card.ist-dran {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px var(--brand-soft-2), var(--shadow-2);
+}
+.jump-marke {
+  position: absolute; top: -9px; right: 12px;
+  background: var(--brand); color: var(--auf-akzent, #fff);
+  font-size: 11px; font-weight: 900; letter-spacing: .02em;
+  padding: 3px 9px; border-radius: 999px; white-space: nowrap;
+}
+.jump-card.ist-zu { opacity: .55; cursor: default; }
+.jump-card.ist-zu:hover { transform: none; box-shadow: none; }
+.ring-zu { display: grid; place-items: center; }
+.ring-zu .label { font-size: 20px; }
+
+/* Sprachwahl auf der Startseite */
+.sprach-pillen { display: flex; gap: 6px; margin-top: 8px; }
+.sprach-pille {
+  border: 1px solid var(--line-2); background: var(--surface);
+  color: var(--ink-soft); font-weight: 800; font-size: 12.5px;
+  padding: 4px 11px; border-radius: 999px; cursor: pointer;
+  transition: background .12s var(--ease), color .12s var(--ease), border-color .12s var(--ease);
+}
+.sprach-pille:hover { border-color: var(--brand); color: var(--brand); }
+.sprach-pille.ist-an { background: var(--brand); border-color: var(--brand); color: var(--auf-akzent, #fff); }
+.sprach-pillen.ist-kompakt { gap: 4px; margin: 0; flex: 0 0 auto; }
+.sprach-pillen.ist-kompakt .sprach-pille { padding: 5px 9px; font-size: 12px; letter-spacing: .04em; }
+
+@media (max-width: 560px) {
+  .weiter-reihe { grid-auto-columns: 236px; }
+  .jump-name { font-size: 14.5px; }
+}
 
 .ring {
   width: 56px; height: 56px;
@@ -1481,7 +1615,7 @@ a { color: inherit; text-decoration: none; }
 .streak-title { font-family: Fraunces, serif; font-weight: 900; font-size: 34px; }
 .streak-week { display: flex; gap: 14px; }
 
-/* ---- Koran-Modul (Elif & Ba Fusion, app/quran.js) ---- */
+/* ---- Kuran-Modul (Elif & Ba Fusion, app/quran.js) ---- */
 .question-card .qtext-arabic, .qtext-arabic { font-family: 'Scheherazade New', serif; font-size: 46px; line-height: 2; direction: rtl; text-align: center; font-weight: 700; }
 .deck-card.locked { position: relative; opacity: .55; cursor: not-allowed; }
 .deck-card.locked .deck-lock { position: absolute; top: 10px; right: 12px; font-size: 17px; }
@@ -1522,14 +1656,24 @@ a { color: inherit; text-decoration: none; }
    Labelbalken über weißer Karte mit dickem Navy-Rand, "Deutsch"-Antwortpanel,
    kursive Hinweisbox, Versal-Buttons, JA/VAGE/NEIN. Der Vollbild-Look
    (hellblauer Verlauf, navy Topbar, grüne Fortschrittslinie) hängt an
-   .quiz-shell.qp-skin und gilt für die Koran-Stapel. */
+   .quiz-shell.qp-skin und gilt für die Kuran-Stapel. */
 .qp-card { padding: 0 !important; background: transparent !important; border: none !important; box-shadow: none !important; }
 .qp-cardlabel { background: var(--brand); color: #fff; border-radius: 10px 10px 0 0; padding: 8px 14px; font-size: 13.5px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; letter-spacing: .01em; }
 .qp-cardlabel-slim { border-radius: 10px 10px 0 0; }
 .qp-labelicons { display: flex; align-items: center; gap: 8px; }
 .qp-cardlabel .qtag { background: rgba(255,255,255,.16); color: #fff; border: none; font-size: 11px; padding: 2px 9px; border-radius: 999px; }
-.qp-spk-mini { background: rgba(255,255,255,.16); border: none; color: #fff; border-radius: 7px; font-size: 13px; padding: 3px 9px; cursor: pointer; }
-.qp-spk-mini:hover { background: rgba(255,255,255,.3); }
+/* Der Nochmal-hoeren-Knopf (13.09.2026, Nuri: „der kann gerne ein bisschen
+   sichtbarer sein"): vorher 13 px in der Farbe des Balkens, jetzt eine weisse
+   Pille mit Schrift und einem leisen Puls, der nach zwei Runden aufhoert. */
+.qp-spk-mini { background: #fff; border: none; color: var(--brand); border-radius: 999px; font-size: 16px; font-weight: 900;
+  padding: 7px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-family: inherit;
+  box-shadow: 0 3px 0 rgba(0,0,0,.18), 0 0 0 0 rgba(255,255,255,.7); animation: spk-puls 1.6s ease-out 2; }
+.qp-spk-mini:hover { background: #fff; transform: translateY(1px); box-shadow: 0 2px 0 rgba(0,0,0,.18); }
+.qp-spk-mini:active { transform: translateY(3px); box-shadow: none; }
+.qp-spk-mini .spk-wort { font-size: 13px; }
+@keyframes spk-puls { 0% { box-shadow: 0 3px 0 rgba(0,0,0,.18), 0 0 0 0 rgba(255,255,255,.75); } 100% { box-shadow: 0 3px 0 rgba(0,0,0,.18), 0 0 0 14px rgba(255,255,255,0); } }
+@media (prefers-reduced-motion: reduce) { .qp-spk-mini { animation: none; } }
+@media (max-width: 420px) { .qp-spk-mini .spk-wort { display: none; } .qp-spk-mini { padding: 7px 11px; } }
 .qp-cardbody { background: #fff; border: 2.5px solid var(--brand); border-top: none; border-radius: 0 0 10px 10px; padding: 22px 16px; min-height: 150px; display: grid; place-items: center; }
 .qp-cardbody .qtext { margin: 0; }
 .qp-answrap { margin-top: 14px; }
@@ -1548,7 +1692,7 @@ a { color: inherit; text-decoration: none; }
 .qp-rate-ja { background: var(--success); }
 .qp-rate-vage { background: var(--gold); color: #5a4508; }
 .qp-rate-nein { background: var(--rose); }
-/* Vollbild-Skin für Koran-Stapel */
+/* Vollbild-Skin für Kuran-Stapel */
 .quiz-shell.qp-skin { background: linear-gradient(172deg, var(--brand-soft-2) 0%, var(--bg) 100%); min-height: 100vh; }
 .qp-skin .quiz-progress { background: rgba(255,255,255,.35); height: 5px; }
 .qp-skin .quiz-progress .bar { background: var(--success); }
@@ -1633,8 +1777,10 @@ header.topbar { padding-top: max(12px, env(safe-area-inset-top)); }
 @keyframes teachPop { from { transform: scale(.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .qp-teachtitle { display: inline-block; background: var(--success-bg); color: var(--success-3); font-weight: 800; font-size: 13px; padding: 4px 12px; border-radius: 999px; }
 .qp-teachname { font-weight: 900; font-size: 26px; color: var(--brand); letter-spacing: .01em; }
-.qp-teachspk { border: none; background: var(--accent-soft); color: var(--brand); font-family: inherit; font-weight: 800; font-size: 13px; border-radius: 999px; padding: 8px 16px; cursor: pointer; transition: background .12s; }
-.qp-teachspk:hover { background: var(--accent-soft); }
+.qp-teachspk { border: none; background: var(--brand); color: #fff; font-family: inherit; font-weight: 900; font-size: 15px; border-radius: 999px; padding: 12px 22px; cursor: pointer;
+  box-shadow: 0 4px 0 var(--brand-3, #4b3fb0); transition: transform .08s; }
+.qp-teachspk:hover { background: var(--brand); }
+.qp-teachspk:active { transform: translateY(4px); box-shadow: none; }
 
 /* Rundenende: Fußleiste über der Home-Geste, Inhalt nicht abgeschnitten */
 .roundend .quiz-stage { padding-bottom: 130px; }
@@ -1807,7 +1953,7 @@ header.topbar { padding-top: max(12px, env(safe-area-inset-top)); }
    1) "Lernen"-Modal ragte rechts raus: Grid-Kinder (mode-card mit
       86-px-Icon) konnten nicht schrumpfen und sprengten die Modal-
       Breite. minmax(0,1fr) + min-width:0 + Overflow-Schutz.
-   2) Karten-Liste im Stapel: schöne Zeilen für Koran-Karten mit
+   2) Karten-Liste im Stapel: schöne Zeilen für Kuran-Karten mit
       großem Buchstaben, Name und Prozent-Ring (siehe main.js).
    ================================================================== */
 .modal { max-width: min(760px, calc(100vw - 20px)); overflow-x: hidden; }
@@ -1820,7 +1966,7 @@ header.topbar { padding-top: max(12px, env(safe-area-inset-top)); }
 .modal .mode-card { min-width: 0; }
 .modal .modal-body > div[style*="grid"] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 
-/* Koran-Kartenzeile: Buchstabe groß · Name · Fortschritts-Ring mit % */
+/* Kuran-Kartenzeile: Buchstabe groß · Name · Fortschritts-Ring mit % */
 .qcard-row { display: flex; align-items: center; gap: 14px; background: var(--surface, #fff);
   border: 1px solid var(--line, #ECEBE6); border-radius: 16px; padding: 10px 14px; }
 .qcard-ar { font-family: 'Scheherazade New', serif; font-weight: 700; font-size: 30px; line-height: 1.7;
@@ -1874,7 +2020,12 @@ header.topbar { padding-top: max(12px, env(safe-area-inset-top)); }
 
 /* ---- Regel-Intro-Screens (Video "Kurze Vokale") ---- */
 .qi-wrap { position: fixed; inset: 0; z-index: 200; background: linear-gradient(165deg, var(--brand-3) 0%, var(--brand-2) 100%); color: #fff; overflow-y: auto; display: flex; }
-.qi-inner { max-width: 560px; width: 100%; margin: 0 auto; padding: 18px 18px 24px; display: flex; flex-direction: column; min-height: 100%; }
+/* Die Einführung stand oben und der Knopf ganz unten, dazwischen eine große
+   leere Fläche — auf jedem Bildschirm, auf dem der Text kürzer ist als die
+   Seite. Das ist der erste Bildschirm jeder Lektion. (11.09.2026)
+   Jetzt steht alles zusammen in der Mitte; ist der Text länger als die
+   Seite, füllt er sie wie vorher und scrollt. */
+.qi-inner { max-width: 560px; width: 100%; margin: 0 auto; padding: 18px 18px 24px; display: flex; flex-direction: column; justify-content: center; min-height: 100%; }
 .qi-x { background: none; border: none; color: #FF6B81; font-size: 22px; font-weight: 800; cursor: pointer; padding: 6px; }
 .qi-title { text-align: center; font-size: 22px; font-weight: 700; margin: 4px 0 16px; }
 .qi-title small { font-weight: 400; font-size: 13px; opacity: .8; }
@@ -1915,6 +2066,9 @@ header.topbar { padding-top: max(12px, env(safe-area-inset-top)); }
 .sur-covernote { font-size: 12px; color: var(--muted, var(--ink-mute)); font-weight: 600; }
 .sur-ayah-tr { color: var(--brand); font-weight: 700; font-size: 14px; margin-top: 4px; }
 .sur-ayah-de { color: var(--muted, var(--ink-mute)); font-size: 13.5px; margin-top: 2px; }
+/* Diyanet uebersetzt manche Verse zusammen ("2-4"). Die Spanne steht dann
+   in derselben Klammerform wie im gedruckten Meal vor dem Satz. */
+.sur-meal-spanne { color: var(--gold, #c9a227); font-weight: 700; margin-inline-end: 5px; }
 .sur-versnum { background: var(--accent-soft); color: var(--brand); border-radius: 999px; font-size: 11px; font-weight: 800; padding: 2px 10px; }
 .sur-play { border: none; background: var(--accent-soft); color: var(--brand); border-radius: 8px; width: 36px; height: 30px; cursor: pointer; font-size: 13px; }
 .sur-play:hover { background: var(--brand); color: #fff; }
@@ -2171,7 +2325,7 @@ header.topbar { padding-top: max(12px, env(safe-area-inset-top)); }
 .hz-reward-xp { display: inline-block; background: var(--success-bg); color: #14603E; font-weight: 900; font-size: 26px; border-radius: 999px; padding: 6px 22px; margin: 6px 0 4px; }
 .hz-reward-sub { font-size: 14px; line-height: 1.7; margin-top: 8px; }
 
-/* ---- Fortschritt: Koran-Weg-Kacheln (P4) ---- */
+/* ---- Fortschritt: Kuran-Weg-Kacheln (P4) ---- */
 .qpr-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
 .qpr-tile { background: var(--accent-soft); border-radius: 9px; padding: 6px 2px; text-align: center; }
 .qpr-tile.is-done { background: var(--success-bg); }
@@ -2255,6 +2409,23 @@ header.topbar { padding-top: max(12px, env(safe-area-inset-top)); }
 .qp-btile { border: none; background: #fff; border-radius: 12px; padding: 2px 14px; font-family: 'Scheherazade New', 'Noto Naskh Arabic', serif;
   font-size: 32px; font-weight: 700; color: var(--brand); cursor: pointer; box-shadow: 0 5px 12px rgba(46,36,112,.15); transition: transform .1s, opacity .15s; }
 .qp-btile:active { transform: scale(.95); }
+
+/* --- Talim-Reihen groesser (10.09.2026) ------------------------------------
+   Bei den Reihen unterscheiden sich Kachel und Falle nur durch EIN winziges
+   Zeichen: „اُتْ" (üt, mit Cezim) gegen „اُتَ" (üte, ohne). Nachgemessen, wie
+   viele Bildpunkte diesen Unterschied ausmachen:
+
+       23 px Schrift  ->  31 Punkte     (ein Fleck von etwa 5 x 6)
+       27 px          ->  41
+       32 px          ->  50
+       38 px          ->  79
+
+   Der ANTEIL an der Tinte bleibt fast gleich (15–19 %), die absolute Flaeche
+   aber nicht — und die entscheidet, ob ein Kind am Tablet den Unterschied
+   ueberhaupt sieht. Deshalb sind Reihen-Kacheln groesser als Wort-Kacheln.
+   Sie sind auch kuerzer (drei Zeichen statt sechs), es ist also Platz da. */
+.qp-btile.ist-reihe { font-size: 42px; padding: 4px 16px; }
+.qp-slot.ist-reihe { font-size: 38px; min-width: 58px; height: 62px; }
 .qp-btile.is-used { opacity: .28; pointer-events: none; }
 .qp-btile.is-wob { animation: pairShake .4s; background: #FBE9E9; }
 .qp-skin .stage-inner:has(.qp-buildslots) .qp-cardbody { min-height: 0; padding: 14px; }
@@ -2266,6 +2437,8 @@ header.topbar { padding-top: max(12px, env(safe-area-inset-top)); }
   .qp-pair-ar { font-size: 23px; padding: 3px 7px; }
   .qp-slot { min-width: 40px; height: 46px; font-size: 26px; }
   .qp-btile { font-size: 27px; padding: 2px 11px; }
+  .qp-btile.ist-reihe { font-size: 34px; padding: 3px 13px; }
+  .qp-slot.ist-reihe { font-size: 31px; min-width: 48px; height: 54px; }
   .qp-buildslots { min-height: 56px; padding: 7px; gap: 6px; }
 }
 @media (max-height: 645px) {
@@ -2503,6 +2676,16 @@ header.topbar { padding-top: max(12px, env(safe-area-inset-top)); }
   border-radius: var(--r-pill); padding: 5px 11px; font-size: 12.5px; font-weight: 900; }
 
 .woche { display: flex; gap: 5px; margin: 12px 0 14px; }
+/* Lernzeit-Karte (13.09.2026) — Minuten heute, Balken, Nachweis, Woche. */
+.lz-karte { padding: 18px; }
+.lz-gross { margin-top: 8px; line-height: 1; }
+.lz-gross b { font-size: 44px; font-weight: 900; letter-spacing: -.02em; }
+.lz-gross span { font-size: 16px; font-weight: 800; color: var(--ink-mute); margin-left: 4px; }
+.lz-balken { margin-top: 10px; }
+.lz-nachweis { margin: 10px 0 12px; padding: 10px 12px; border-radius: 14px; font-weight: 800; font-size: 14px;
+  background: var(--bg-2); color: var(--ink); }
+.lz-nachweis.ist-fertig { background: var(--success-soft, #E7F7EE); color: var(--success, #1B8A5A); }
+.ziel-pill.zeit.ist-an { background: rgba(255,255,255,.34); }
 .w-tag { flex: 1; text-align: center; }
 .w-nm { display: block; font-size: 10.5px; font-weight: 800; color: var(--ink-mute); letter-spacing: .04em; }
 .w-pk { display: grid; place-items: center; width: 100%; max-width: 38px; aspect-ratio: 1; margin: 4px auto 0;
@@ -3332,9 +3515,21 @@ if (/[?&]pruef=1/.test(location.search)) (function () {
   window.addEventListener('unhandledrejection', function (e) { errs.push('Promise: ' + String(e.reason && e.reason.message || e.reason)); });
   setTimeout(function () {
     var w = window.innerWidth, breit = [];
+    /* Was IN einem seitlich scrollbaren Kasten steht, darf hinausragen — das
+       ist ja der Zweck (die Kachelreihe „Weitermachen" etwa). Gemeldet wird
+       nur, was wirklich aus dem Bild laeuft. (11.09.2026: Ohne diese
+       Unterscheidung meldete die Pruefung 25 Fundstellen, von denen keine
+       einzige ein Fehler war — und wurde damit nutzlos.) */
+    var scrollbar = function (el) {
+      for (var a = el.parentElement; a && a !== document.body; a = a.parentElement) {
+        var st = getComputedStyle(a);
+        if ((st.overflowX === 'auto' || st.overflowX === 'scroll') && a.scrollWidth > a.clientWidth + 1) return true;
+      }
+      return false;
+    };
     document.querySelectorAll('body *').forEach(function (el) {
       var r = el.getBoundingClientRect();
-      if (r.width > 0 && (r.right > w + 1 || r.left < -1)) breit.push((el.className && String(el.className).slice(0, 40) || el.tagName) + ' [' + Math.round(r.left) + '..' + Math.round(r.right) + ']');
+      if (r.width > 0 && (r.right > w + 1 || r.left < -1) && !scrollbar(el)) breit.push((el.className && String(el.className).slice(0, 40) || el.tagName) + ' [' + Math.round(r.left) + '..' + Math.round(r.right) + ']');
     });
     var pre = document.createElement('pre'); pre.id = 'pruef';
     var rr = function (sel) { var el = document.querySelector(sel); if (!el) return null; var r = el.getBoundingClientRect(); return [Math.round(r.top), Math.round(r.height)]; };
@@ -3343,13 +3538,13 @@ if (/[?&]pruef=1/.test(location.search)) (function () {
   }, 4000);
 })();
 </script>
-<script src="vendor/react.js?v=11.0"></script>
-<script src="vendor/react-dom.js?v=11.0"></script>
-<script src="vendor/qrcode.min.js?v=11.0"></script>
+<script src="vendor/react.js?v=11.7"></script>
+<script src="vendor/react-dom.js?v=11.7"></script>
+<script src="vendor/qrcode.min.js?v=11.7"></script>
 
 <!-- Ein einziges, fertig übersetztes Bündel (siehe build.mjs). Die lesbaren
      Quelldateien liegen weiter in app/ — sie werden nur nicht mehr geladen. -->
-<script src="app/bundle.js?v=11.0"></script>
+<script src="app/bundle.js?v=11.7"></script>
 <script>
 /* ------------------------------------------------------------------
    FRISCHE-WÄCHTER (09.08.2026). Ursache des Dauerärgers "es hat sich
@@ -3403,6 +3598,129 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
 window.PWAInstall = { deferred: null, prompt: function () { if (this.deferred) { this.deferred.prompt(); this.deferred = null; return true; } return false; } };
 window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); window.PWAInstall.deferred = e; });
 
+/* ============================================================================
+   SPRACHPROBE  —  index.html?pruef=1&sprache=1
+   ---------------------------------------------------------------------------
+   Sucht deutschen Text dort, wo er stört: auf dem Bildschirm.
+
+   Bisher wurde im QUELLTEXT gezählt (tools/pruefe-deutsch.mjs). Das findet,
+   was nicht in _t steht — aber es meldet auch alles, was auf Bildschirmen
+   liegt, die es seit dem Planwechsel gar nicht mehr gibt, und es findet
+   NICHT, was zwar in _t steht, aber im Wörterbuch fehlt.
+
+   Diese Probe geht umgekehrt vor: App auf Türkisch, durch die Navigation
+   klicken, jeden sichtbaren Text gegen das Wörterbuch halten.
+
+     · Steht der Text dort als SCHLÜSSEL (also als deutscher Urtext), dann
+       greift an dieser Stelle kein _t.
+     · Steht er nirgends und trägt deutsche Merkmale, ist er verdächtig.
+
+   EIN FALLSTRICK, in den ich selbst getappt bin: Der erste Durchlauf klickte
+   auch die Sprachpillen DE|TR mit — und stellte damit auf Deutsch um. Er
+   meldete danach 99 Funde, die alle richtig waren. Die Pillen sind deshalb
+   ausgenommen.
+
+   Ergebnis in <pre id="sprachprobe">.
+============================================================================ */
+if (/[?&]pruef=1/.test(location.search) && /[?&]sprache=1/.test(location.search)) (function () {
+  function lauf() {
+    var W = window.SPRACHE_TR || {};
+    if (!window.Sprache || window.Sprache.code !== 'tr') {
+      try { localStorage.setItem('eb_sprache_v1', 'tr'); } catch (e) {}
+      location.replace(location.pathname + location.search);
+      return;
+    }
+    var werte = {}, schluessel = {};
+    for (var k in W) { schluessel[k] = 1; werte[String(W[k])] = 1; }
+    var verdacht = {}, DE = /ß|ä|\b(und|der|die|das|nicht|mit|für|ist|wird|kann|eine|oder|noch|schon|hier|alle|kein|von|zum|zur|aus|über|nach|vor|durch|ohne|gegen|lesen|hören|Karten|Stapel|Fragen|Frage|Farbe|Erstellen|dabei|geschafft|Aufnahme|Lehrkraft|Lektion)\b/;
+    var sicht = function (e) { return e && e.offsetWidth > 0; };
+    var istSprache = function (e) {
+      return (e.closest && e.closest('.sprach-pillen')) || /^(DE|TR|Deutsch|Türkçe)$/.test(e.textContent.trim());
+    };
+    function sammeln(wo) {
+      var alle = document.querySelectorAll('body *');
+      for (var i = 0; i < alle.length; i++) {
+        var el = alle[i];
+        if (el.children.length || !sicht(el)) continue;
+        var t = (el.innerText || '').replace(/\s+/g, ' ').trim();
+        if (!t || t.length < 4 || t.length > 220) continue;
+        if (/^[\d\s%·/.,:+-]+$/.test(t) || /[\u0600-\u06FF]/.test(t)) continue;
+        if (werte[t]) continue;
+        if (schluessel[t] && W[t] !== t) { verdacht['unübersetzt · ' + wo + ' · ' + t] = 1; continue; }
+        if (DE.test(t)) verdacht['verdächtig · ' + wo + ' · ' + t] = 1;
+      }
+      var attr = document.querySelectorAll('[title],[placeholder],[aria-label]');
+      for (var j = 0; j < attr.length; j++) {
+        var namen = ['title', 'placeholder', 'aria-label'];
+        for (var n = 0; n < namen.length; n++) {
+          var a = (attr[j].getAttribute(namen[n]) || '').trim();
+          if (a.length < 4 || a.length > 220 || werte[a]) continue;
+          if (schluessel[a] && W[a] !== a) verdacht['unübersetzt · ' + wo + '[' + namen[n] + '] · ' + a] = 1;
+          else if (DE.test(a)) verdacht['verdächtig · ' + wo + '[' + namen[n] + '] · ' + a] = 1;
+        }
+      }
+    }
+    var nav = [], roh = document.querySelectorAll('.sidebar button, nav button, aside button');
+    for (var i = 0; i < roh.length; i++) if (sicht(roh[i]) && !istSprache(roh[i])) nav.push(roh[i]);
+    var k2 = 0;
+    (function weiter() {
+      if (k2 >= nav.length) {
+        var pre = document.createElement('pre');
+        pre.id = 'sprachprobe';
+        pre.textContent = JSON.stringify(Object.keys(verdacht), null, 1);
+        document.body.appendChild(pre);
+        return;
+      }
+      var b = nav[k2], wo = b.textContent.trim().slice(0, 14);
+      b.click(); k2++;
+      setTimeout(function () { sammeln(wo); tiefer(wo, weiter); }, 900);
+    })();
+
+    /* AUCH DIE MODULE ÖFFNEN, NICHT NUR DIE NAVIGATION. (11.09.2026)
+
+       Der erste Bauplan lief nur die Navigation ab und meldete danach null
+       Funde. Von Hand geöffnet stand auf „Sureleri oku ve dinle" trotzdem
+       „113 Al-Falaq · Das Morgengrauen · 5 ayet" — die Probe war nie dort.
+
+       Die Modul-Einstiege stehen in der Werkzeugleiste der Stapelseite
+       (`.werkzeuge`): Auswendiglernen, Unendlich-XP, Suren, Buchstaben-
+       Übersicht. Die werden jetzt einzeln geöffnet und wieder verlassen.
+       Nur diese eine Leiste — wahllos Knöpfe zu drücken hieße, Aufnahmen zu
+       starten und Stapel anzulegen. */
+    function tiefer(wo, fertig) {
+      var leiste = document.querySelector('.werkzeuge');
+      if (!leiste) return fertig();
+      var knoepfe = [];
+      var alle = leiste.querySelectorAll('button, a');
+      for (var i = 0; i < alle.length; i++) if (sicht(alle[i])) knoepfe.push(alle[i]);
+      var n = 0;
+      (function nochEins() {
+        if (n >= knoepfe.length) return fertig();
+        var k = knoepfe[n], name = k.textContent.trim().slice(0, 16);
+        n++;
+        k.click();
+        setTimeout(function () {
+          sammeln(wo + ' › ' + name);
+          /* zurück auf die Stapelseite, sonst ist die Leiste weg */
+          var zurueck = null, b2 = document.querySelectorAll('.sidebar button, nav button, aside button');
+          for (var j = 0; j < b2.length; j++) if (b2[j] === nav[2]) zurueck = b2[j];
+          if (zurueck) zurueck.click();
+          setTimeout(function () {
+            leiste = document.querySelector('.werkzeuge');
+            knoepfe = [];
+            if (leiste) {
+              var neu2 = leiste.querySelectorAll('button, a');
+              for (var m = 0; m < neu2.length; m++) if (sicht(neu2[m])) knoepfe.push(neu2[m]);
+            }
+            nochEins();
+          }, 700);
+        }, 1400);
+      })();
+    }
+  }
+  setTimeout(lauf, 3000);
+})();
+
 /* Knopf "App aktualisieren" (Einstellungen / Verbindung prüfen). */
 window.forceAppUpdate = function () {
   var jobs = [];
@@ -3414,6 +3732,221 @@ window.forceAppUpdate = function () {
   var go = function () { location.replace(location.pathname + '?u=' + Date.now()); };
   Promise.all(jobs).then(go, go);
 };
+</script>
+
+<script>
+/* ============================================================================
+   PROBERUNDE  —  index.html?pruef=1&spiel=1
+   ---------------------------------------------------------------------------
+   Spielt eine Runde von selbst durch und schreibt das Ergebnis in
+   <pre id="probe">. Gedacht ist das gegen genau einen Fehlertyp, und der hat
+   in der Nacht zum 11.09.2026 Geld gekostet:
+
+     `versucheRef` war in der falschen Komponente angelegt. Der Bau lief, das
+     Buendel lief, alle Sandkasten-Pruefungen liefen — und trotzdem blieb
+     JEDE beantwortete Karte stehen, weil der Auswerter in einen
+     ReferenceError lief. Gemerkt habe ich es erst, als ich die Konsole
+     geoeffnet habe. Ein Kind haette es sofort gemerkt.
+
+   Diese Proberunde tippt Karte fuer Karte irgendeine Antwort an und sieht
+   nach, ob die Runde WEITERGEHT. Ob die Antwort richtig war, ist egal — der
+   Fehler, um den es geht, haelt die Runde ganz an.
+
+   Ergebnis in <pre id="probe">:
+     karten     wie viele Karten durchgelaufen sind
+     fehler     alles, was in der Konsole aufgeschlagen ist
+     ende       ob das Rundenende erreicht wurde
+     stehen     ob die Runde irgendwo haengen geblieben ist   ← der Ernstfall
+============================================================================ */
+if (/[?&]pruef=1/.test(location.search) && /[?&]spiel=1/.test(location.search)) (function () {
+  var fehler = [];
+  window.addEventListener('error', function (e) { fehler.push(String(e.message || e)); });
+  window.addEventListener('unhandledrejection', function (e) { fehler.push('Promise: ' + String((e.reason && e.reason.message) || e.reason)); });
+
+  var karten = 0, ende = false, stehen = null, letzte = '', gleich = 0;
+  /* Wie viele Karten hoechstens — &karten=18 macht den Durchlauf kuerzer,
+     wenn alle 17 Lektionen nacheinander drankommen. */
+  var MAX = parseInt((/[?&]karten=(\d+)/.exec(location.search) || [])[1] || '40', 10);
+
+  function sichtbar(el) { return el && el.offsetWidth > 0 && el.offsetHeight > 0 && !el.disabled; }
+  function text() { var q = document.querySelector('.quiz-shell'); return q ? q.innerText.slice(0, 400) : document.body.innerText.slice(0, 400); }
+  function tippe() {
+    var q = document.querySelector('.quiz-shell');
+    /* Solange die Runde noch nicht laeuft, ist der Weg dorthin gemeint: die
+       Modus-Auswahl („Wie willst du lernen?") steht als Fenster davor, und
+       deren Hauptknopf heisst je nach Sprache anders. Gesucht wird deshalb
+       der erste hervorgehobene Knopf ueber die volle Breite. */
+    if (!q) {
+      var start = [].slice.call(document.querySelectorAll('.qi-start, .btn-primary.btn-full, .btn-primary.btn-lg, .btn-primary, .qp-btn')).filter(sichtbar);
+      if (start.length) { start[0].click(); return false; }
+      return false;
+    }
+    /* „Verbinde die Paare" braucht ZWEI Klicks, einen je Spalte. Ein einfaches
+       „nimm den ersten Knopf" bleibt dort stehen — beim ersten Lauf genau so
+       passiert, nach sechs Karten. Das ist kein Fehler der App, sondern einer
+       der Proberunde gewesen. */
+    var spalten = [].slice.call(q.querySelectorAll('.qp-paircol'));
+    if (spalten.length >= 2) {
+      var links = [].slice.call(spalten[0].querySelectorAll('.qp-pair')).filter(sichtbar);
+      var rechts = [].slice.call(spalten[1].querySelectorAll('.qp-pair')).filter(sichtbar);
+      if (links.length && rechts.length) {
+        links[0].click();
+        setTimeout(function () { rechts[0].click(); }, 120);
+        return true;
+      }
+    }
+    /* Reihenfolge nach Fragetyp. `.qp-rate` ist die Selbsteinschaetzung
+       („Ja · Vage · Nein") der Abruf-Karten — ohne sie bleibt die Probe in
+       der Şedde-Tafel nach fuenf Karten stehen. Auch das war ein Mangel der
+       Probe, nicht der App. */
+    /* `.qi-start` ist „Lernen beginnen" auf der Einfuehrungsseite, die seit
+       dem 11.09.2026 beim ERSTEN Betreten einer Lektion von selbst aufgeht.
+       Ohne sie bleibt die Probe gleich auf der ersten Seite stehen. */
+    var kandidaten = ['.qi-start', 'button.option:not(.is-disabled)', '.qp-rate', '.qp-btn', '.btn-primary', 'button.tf-btn', '.qp-tile', '.order-option'];
+    for (var i = 0; i < kandidaten.length; i++) {
+      var els = [].slice.call(q.querySelectorAll(kandidaten[i])).filter(sichtbar);
+      if (els.length) { els[0].click(); return true; }
+    }
+    return false;
+  }
+
+  /* MIT &sprache=1 ACHTET DIE PROBERUNDE AUCH AUF DIE SPRACHE. (11.09.2026)
+
+     Die Sprachprobe geht durch die Navigation und die Module — aber nie in
+     eine Runde hinein. Genau dort verbringt ein Kind seine ganze Zeit, und
+     genau dort stand „Welche Paare gehören zusammen?" auf Türkisch noch
+     deutsch da, zusammen mit „28 Fehlversuche".
+
+     Ein Durchgang, zwei Antworten: Die Runde spielt wie immer, sammelt dabei
+     aber jeden sichtbaren Text der Quiz-Hülle ein. Das Ergebnis steht neben
+     dem der Runde. */
+  var sprachFunde = {};
+  var SPRACHE_MIT = /[?&]sprache=1/.test(location.search);
+  function sprachBlick() {
+    if (!SPRACHE_MIT) return;
+    var W = window.SPRACHE_TR || {};
+    var q = document.querySelector('.quiz-shell') || document.body;
+    var DE = /ß|ä|\b(und|der|die|das|nicht|mit|für|ist|wird|kann|eine|oder|noch|schon|hier|alle|kein|von|zum|zur|aus|über|nach|vor|durch|ohne|gegen|Karten|Stapel|Fragen|Frage|Antwort|Silben|Reihenfolge|Fehlversuch|Fehlversuche|Paare|gehören|richtig|falsch|weiter)\b/;
+    var alle = q.querySelectorAll('*');
+    for (var i = 0; i < alle.length; i++) {
+      var el = alle[i];
+      if (el.children.length || !el.offsetWidth) continue;
+      var t = (el.innerText || '').replace(/\s+/g, ' ').trim();
+      if (!t || t.length < 4 || t.length > 200) continue;
+      if (/^[\d\s%·/.,:+-]+$/.test(t) || /[\u0600-\u06FF]/.test(t)) continue;
+      var istWert = false;
+      for (var k in W) if (String(W[k]) === t) { istWert = true; break; }
+      if (istWert) continue;
+      if (W[t] !== undefined && W[t] !== t) sprachFunde['unübersetzt · ' + t] = 1;
+      else if (DE.test(t)) sprachFunde['verdächtig · ' + t] = 1;
+    }
+  }
+
+  function schritt() {
+    sprachBlick();
+    if (karten >= MAX || ende) return fertig();
+    var jetzt = text();
+    if (jetzt === letzte) { gleich++; } else { gleich = 0; letzte = jetzt; }
+    /* Bleibt dieselbe Karte stehen, erst ueberspringen — dann erst aufgeben.
+
+       Manche Karten kann eine Maschine gar nicht loesen: „Baue das Wort"
+       verlangt die RICHTIGE Reihenfolge der Silben, und die kennt die Probe
+       nicht. Ohne diesen Ausweg meldet sie dort „stehen" und sieht aus wie ein
+       Befund — dabei waere es nur ihre eigene Grenze. Ein Kind hat denselben
+       Ausweg: den Ueberspringen-Pfeil oben. */
+    if (gleich === 7) {
+      var skip = document.querySelector('.quiz-shell .qp-skip');
+      if (skip && sichtbar(skip)) { skip.click(); gleich = 0; letzte = ''; }
+    }
+    if (gleich >= 14) { stehen = jetzt.slice(0, 160); return fertig(); }
+    if (/roundend|re-sterne/.test(document.body.className) || document.querySelector('.re-sterne')) { ende = true; return fertig(); }
+    if (tippe()) karten++;
+    setTimeout(schritt, 700);
+  }
+
+  function fertig() {
+    var ergebnis = { karten: karten, fehler: fehler, ende: ende, stehen: stehen };
+    if (SPRACHE_MIT) ergebnis.deutsch = Object.keys(sprachFunde);
+    var pre = document.getElementById('probe') || document.createElement('pre');
+    pre.id = 'probe';
+    pre.textContent = JSON.stringify(ergebnis, null, 1);
+    document.body.appendChild(pre);
+    reiheWeiter(ergebnis);
+  }
+
+  /* ---------- EINE REIHE VON LEKTIONEN AM STUECK (11.09.2026) ----------
+
+     `&reihe=quran-harfler,quran-formen,…` spielt eine Lektion nach der
+     anderen durch, jede mit frisch geleertem Speicher, und sammelt die
+     Ergebnisse in sessionStorage unter `probe_reihe`. Am Ende steht alles
+     zusammen in <pre id="probe-reihe">.
+
+     Vorher musste jede der 17 Lektionen einzeln angestossen und einzeln
+     nachgesehen werden — siebzehnmal warten, siebzehnmal ablesen. Ein
+     vollstaendiger Durchlauf war damit so muehsam, dass er nicht nach jeder
+     Aenderung gemacht wurde. Genau dann nuetzt eine Probe aber am meisten. */
+  function reiheWeiter(ergebnis) {
+    var m = /[?&]reihe=([^&]+)/.exec(location.search);
+    if (!m) return;
+    var liste = decodeURIComponent(m[1]).split(',').filter(Boolean);
+    var jetzt = (/[?&]stapel=([^&]+)/.exec(location.search) || [])[1] || '';
+    var sammlung = [];
+    try { sammlung = JSON.parse(sessionStorage.getItem('probe_reihe') || '[]'); } catch (e) {}
+    sammlung.push(Object.assign({ stapel: decodeURIComponent(jetzt) }, ergebnis));
+    try { sessionStorage.setItem('probe_reihe', JSON.stringify(sammlung)); } catch (e) {}
+
+    var i = liste.indexOf(decodeURIComponent(jetzt));
+    var naechste = liste[i + 1];
+    if (!naechste) {
+      var p2 = document.createElement('pre');
+      p2.id = 'probe-reihe';
+      p2.textContent = JSON.stringify(sammlung, null, 1);
+      document.body.appendChild(p2);
+      return;
+    }
+    /* Frischer Speicher fuer jede Lektion: Nur so laeuft die Einfuehrung
+       wieder von selbst auf und die Lehrkarte kommt wirklich als erste.
+
+       DIE SPRACHWAHL UEBERLEBT DAS. (11.09.2026) Sie liegt im selben Speicher,
+       und ohne diese Ausnahme lief die Reihe ab Lektion 2 wieder auf Deutsch —
+       eine Sprachprobe, die sich selbst die Sprache umstellt, misst nichts.
+       Denselben Fehler hatte ich schon einmal: Der erste Durchlauf der
+       Sprachprobe klickte die DE-Pille mit. */
+    var sprache = null;
+    try { sprache = localStorage.getItem('eb_sprache_v1'); } catch (e) {}
+    try { localStorage.clear(); } catch (e) {}
+    try { if (sprache) localStorage.setItem('eb_sprache_v1', sprache); } catch (e) {}
+    var basis = location.pathname + '?pruef=1&spiel=1&reihe=' + encodeURIComponent(liste.join(','))
+      + '&stapel=' + encodeURIComponent(naechste)
+      + ((/[?&]karten=(\d+)/.exec(location.search) || [])[1] ? '&karten=' + /[?&]karten=(\d+)/.exec(location.search)[1] : '');
+    location.replace(basis);
+  }
+
+  /* Direkt in die Runde, statt sich durch die Oberflaeche zu klicken.
+
+     Der erste Anlauf hat versucht, wie ein Kind zu tippen: Lektion suchen,
+     Modus-Fenster wegklicken, Runde starten. Das ist an den Beschriftungen
+     gescheitert — die App spricht zwei Sprachen, und die Knoepfe heissen je
+     nach Bildschirm anders. Gemessen werden soll ohnehin die RUNDE, nicht
+     der Weg dorthin: Die Adresse #quiz oeffnet sie mit der ersten
+     Kuran-Lektion, das kann der Router seit Fassung 11.0. */
+  /* Der Sprung steht in der ADRESSE, nicht im sessionStorage. Ein Merker im
+     Speicher ueberlebt einen abgebrochenen Lauf und blockiert dann den
+     naechsten — genau das ist beim ersten Versuch passiert: Der Merker stand
+     noch, der Sprung unterblieb, und die Proberunde tippte auf der
+     Stapel-Seite ins Leere. In der Adresse ist er selbsterklaerend und immer
+     richtig.
+
+     Und: Nur die Raute zu setzen laedt nicht neu; die App liest sie aber nur
+     beim Start. Deshalb der volle Sprung mit location.replace. */
+  if (!/^#quiz$/.test(location.hash)) {
+    if (!/[?&]gesprungen=1/.test(location.search)) {
+      location.replace(location.pathname + location.search + '&gesprungen=1#quiz');
+      return;
+    }
+  }
+  setTimeout(schritt, 3000);
+})();
 </script>
 
 </body></html>

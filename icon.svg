@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="ebGrund" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0" stop-color="#3B2E8F"/>
+      <stop offset=".55" stop-color="#241B62"/>
+      <stop offset="1" stop-color="#150F3D"/>
+    </linearGradient>
+    <linearGradient id="ebGold" x1="0" y1="0" x2="0.2" y2="1">
+      <stop offset="0" stop-color="#FFE39A"/>
+      <stop offset=".45" stop-color="#F5B000"/>
+      <stop offset="1" stop-color="#C98A00"/>
+    </linearGradient>
+    <linearGradient id="ebElif" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFF6DC"/>
+      <stop offset=".5" stop-color="#FFD35C"/>
+      <stop offset="1" stop-color="#F5B000"/>
+    </linearGradient>
+    <radialGradient id="ebSchein" cx="0.5" cy="0.34" r="0.6">
+      <stop offset="0" stop-color="#8273F5" stop-opacity=".5"/>
+      <stop offset="1" stop-color="#8273F5" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Der Grund bleibt randlos und wird NIE mitverkleinert. Die maskable-
+       Fassung schrumpft nur die Gruppe "zeichen" — sonst entstünde mitten
+       im Icon eine sichtbare Kante, wo der verkleinerte Grund aufhört. -->
+  <g id="grund">
+    <rect width="512" height="512" fill="url(#ebGrund)"/>
+    <circle cx="256" cy="196" r="280" fill="url(#ebSchein)"/>
+    <polygon points="256.0,24.0 324.0,92.0 420.0,92.0 420.0,188.0 488.0,256.0 420.0,324.0 420.0,420.0 324.0,420.0 256.0,488.0 188.0,420.0 92.0,420.0 92.0,324.0 24.0,256.0 92.0,188.0 92.0,92.0 188.0,92.0" fill="#A99BFF" fill-opacity=".07"/>
+    <polygon points="256.0,24.0 324.0,92.0 420.0,92.0 420.0,188.0 488.0,256.0 420.0,324.0 420.0,420.0 324.0,420.0 256.0,488.0 188.0,420.0 92.0,420.0 92.0,324.0 24.0,256.0 92.0,188.0 92.0,92.0 188.0,92.0" fill="none" stroke="#C9BFFF" stroke-opacity=".10" stroke-width="2"/>
+  </g>
+
+  <!-- Elif und Ba: die echten Umrisse aus Scheherazade (SIL, Open Font
+       License). Eine Grundlinie, ein Maßstab, nur verschoben — nicht
+       verzerrt und nicht nachgebaut. -->
+  <g id="zeichen" transform="translate(66.389 338.966) scale(0.18792 -0.18792)">
+    <path d="M1902 626Q1902 557 1881.0 469.0Q1860 381 1821.5 302.5Q1783 224 1729 181Q1664 130 1553.5 87.0Q1443 44 1306.0 13.0Q1169 -18 1022.0 -35.5Q875 -53 737 -53Q447 -53 281.5 50.0Q116 153 116 337Q116 415 139.5 485.0Q163 555 195.0 610.0Q227 665 252.5 696.5Q278 728 281 728Q287 728 303.0 717.5Q319 707 319 693Q238 578 238 460Q238 359 316.5 308.5Q395 258 526.5 241.0Q658 224 816 224Q929 224 1058.0 234.0Q1187 244 1312.5 263.0Q1438 282 1541.0 309.5Q1644 337 1705.5 373.5Q1767 410 1767 454Q1767 474 1739.5 507.0Q1712 540 1684.5 576.5Q1657 613 1657 642Q1657 657 1671.5 701.0Q1686 745 1705.5 797.5Q1725 850 1741.5 891.5Q1758 933 1763 943Q1796 912 1828.0 860.5Q1860 809 1881.0 748.0Q1902 687 1902 626Z" fill="url(#ebGold)"/>
+    <path d="M1167 -321Q1167 -328 1149.0 -360.5Q1131 -393 1106.0 -431.5Q1081 -470 1058.0 -498.5Q1035 -527 1026 -527Q1022 -527 993.0 -508.0Q964 -489 928.5 -463.0Q893 -437 866.0 -414.5Q839 -392 839 -385Q839 -376 858.0 -343.5Q877 -311 902.5 -272.5Q928 -234 950.0 -205.5Q972 -177 979 -177Q987 -177 1016.5 -196.5Q1046 -216 1081.0 -242.5Q1116 -269 1141.5 -291.5Q1167 -314 1167 -321Z" fill="#F0476A"/>
+    <g transform="translate(769.0 0)">
+      <path d="M373 349Q373 309 359.5 249.0Q346 189 326.5 130.0Q307 71 289.5 31.5Q272 -8 263 -8Q250 -8 234.0 -1.0Q218 6 218 15Q218 23 228.5 60.5Q239 98 239 187Q239 226 229.5 302.0Q220 378 205.0 474.5Q190 571 173.0 672.0Q156 773 141.0 863.0Q126 953 116.5 1016.0Q107 1079 107 1098Q107 1139 129.0 1201.5Q151 1264 186.0 1322.5Q221 1381 260 1410Q274 1389 280.0 1360.0Q286 1331 286 1311V1212Z" fill="url(#ebElif)"/>
+    </g>
+  </g>
+</svg>
