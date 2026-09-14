@@ -1320,6 +1320,14 @@ window.SPRACHE_TR = {
   "Alle {n} T\xF6ne": "T\xFCm sesler ({n})",
   "Zur\xFCck zu allen T\xF6nen": "T\xFCm seslere d\xF6n",
   "{n} stammen aus dem Video und sind rechnerisch zugeordnet": "{n} tanesi videodan geliyor ve hesapla e\u015Fle\u015Ftirildi",
+  /* Ersatzstimme-Schalter (13.09.2026). */
+  "\u{1F507} keine Aufnahme \u2014 bleibt still": "\u{1F507} kay\u0131t yok \u2014 sessiz kal\u0131r",
+  "Aufnahme gel\xF6scht \u2014 die Karte bleibt still, bis sie neu eingesprochen ist.": "Kay\u0131t silindi \u2014 yeniden seslendirilene kadar kart sessiz kal\u0131r.",
+  "Computerstimme, wo keine Aufnahme ist": "Kay\u0131t olmayan yerde bilgisayar sesi",
+  "Computerstimme, wo keine Aufnahme ist (nur Lehrkraft)": "Kay\u0131t olmayan yerde bilgisayar sesi (sadece \xF6\u011Fretmen)",
+  "Die Rezitation aus dem Internet kam nicht durch, und in der App liegt f\xFCr diesen Vers noch keine Aufnahme.": "\u0130nternetten k\u0131raat gelmedi ve uygulamada bu \xE2yet i\xE7in hen\xFCz kay\u0131t yok.",
+  "F\xFCr dieses Gebet gibt es noch keine Aufnahme. Bitte deine Lehrkraft, es im Aussprache-Studio einzusprechen \u2014 dann h\xF6rst du es hier.": "Bu dua i\xE7in hen\xFCz kay\u0131t yok. \xD6\u011Fretmeninden Telaffuz St\xFCdyosu'nda seslendirmesini iste \u2014 sonra burada duyars\u0131n.",
+  "keine Aufnahme \u2014 bleibt still": "kay\u0131t yok \u2014 sessiz kal\u0131r",
   /* Hilfe: Herkunft der Stimmen (13.09.2026). */
   "Wessen Stimme h\xF6re ich?": "Kimin sesini duyuyorum?",
   'Buchstaben, Silben, W\xF6rter und Tecvid: Hoca Fatih \xC7ollak, aus seinem Elifba-Kurs. Der Wortschatz \u201EKuran verstehen" und die Fatiha-Zeilen: die Wort-f\xFCr-Wort-Rezitation von quran.com (Wisam Sharieff) und Verse von Mishary Alafasy. Nur wo es davon nichts gibt \u2014 ein paar Gebete und Alltagss\xE4tze \u2014 liest noch die Ger\xE4testimme, bis jemand aus der Gemeinde sie einspricht.': `Harfler, heceler, kelimeler ve Tecvid: Hoca Fatih \xC7ollak, Elifba kursundan. \u201EKur'an'\u0131 anlamak" kelimeleri ve F\xE2tiha sat\u0131rlar\u0131: quran.com'un kelime kelime k\u0131raati (Wisam Sharieff) ve Mishary Alafasy'nin \xE2yetleri. Sadece bunlar\u0131n olmad\u0131\u011F\u0131 yerde \u2014 birka\xE7 dua ve g\xFCnl\xFCk c\xFCmle \u2014 cemaatten biri seslendirene kadar cihaz sesi okur.`,
@@ -1858,6 +1866,20 @@ window.QuranCourse = function() {
     for (const t of teile) if (eindeutig.indexOf(t) < 0) eindeutig.push(t);
     return eindeutig.length === 1 ? eindeutig[0] : "";
   }
+  function varianten(text) {
+    const t = normalize(text);
+    if (!t || /\s/.test(t)) return [];
+    const out = [];
+    const hemze = t.replace(/[أإٱ]/g, "\u0627").replace(/ى/g, "\u064A");
+    if (hemze !== t) out.push(hemze);
+    const ohne = t.replace(/[\u064B-\u0652]+$/, "");
+    if (ohne && ohne !== t) {
+      out.push(ohne);
+      const oh = ohne.replace(/[أإٱ]/g, "\u0627").replace(/ى/g, "\u064A");
+      if (oh !== ohne) out.push(oh);
+    }
+    return out;
+  }
   function keyFor(text) {
     const k = hashKey(text);
     if (kennt(k)) return k;
@@ -1867,6 +1889,10 @@ window.QuranCourse = function() {
     if (g && g !== normalize(text)) {
       const gk = hashKey(g);
       if (kennt(gk)) return gk;
+    }
+    for (const v of varianten(text)) {
+      const vk = hashKey(v);
+      if (kennt(vk)) return vk;
     }
     return k;
   }
@@ -2032,7 +2058,8 @@ window.QuranCourse = function() {
   function has(text) {
     if (kennt(hashKey(text)) || kennt(legacyKey(text))) return true;
     const g = grundform(text);
-    return !!(g && g !== normalize(text) && kennt(hashKey(g)));
+    if (g && g !== normalize(text) && kennt(hashKey(g))) return true;
+    return varianten(text).some((v) => kennt(hashKey(v)));
   }
   function stopAll() {
     Object.values(pool).forEach((a) => {
@@ -2385,8 +2412,23 @@ window.QuranAudio = function() {
       if (fallbackText) tts(fallbackText, opts);
     }
   }
+  function ersatzstimmeErlaubt() {
+    try {
+      const t = JSON.parse(localStorage.getItem("s34a_tweaks_v1") || "{}");
+      return t.ersatzstimme === true;
+    } catch (e) {
+      return false;
+    }
+  }
   function tts(text, opts) {
     opts = opts || {};
+    if (!ersatzstimmeErlaubt()) {
+      try {
+        window.dispatchEvent(new CustomEvent("quran-tts-missing"));
+      } catch (e) {
+      }
+      return;
+    }
     if (!window.speechSynthesis) return;
     if (!arVoice || !latVoice) findVoice();
     const reading = cleanReading(opts.reading);
@@ -2483,6 +2525,7 @@ window.QuranAudio = function() {
         return failed[name] ? { src: "fehler", label: _t("Tondatei nicht ladbar"), file: name } : { src: "internet", label: _t("Tondatei aus dem Internet"), file: name };
       }
     }
+    if (!ersatzstimmeErlaubt()) return { src: "stumm", label: _t("keine Aufnahme \u2014 bleibt still") };
     if (!arVoice && !latVoice) findVoice();
     const les = umschriftAus(topicId, reading);
     if (cleanReading(les) && latVoice) return { src: "lesung", label: _t("Ersatzstimme liest die Umschrift") };
@@ -4867,9 +4910,10 @@ window.SURAHS_DATA = [
 
 ;
 /* ---- app/config.js ---- */
-window.APP_BUILD = "11.7";
-window.APP_VERSION = "Version 11.7 \xB7 13.09.2026";
+window.APP_BUILD = "11.8";
+window.APP_VERSION = "Version 11.8 \xB7 14.09.2026";
 window.GEMEINDE_NAME = "";
+window.APP_URL = "https://elif-be.de";
 window.SUPABASE_URL = "";
 window.SUPABASE_ANON_KEY = "";
 try {
@@ -5706,7 +5750,7 @@ window.Classroom = /* @__PURE__ */ function() {
     const data = {};
     KEYS.forEach((k) => {
       const v = lsGetRaw(k);
-      if (v !== null) data[k] = v;
+      if (v !== null) data[k] = k === "s34a_tweaks_v1" ? ohneErsatzstimme(v) : v;
     });
     try {
       for (let i = 0; i < localStorage.length; i++) {
@@ -5737,7 +5781,19 @@ window.Classroom = /* @__PURE__ */ function() {
     return b;
   }
   const unionMap = (a, b) => Object.assign({}, a || {}, b || {});
+  function ohneErsatzstimme(raw) {
+    try {
+      const o = JSON.parse(raw);
+      if (o && typeof o === "object" && "ersatzstimme" in o) {
+        delete o.ersatzstimme;
+        return JSON.stringify(o);
+      }
+    } catch (e) {
+    }
+    return raw;
+  }
   function mergeKey(key, remoteRaw, localRaw) {
+    if (key === "s34a_tweaks_v1" && remoteRaw !== void 0 && remoteRaw !== null) remoteRaw = ohneErsatzstimme(remoteRaw);
     if (remoteRaw === void 0 || remoteRaw === null) return localRaw;
     if (localRaw === void 0 || localRaw === null) return remoteRaw;
     if (remoteRaw === localRaw) return localRaw;
@@ -11687,6 +11743,10 @@ window.LessonScreen = LessonScreen;
         }
         audioRef.current = null;
       }
+      try {
+        window.QuranVoice && window.QuranVoice.stopAll && window.QuranVoice.stopAll();
+      } catch (e) {
+      }
     };
     useEffect(() => stopAudio, []);
     useEffect(() => {
@@ -11702,6 +11762,25 @@ window.LessonScreen = LessonScreen;
           audioRef.current.pause();
         } catch (e) {
         }
+      }
+      const ayah = surah.ayahs[i];
+      if (ayah && window.QuranVoice && window.QuranVoice.has && window.QuranVoice.has(ayah.ar)) {
+        try {
+          window.QuranVoice.stopAll && window.QuranVoice.stopAll();
+        } catch (e) {
+        }
+        setPlaying(i);
+        const ok = window.QuranVoice.play(ayah.ar, { onEnd: (good) => {
+          if (good && thenNext && queueRef.current) {
+            const next = i + 1;
+            if (next < surah.ayahs.length) {
+              playAyah(next, true);
+              return;
+            }
+          }
+          stopAudio();
+        } });
+        if (ok) return;
       }
       const a = new Audio(ayahUrl(surah, i));
       audioRef.current = a;
@@ -12244,9 +12323,8 @@ window.LessonScreen = LessonScreen;
       if (!part) return;
       setPlaying(i);
       setFailed("");
-      const eigeneErlaubt = !(item.n && item.audioStart) || surahVoicePref() === "lehrer";
       try {
-        if (eigeneErlaubt && window.QuranVoice && window.QuranVoice.has(part.ar)) {
+        if (window.QuranVoice && window.QuranVoice.has(part.ar)) {
           const ok = window.QuranVoice.play(part.ar, {
             slow: opts.slow,
             onEnd: function(good) {
@@ -12293,6 +12371,16 @@ window.LessonScreen = LessonScreen;
       speakFallback(part, opts, onEnd, false);
     }, [item]);
     function speakFallback(part, opts, onEnd, warEsInternet) {
+      try {
+        const q = window.QuranAudio && window.QuranAudio.sourceFor ? window.QuranAudio.sourceFor(part.ar, part.tr) : null;
+        if (q && q.src === "stumm") {
+          setPlaying(-1);
+          setFailed(warEsInternet ? _t("Die Rezitation aus dem Internet kam nicht durch, und in der App liegt f\xFCr diesen Vers noch keine Aufnahme.") : _t("F\xFCr dieses Gebet gibt es noch keine Aufnahme. Bitte deine Lehrkraft, es im Aussprache-Studio einzusprechen \u2014 dann h\xF6rst du es hier."));
+          if (onEnd) onEnd(false);
+          return;
+        }
+      } catch (e) {
+      }
       let spoke = false;
       try {
         if (window.QuranAudio && window.QuranAudio.speakText) {
@@ -13111,10 +13199,10 @@ window.LessonScreen = LessonScreen;
         return x + 1;
       });
     };
-    const chip = has ? /* @__PURE__ */ React.createElement("span", { className: "pill", style: { background: "var(--success-soft, #E7F7EE)", color: "var(--success, #1B8A5A)", fontWeight: 800 } }, _t("\u{1F399}\uFE0F deine Aufnahme")) : item.audioStart ? /* @__PURE__ */ React.createElement("span", { className: "pill", style: { background: "var(--accent-soft)", color: "var(--brand)", fontWeight: 800 } }, "\u{1F310} Internet-Rezitation") : /* @__PURE__ */ React.createElement("span", { className: "pill", style: { background: "#FDF1E0", color: "#8a5a06", fontWeight: 800 } }, "\u{1F5E3} Computerstimme");
+    const chip = has ? /* @__PURE__ */ React.createElement("span", { className: "pill", style: { background: "var(--success-soft, #E7F7EE)", color: "var(--success, #1B8A5A)", fontWeight: 800 } }, _t("\u{1F399}\uFE0F deine Aufnahme")) : item.audioStart ? /* @__PURE__ */ React.createElement("span", { className: "pill", style: { background: "var(--accent-soft)", color: "var(--brand)", fontWeight: 800 } }, "\u{1F310} Internet-Rezitation") : /* @__PURE__ */ React.createElement("span", { className: "pill", style: { background: "#FDF1E0", color: "#8a5a06", fontWeight: 800 } }, "\u{1F507} noch keine Aufnahme");
     return /* @__PURE__ */ React.createElement("div", { className: "hz-ton-row" }, /* @__PURE__ */ React.createElement("div", { className: "hz-ton-head" }, /* @__PURE__ */ React.createElement("b", null, item.kind === "sure" ? "Vers " : "Teil ", i + 1), chip), /* @__PURE__ */ React.createElement("div", { className: "hz-ton-ar", dir: "rtl" }, part.ar), /* @__PURE__ */ React.createElement("div", { className: "hz-ton-tr" }, part.tr), !rec && !take && /* @__PURE__ */ React.createElement("div", { className: "hz-row", style: { marginTop: 8 } }, /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost", onClick: function() {
       audio.play(i);
-    } }, _t("\u25B6\uFE0F So klingt es jetzt")), /* @__PURE__ */ React.createElement("button", { className: "btn btn-primary", disabled: busy, onClick: start }, "\u{1F399}\uFE0F ", has ? _t("Neu einsprechen") : "Einsprechen"), has && /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost", disabled: busy, style: { color: "var(--rose, #D64545)" }, onClick: remove }, "\u{1F5D1}\uFE0F L\xF6schen", item.audioStart ? " \u2192 Rezitation" : " \u2192 Computerstimme")), rec && /* @__PURE__ */ React.createElement("div", { className: "hz-row", style: { marginTop: 8, alignItems: "center" } }, /* @__PURE__ */ React.createElement("button", { className: "btn", style: { background: "var(--rose)", color: "#fff", fontWeight: 800 }, onClick: stop }, _t("\u23F9 Fertig")), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 800, color: "#B3123A" } }, "\u25CF Aufnahme l\xE4uft \u2026 ", secs, "s"), /* @__PURE__ */ React.createElement("span", { className: "muted", style: { fontSize: 12 } }, "(max. 30 s)")), take && /* @__PURE__ */ React.createElement("div", { className: "hz-ton-take" }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800, fontSize: 13 } }, _t("Probeaufnahme \u2014 erst anh\xF6ren, dann entscheiden:")), /* @__PURE__ */ React.createElement("div", { className: "hz-row", style: { marginTop: 6 } }, /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost", onClick: playTake }, "\u25B6\uFE0F Probeh\xF6ren"), /* @__PURE__ */ React.createElement("button", { className: "btn btn-primary", disabled: busy, onClick: keep }, busy ? "\u23F3 L\xE4dt hoch\u2026" : "\u2705 \xDCbernehmen"), /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost", onClick: start }, "\u{1F501} Nochmal"), /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost", style: { color: "var(--rose, #D64545)" }, onClick: discard }, "\u{1F5D1}\uFE0F Verwerfen"))), err && /* @__PURE__ */ React.createElement("div", { className: "hz-err", style: { marginTop: 8 } }, err));
+    } }, _t("\u25B6\uFE0F So klingt es jetzt")), /* @__PURE__ */ React.createElement("button", { className: "btn btn-primary", disabled: busy, onClick: start }, "\u{1F399}\uFE0F ", has ? _t("Neu einsprechen") : "Einsprechen"), has && /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost", disabled: busy, style: { color: "var(--rose, #D64545)" }, onClick: remove }, "\u{1F5D1}\uFE0F L\xF6schen", item.audioStart ? " \u2192 Rezitation" : " \u2192 still (keine Aufnahme)")), rec && /* @__PURE__ */ React.createElement("div", { className: "hz-row", style: { marginTop: 8, alignItems: "center" } }, /* @__PURE__ */ React.createElement("button", { className: "btn", style: { background: "var(--rose)", color: "#fff", fontWeight: 800 }, onClick: stop }, _t("\u23F9 Fertig")), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 800, color: "#B3123A" } }, "\u25CF Aufnahme l\xE4uft \u2026 ", secs, "s"), /* @__PURE__ */ React.createElement("span", { className: "muted", style: { fontSize: 12 } }, "(max. 30 s)")), take && /* @__PURE__ */ React.createElement("div", { className: "hz-ton-take" }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800, fontSize: 13 } }, _t("Probeaufnahme \u2014 erst anh\xF6ren, dann entscheiden:")), /* @__PURE__ */ React.createElement("div", { className: "hz-row", style: { marginTop: 6 } }, /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost", onClick: playTake }, "\u25B6\uFE0F Probeh\xF6ren"), /* @__PURE__ */ React.createElement("button", { className: "btn btn-primary", disabled: busy, onClick: keep }, busy ? "\u23F3 L\xE4dt hoch\u2026" : "\u2705 \xDCbernehmen"), /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost", onClick: start }, "\u{1F501} Nochmal"), /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost", style: { color: "var(--rose, #D64545)" }, onClick: discard }, "\u{1F5D1}\uFE0F Verwerfen"))), err && /* @__PURE__ */ React.createElement("div", { className: "hz-err", style: { marginTop: 8 } }, err));
   }
   function TonTab({ item, audio }) {
     const [, force] = useState(0);
@@ -19367,7 +19455,7 @@ function PruefLinkKasten({ onClose, setMsg, ctx }) {
   ), /* @__PURE__ */ React.createElement("div", { className: "row", style: { gap: 8, marginTop: 10, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("button", { className: "btn btn-primary", onClick: teilen }, "\u{1F4E4} ", _t("Link weitergeben")), /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost", onClick: () => ctx.go("pruefung") }, _t("Selbst ansehen"))));
 }
 function Settings({ ctx }) {
-  const t = { sounds: ctx.tweaks.sounds !== false, haptik: ctx.tweaks.haptik !== false, dark: !!ctx.tweaks.dark };
+  const t = { sounds: ctx.tweaks.sounds !== false, haptik: ctx.tweaks.haptik !== false, dark: !!ctx.tweaks.dark, ersatzstimme: ctx.tweaks.ersatzstimme === true };
   const SS = window.SimpleSync;
   const acc = SS && SS.account();
   const [msg, setMsg] = useState("");
@@ -19391,7 +19479,7 @@ function Settings({ ctx }) {
   return /* @__PURE__ */ React.createElement("div", { className: "page", style: { maxWidth: 720 } }, /* @__PURE__ */ React.createElement("div", { className: "row", style: { justifyContent: "space-between" } }, /* @__PURE__ */ React.createElement("button", { className: "icon-btn", onClick: () => ctx.go("profile") }, /* @__PURE__ */ React.createElement(Icon.Back, null)), /* @__PURE__ */ React.createElement("h1", { style: { fontSize: 22 } }, _t("Einstellungen")), /* @__PURE__ */ React.createElement("div", { style: { width: 40 } })), /* @__PURE__ */ React.createElement("div", { className: "card flat settings-list" }, row("\u{1F4F2}", _t("Als App installieren"), void 0, () => {
     if (window.PWAInstall && window.PWAInstall.prompt()) return;
     alert(/iPhone|iPad|iPod/i.test(navigator.userAgent) ? _t('Auf dem iPhone/iPad: In Safari unten auf das Teilen-Symbol tippen und dann "Zum Home-Bildschirm" w\xE4hlen.') : _t('Im Browser-Men\xFC (\u22EE) auf "App installieren" bzw. "Zum Startbildschirm hinzuf\xFCgen" tippen \u2014 dann \xF6ffnet sich die App wie eine echte App mit eigenem Icon.'));
-  }), row("\u{1F4E7}", _t("Freunde einladen"), /* @__PURE__ */ React.createElement("span", { className: "muted", style: { fontSize: 12.5 } }, _t("Link teilen")), invite), row("\u2753", _t("Hilfe"), void 0, () => ctx.go("help")), row("\u{1F4AC}", "Kontakt", void 0, () => ctx.go("help")), row("\u{1F30D}", _t("Sprache"), /* @__PURE__ */ React.createElement(SprachWahl, null), null), window.Lernzeit && row("\u23F1", _t("Lernzeit-Ziel pro Tag"), /* @__PURE__ */ React.createElement(LernzeitWahl, null), null), row("\u2705", "PR\xDCFUNG", /* @__PURE__ */ React.createElement("span", { className: "muted", style: { fontSize: 12.5 } }, _t("Link zum Weitergeben")), () => setPruefLink(true))), !!msg && /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontWeight: 700, margin: "8px 2px", fontSize: 13 } }, msg), pruefLink && /* @__PURE__ */ React.createElement(PruefLinkKasten, { onClose: () => setPruefLink(false), setMsg, ctx }), /* @__PURE__ */ React.createElement("div", { className: "card flat settings-list" }, [["sounds", _t("Sounds")], ["haptik", _t("Haptik")], ["dark", _t("Dunkelmodus")]].map(([k, l]) => /* @__PURE__ */ React.createElement("div", { key: k, className: "setting-row" }, /* @__PURE__ */ React.createElement("span", { className: "lbl" }, l), /* @__PURE__ */ React.createElement("button", { className: "toggle " + (t[k] ? "on" : ""), onClick: () => ctx.setTweak(k, !t[k]) })))), /* @__PURE__ */ React.createElement("div", { className: "card flat settings-list" }, row(
+  }), row("\u{1F4E7}", _t("Freunde einladen"), /* @__PURE__ */ React.createElement("span", { className: "muted", style: { fontSize: 12.5 } }, _t("Link teilen")), invite), row("\u2753", _t("Hilfe"), void 0, () => ctx.go("help")), row("\u{1F4AC}", "Kontakt", void 0, () => ctx.go("help")), row("\u{1F30D}", _t("Sprache"), /* @__PURE__ */ React.createElement(SprachWahl, null), null), window.Lernzeit && row("\u23F1", _t("Lernzeit-Ziel pro Tag"), /* @__PURE__ */ React.createElement(LernzeitWahl, null), null), row("\u2705", "PR\xDCFUNG", /* @__PURE__ */ React.createElement("span", { className: "muted", style: { fontSize: 12.5 } }, _t("Link zum Weitergeben")), () => setPruefLink(true))), !!msg && /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontWeight: 700, margin: "8px 2px", fontSize: 13 } }, msg), pruefLink && /* @__PURE__ */ React.createElement(PruefLinkKasten, { onClose: () => setPruefLink(false), setMsg, ctx }), /* @__PURE__ */ React.createElement("div", { className: "card flat settings-list" }, [["sounds", _t("Sounds")], ["haptik", _t("Haptik")], ["dark", _t("Dunkelmodus")]].concat(ctx.teacherUnlocked ? [["ersatzstimme", _t("Computerstimme, wo keine Aufnahme ist (nur Lehrkraft)")]] : []).map(([k, l]) => /* @__PURE__ */ React.createElement("div", { key: k, className: "setting-row" }, /* @__PURE__ */ React.createElement("span", { className: "lbl" }, l), /* @__PURE__ */ React.createElement("button", { className: "toggle " + (t[k] ? "on" : ""), onClick: () => ctx.setTweak(k, !t[k]) })))), /* @__PURE__ */ React.createElement("div", { className: "card flat settings-list" }, row(
     null,
     _t("Konto & Sicherheit"),
     /* @__PURE__ */ React.createElement("span", { className: "muted", style: { fontSize: 12.5 } }, acc ? acc.name : _t("nicht angemeldet")),
@@ -20571,7 +20659,7 @@ function CardEditor({ ctx }) {
     setMsg(_t("L\xF6sche \u2026"));
     const r = await QV.del(c.q);
     setBusy(false);
-    if (r.ok) flash(_t("Aufnahme gel\xF6scht \u2014 es gilt wieder die Standardstimme \u2705"));
+    if (r.ok) flash(_t("Aufnahme gel\xF6scht \u2014 die Karte bleibt still, bis sie neu eingesprochen ist."));
     else {
       setMsg("");
       setErr(r.error || _t("L\xF6schen fehlgeschlagen."));
@@ -20582,7 +20670,7 @@ function CardEditor({ ctx }) {
     if (!QA || !QA.sourceFor) return null;
     const src = QA.sourceFor(c.q, c.a, CE && CE.stapelId ? CE.stapelId(c.key) : "");
     const style = src.src === "eigen" ? { background: "var(--success-soft, #E7F7EE)", color: "var(--success, #1B8A5A)" } : src.src === "app" ? { background: "var(--accent-soft)", color: "var(--brand)" } : src.src === "fehler" ? { background: "#FDE3E8", color: "#B3123A" } : { background: "#F2F2F5", color: "#66717b" };
-    const label = src.src === "eigen" ? _t("\u{1F399}\uFE0F deine Aufnahme") : src.src === "app" ? _t("\u{1F50A} App-Aufnahme") : src.src === "internet" ? _t("\u{1F310} Internet-Aufnahme") : src.src === "fehler" ? _t("\u26A0\uFE0F Ton nicht ladbar") : "\u{1F5E3} Systemstimme";
+    const label = src.src === "eigen" ? _t("\u{1F399}\uFE0F deine Aufnahme") : src.src === "app" ? _t("\u{1F50A} App-Aufnahme") : src.src === "internet" ? _t("\u{1F310} Internet-Aufnahme") : src.src === "fehler" ? _t("\u26A0\uFE0F Ton nicht ladbar") : src.src === "stumm" ? _t("\u{1F507} keine Aufnahme \u2014 bleibt still") : "\u{1F5E3} Systemstimme";
     return /* @__PURE__ */ React.createElement("span", { className: "pill", style: { fontWeight: 800, ...style } }, label);
   };
   return /* @__PURE__ */ React.createElement("div", { className: "page", style: { maxWidth: 780 } }, /* @__PURE__ */ React.createElement("div", { className: "row", style: { justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 } }, /* @__PURE__ */ React.createElement("h1", { style: { margin: 0 } }, "\u270F\uFE0F Buchstaben-Werkstatt"), /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost", onClick: () => ctx.go("teacher") }, "\u2190 Klassenzimmer")), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 13.5, marginTop: 6, lineHeight: 1.55 } }, "Jede Karte geh\xF6rt dir: ", /* @__PURE__ */ React.createElement("b", null, _t("Schreibweise")), " und ", /* @__PURE__ */ React.createElement("b", null, _t("Umschrift")), " ", _t("\xE4ndern, die Aussprache"), " ", /* @__PURE__ */ React.createElement("b", null, "einsprechen, probeh\xF6ren, \xFCbernehmen oder l\xF6schen"), " \u2014 und jederzeit zur\xFCck zum Original. Alles gilt sofort \xFCberall; der Fortschritt der Kinder bleibt erhalten."), /* @__PURE__ */ React.createElement("div", { className: "row", style: { gap: 8, marginTop: 14, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement(

@@ -1,7 +1,7 @@
 // Versionsstempel — sichtbar in Einstellungen & Anmelde-Fenster, damit sofort
 // erkennbar ist, ob auf Netlify wirklich die neueste Version läuft.
-window.APP_BUILD = '11.7';
-window.APP_VERSION = 'Version 11.7 · 13.09.2026';
+window.APP_BUILD = '11.8';
+window.APP_VERSION = 'Version 11.8 · 14.09.2026';
 
 // Supabase-Konfiguration für echte Accounts, Fortschritt-Sync, Freunde und Live-Quiz.
 //
@@ -15,6 +15,10 @@ window.APP_VERSION = 'Version 11.7 · 13.09.2026';
 // (11.0) Gemeinde/Verein hinter dem Kurs — Name neben dem Logo (assets/logo-gemeinde.jpg).
 // Leer lassen = nur das Logo. Beispiel: 'Türkisch-Islamische Gemeinde Musterstadt'
 window.GEMEINDE_NAME = '';
+
+// (11.8) Adresse, unter der die App läuft — die Landingpage (installieren.html)
+// verlinkt dorthin („Jetzt lernen“).
+window.APP_URL = 'https://elif-be.de';
 
 window.SUPABASE_URL = '';
 window.SUPABASE_ANON_KEY = '';

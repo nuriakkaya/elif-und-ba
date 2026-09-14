@@ -36,14 +36,14 @@ Diesen Ordner offen lassen.
    Dateien **und** die Ordner `app`, `vendor`, `netlify`, `assets`, `fonts`,
    `media`.
 3. Alles in das große Feld im Browser ziehen. Warten, bis die Liste vollständig
-   ist — so viele, wie das Werkzeug beim Bauen gemeldet hat (zurzeit **73 Dateien**).
+   ist — so viele, wie das Werkzeug beim Bauen gemeldet hat (zurzeit **77 Dateien**).
 4. Unten auf **Commit changes** klicken.
 
 > Wichtig: Nicht den äußeren Ordner ziehen, sondern **seinen Inhalt**.
 > Nach dem Hochladen muss `index.html` in der Dateiliste ganz oben stehen.
 
 > **Eine Runde genügt.** GitHub nimmt 100 Dateien je Vorgang, und dieses Paket
-> hat zurzeit 73. Die über 700 Aussprachen liegen darin als 19 Bündel — eine Datei je
+> hat zurzeit 77. Die fast 1.000 Aussprachen liegen darin als 22 Bündel — eine Datei je
 > Lektion. Früher waren es einzelne Töne, und das hieß acht Runden Ziehen und
 > Ablegen; wer eine vergaß, hatte stumme Karten, ohne dass die App etwas sagte.
 

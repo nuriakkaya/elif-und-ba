@@ -16,7 +16,7 @@
      Einzige Ausnahme: die Aussprache-Aufnahmen (Route "media"), damit sie
      offline hörbar bleiben.
 */
-const CACHE = 'elifba-11-9';
+const CACHE = 'elifba-11-10';
 
 const PRECACHE = [
   './',
