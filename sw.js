@@ -20,7 +20,7 @@
    Name darf nie ein zweites Mal vorkommen, sonst behaelt ein Geraet seinen
    alten Vorrat. „elifba-11-10" gab es schon zu Version 11.7 — deshalb zaehlt
    der Name weiter, waehrend die Version bei 11.10 steht. (14.09.2026) */
-const CACHE = 'elifba-11-13';
+const CACHE = 'elifba-11-14';
 
 const PRECACHE = [
   './',

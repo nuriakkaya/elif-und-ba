@@ -1,7 +1,7 @@
 // Versionsstempel — sichtbar in Einstellungen & Anmelde-Fenster, damit sofort
 // erkennbar ist, ob auf Netlify wirklich die neueste Version läuft.
-window.APP_BUILD = '11.11';
-window.APP_VERSION = 'Version 11.11 · 15.09.2026';
+window.APP_BUILD = '11.12';
+window.APP_VERSION = 'Version 11.12 · 15.09.2026';
 
 // Supabase-Konfiguration für echte Accounts, Fortschritt-Sync, Freunde und Live-Quiz.
 //
