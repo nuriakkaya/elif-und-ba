@@ -1619,7 +1619,16 @@ a { color: inherit; text-decoration: none; }
 .question-card .qtext-arabic, .qtext-arabic { font-family: 'Scheherazade New', serif; font-size: 46px; line-height: 2; direction: rtl; text-align: center; font-weight: 700; }
 .deck-card.locked { position: relative; opacity: .55; cursor: not-allowed; }
 .deck-card.locked .deck-lock { position: absolute; top: 10px; right: 12px; font-size: 17px; }
-.option.option-arabic { font-family: 'Scheherazade New', serif; font-size: 32px; line-height: 1.7; text-align: center; direction: rtl; font-weight: 700; }
+/* Zeilenhoehe 1.55 statt 1.7 (14.09.2026): Das reicht fuer die Harekat ueber
+   und unter dem Buchstaben und spart bei fuenf Antworten die letzten rund
+   25 Punkte, die auf einem iPhone ueber den Rand standen. */
+/* Arabische Antwortknoepfe sind von Natur aus hoch: grosse Schrift, dazu die
+   Harekat ueber und unter dem Buchstaben. Bei fuenf davon entscheidet jeder
+   Punkt darueber, ob die letzte Antwort noch auf den Bildschirm passt. Deshalb
+   eigene, engere Polsterung — die Trefferflaeche bleibt mit rund 74 Punkten
+   weit ueber dem Mindestmass. Zeilenhoehe 1.55 statt 1.7 aus demselben Grund.
+   (14.09.2026, nachgemessen an vier Handy-Groessen) */
+.option.option-arabic { font-family: 'Scheherazade New', serif; font-size: 32px; line-height: 1.55; text-align: center; direction: rtl; font-weight: 700; padding: 11px 14px; }
 .hareke { color: var(--accent, var(--brand)); }
 .option.is-correct .hareke, .option.is-wrong .hareke, .option.is-disabled .hareke { color: inherit; }
 .spkrow { display: flex; gap: 14px; justify-content: center; margin: 4px 0; }
@@ -1745,14 +1754,62 @@ a { color: inherit; text-decoration: none; }
       mehr — Topbars & Fußleisten polstern mit env(safe-area-inset-*).
    ================================================================== */
 .quiz-shell { padding-top: env(safe-area-inset-top); }
-.quiz-shell.qp-skin { min-height: 100dvh; }
-.qp-skin .quiz-stage { align-items: stretch; padding: 14px 16px calc(16px + env(safe-area-inset-bottom)); }
+/* FESTE HOEHE STATT MINDESTHOEHE. (14.09.2026)
+
+   `min-height` heisst: mindestens so hoch — waechst der Inhalt, waechst die
+   Huelle mit. Genau das geschah: Die Huelle wurde 873 Punkte hoch, wo das
+   Fenster 852 hat, und die Fragekarte gab ihre 21 ueberzaehligen Punkte nie
+   her, weil ihr niemand den Platz streitig machte. `height` macht den Rahmen
+   fest — jetzt muessen sich die Kinder darin einrichten, und die Karte raeumt
+   das Feld fuer die Antworten.
+
+   Sollte es doch einmal nicht reichen (sehr kleines Geraet, sehr lange
+   Antworten), scrollt NUR die Buehne. Die Kopfzeile bleibt dann stehen, statt
+   unter die Statusleiste des Telefons zu rutschen — Nuris zweite Beschwerde
+   vom selben Tag. */
+.quiz-shell.qp-skin { height: 100dvh; box-sizing: border-box; }
+/* `min-height: 0` ist der Schluessel: Ein Flex-Kind schrumpft NICHT unter die
+   Groesse seines Inhalts, solange `min-height: auto` gilt — es waechst
+   stattdessen ueber den Rand hinaus. Genau deshalb half es nicht, der
+   Fragekarte das Wachsen zu erlauben: Der Platz, den sie haette hergeben
+   koennen, wurde ihr nie streitig gemacht. Mit dieser Zeile gibt die Buehne
+   den Druck weiter, und die Karte raeumt das Feld. (14.09.2026) */
+.qp-skin .quiz-stage { align-items: stretch; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 14px 16px calc(16px + env(safe-area-inset-bottom)); }
 .qp-skin .quiz-stage .stage-inner { flex: 1 1 auto; min-height: 0; max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; }
 .qp-skin .qp-gatespacer { flex: 1 1 24px; height: auto; min-height: 10px; }
-.qp-skin .qp-cardbody { min-height: clamp(150px, 30dvh, 300px); }
+
+/* DIE KARTE NIMMT, WAS UEBRIG BLEIBT — SIE FORDERT NICHTS. (14.09.2026)
+
+   Hier stand `min-height: clamp(220px, 42dvh, 430px)` fuer Handys, mit der
+   guten Absicht: Bei zwei, drei Antworten sah die Karte sonst verloren aus.
+   Nur ist 42dvh eine FORDERUNG. Auf einem iPhone (393x852) sind das 358
+   Punkte allein fuer die Frage — und wenn darunter fuenf arabische
+   Antwortknoepfe stehen, reicht der Bildschirm nicht mehr.
+
+   Nuri mit zwei Bildschirmfotos, 14.09.: Die letzte Antwort lag unterhalb des
+   Randes; man musste scrollen, um sie zu sehen, und beim Scrollen rutschte die
+   Kopfzeile unter die Statusleiste des Telefons. Nachgemessen mit der
+   Proberunde in Handy-Groesse: JEDE Karte stand 313 bis 337 Punkte ueber.
+
+   Jetzt waechst die Karte ueber `flex`, statt eine Hoehe zu verlangen: Ist
+   Platz da, fuellt sie ihn; brauchen die Antworten ihn, gibt sie ihn her. Das
+   erhaelt die urspruengliche Absicht und nimmt ihr die Schaerfe. */
+.qp-skin .qp-card { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; }
+.qp-skin .qp-cardbody { flex: 1 1 auto; min-height: clamp(120px, 18dvh, 260px); }
 @media (max-width: 640px) {
-  /* Handy: Karte deutlich größer — weniger Leerraum zwischen Karte und Buttons */
-  .qp-skin .qp-cardbody { min-height: clamp(220px, 42dvh, 430px); }
+  .qp-skin .qp-cardbody { min-height: clamp(110px, 15dvh, 220px); }
+}
+
+/* Wird es eng — kleines Telefon, fuenf arabische Antworten —, ruecken die
+   Knoepfe zusammen, statt aus dem Bild zu laufen. Die Zeilenhoehe bleibt
+   grosszuegig genug fuer die Harekat ueber und unter dem Buchstaben. */
+@media (max-height: 1000px) {
+  .qp-skin .quiz-stage .stage-inner { gap: 10px; }
+  .qp-skin .options { gap: 8px; }
+  .qp-skin .option { padding: 11px 14px; }
+  .qp-skin .option.option-arabic { font-size: 30px; line-height: 1.5; }
+  .qp-skin .qp-cardbody { padding: 14px 16px; }
+  .qp-skin .qp-cardbody .qtext-arabic { font-size: clamp(40px, 13vw, 54px); line-height: 1.5; }
 }
 .quiz-stack { min-width: 0; flex: 1 1 auto; }
 .quiz-stack-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
@@ -1765,7 +1822,7 @@ a { color: inherit; text-decoration: none; }
   .quiz-toprow { gap: 5px !important; }
   .quiz-topbar .pill { padding: 4px 9px; font-size: 12px; }
   .qp-skin .quiz-stage { padding: 12px 12px calc(14px + env(safe-area-inset-bottom)); }
-  .qp-skin .qp-cardbody .qtext-arabic { font-size: clamp(44px, 15vw, 62px); line-height: 1.9; }
+  .qp-skin .qp-cardbody .qtext-arabic { font-size: clamp(44px, 15vw, 62px); line-height: 1.6; }
 }
 @media (min-width: 641px) { .hide-sm { display: initial; } }
 /* Statusleiste (installierte App): navy Fläche hinter der Notch statt Inhalt darunter */
@@ -2138,6 +2195,9 @@ header.topbar { padding-top: max(12px, env(safe-area-inset-top)); }
 .cb-list { display: grid; gap: 6px; }
 .cb-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: #fff; border: 1px solid var(--line); border-radius: 11px; padding: 9px 12px; }
 .cb-row.is-me { background: var(--accent-soft); border-color: var(--brand-soft-2); }
+/* Die Lücke zwischen den ersten 25 Plätzen und der eigenen Zeile, wenn sie
+   weiter hinten steht — damit klar ist, dass dazwischen noch Kinder stehen. */
+.cb-luecke { text-align: center; color: var(--muted); letter-spacing: 4px; font-size: 18px; line-height: 1; padding: 2px 0 4px; }
 .cb-rank { min-width: 30px; font-weight: 800; font-size: 14px; }
 .cb-name { flex: 1 1 110px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cb-val { font-weight: 800; font-size: 13.5px; color: var(--brand); }
@@ -3538,13 +3598,13 @@ if (/[?&]pruef=1/.test(location.search)) (function () {
   }, 4000);
 })();
 </script>
-<script src="vendor/react.js?v=11.9"></script>
-<script src="vendor/react-dom.js?v=11.9"></script>
-<script src="vendor/qrcode.min.js?v=11.9"></script>
+<script src="vendor/react.js?v=11.11"></script>
+<script src="vendor/react-dom.js?v=11.11"></script>
+<script src="vendor/qrcode.min.js?v=11.11"></script>
 
 <!-- Ein einziges, fertig übersetztes Bündel (siehe build.mjs). Die lesbaren
      Quelldateien liegen weiter in app/ — sie werden nur nicht mehr geladen. -->
-<script src="app/bundle.js?v=11.9"></script>
+<script src="app/bundle.js?v=11.11"></script>
 <script>
 /* ------------------------------------------------------------------
    FRISCHE-WÄCHTER (09.08.2026). Ursache des Dauerärgers "es hat sich
@@ -3842,8 +3902,41 @@ if (/[?&]pruef=1/.test(location.search) && /[?&]spiel=1/.test(location.search)) 
     }
   }
 
+  /* PASST DIE KARTE AUF EINEN HANDY-BILDSCHIRM? (14.09.2026)
+
+     Nuri mit zwei Bildschirmfotos vom iPhone: Die Frage steht oben, die
+     Antworten reichen unten hinaus. Man muss scrollen, um alle zu sehen —
+     und beim Scrollen rutscht die Kopfzeile unter die Statusleiste des
+     Telefons. Gemessen wird deshalb bei JEDER Karte, ob die Seite hoeher
+     ist als das Fenster. Dafuer muss die Probe in Handy-Groesse laufen
+     (Vorschau auf 393x852 stellen); die gemessene Fenstergroesse steht im
+     Ergebnis, damit niemand eine Messung am Rechnerbildschirm fuer eine
+     Handy-Messung haelt. */
+  var zuHoch = {};
+  function hoehenBlick() {
+    if (!document.querySelector('.quiz-shell')) return;
+    /* Nur echte FRAGE-Ansichten messen. Die Einfuehrung einer Lektion und der
+       Rundenabschluss sind Lese-Seiten — die duerfen laenger sein als der
+       Bildschirm, dort scrollt man selbstverstaendlich. Ohne diese Trennung
+       meldete die Probe deren Laenge als Befund (313 Punkte) und verdeckte
+       damit die echte Zahl der Frage-Karten. (14.09.2026) */
+    if (!document.querySelector('.quiz-shell .options, .quiz-shell .qp-paircol, .quiz-shell .qp-tiles')) return;
+    /* Gemessen wird die Unterkante der QUIZ-HUELLE, nicht die der Seite: Die
+       Pruefhilfe haengt mit ?pruef=1 einen langen Bericht ans Dokument, und der
+       machte die Seite um rund 300 Punkte laenger — die Probe meldete dann
+       ihren eigenen Bericht als Befund. (14.09.2026, beim Nachmessen bemerkt) */
+    var q = document.querySelector('.quiz-shell');
+    var ueber = Math.round(q.getBoundingClientRect().bottom + (document.scrollingElement || document.documentElement).scrollTop - window.innerHeight);
+    if (ueber <= 4) return;
+    var art = ((document.querySelector('.qp-cardlabel') || {}).innerText || 'Karte').split('\n')[0].trim();
+    var n = document.querySelectorAll('.quiz-shell .option').length;
+    var schl = art + (n ? ' · ' + n + ' Antworten' : '');
+    if (!zuHoch[schl] || zuHoch[schl] < ueber) zuHoch[schl] = ueber;
+  }
+
   function schritt() {
     sprachBlick();
+    hoehenBlick();
     if (karten >= MAX || ende) return fertig();
     var jetzt = text();
     if (jetzt === letzte) { gleich++; } else { gleich = 0; letzte = jetzt; }
@@ -3865,7 +3958,9 @@ if (/[?&]pruef=1/.test(location.search) && /[?&]spiel=1/.test(location.search)) 
   }
 
   function fertig() {
-    var ergebnis = { karten: karten, fehler: fehler, ende: ende, stehen: stehen };
+    var ergebnis = { karten: karten, fehler: fehler, ende: ende, stehen: stehen,
+                     fenster: [window.innerWidth, window.innerHeight] };
+    if (Object.keys(zuHoch).length) ergebnis.zuHoch = zuHoch;
     if (SPRACHE_MIT) ergebnis.deutsch = Object.keys(sprachFunde);
     var pre = document.getElementById('probe') || document.createElement('pre');
     pre.id = 'probe';

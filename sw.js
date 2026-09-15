@@ -16,7 +16,11 @@
      Einzige Ausnahme: die Aussprache-Aufnahmen (Route "media"), damit sie
      offline hörbar bleiben.
 */
-const CACHE = 'elifba-11-11';
+/* Die Zahl im Namen ist ein fortlaufender Zaehler, NICHT die App-Version: Ein
+   Name darf nie ein zweites Mal vorkommen, sonst behaelt ein Geraet seinen
+   alten Vorrat. „elifba-11-10" gab es schon zu Version 11.7 — deshalb zaehlt
+   der Name weiter, waehrend die Version bei 11.10 steht. (14.09.2026) */
+const CACHE = 'elifba-11-13';
 
 const PRECACHE = [
   './',
@@ -35,8 +39,10 @@ const PRECACHE = [
   'fonts/nunito-latin-ext.woff2',
   'fonts/scheherazade-arabic-400.woff2',
   'fonts/scheherazade-arabic-700.woff2',
+  'installieren.html',
   'assets/letters.mp3',
   'assets/logo-gemeinde.jpg',
+  'assets/logo-gemeinde.png',
   'assets/sounds/correct.mp3',
   'assets/sounds/wrong.mp3',
   'assets/sounds/combo.mp3',

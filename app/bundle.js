@@ -1570,7 +1570,58 @@ window.SPRACHE_TR = {
   "{n} perfekte Runden": "{n} kusursuz tur",
   "noch verschlossen": "hen\xFCz kilitli",
   "Mikrofon-Problem \u2014 versuch es nochmal.": "Mikrofon sorunu \u2014 bir daha dene.",
-  "Keine Tipp-Schl\xFCssel mehr": "\u0130pucu anahtar\u0131 kalmad\u0131"
+  "Keine Tipp-Schl\xFCssel mehr": "\u0130pucu anahtar\u0131 kalmad\u0131",
+  /* Klassensystem: Gerätebindung und Lehrer-Anmeldung (14.09.2026) */
+  "Diesen Namen gibt es schon. Frag kurz deine Lehrkraft \u2014 sie tippt ihre PIN ein.": "Bu isim zaten var. \xD6\u011Fretmenine sor \u2014 o kendi PIN'ini girsin.",
+  "Dieses Ger\xE4t kennt den Namen noch nicht. Tippe einmal die PIN deines Klassenzimmers ein \u2014 danach geht es hier immer.": "Bu cihaz bu ismi hen\xFCz tan\u0131m\u0131yor. S\u0131n\u0131f\u0131n\u0131n PIN'ini bir kez gir \u2014 bundan sonra burada hep \xE7al\u0131\u015F\u0131r.",
+  "Falsches Passwort.": "\u015Eifre yanl\u0131\u015F.",
+  "F\xFCr die Lehrkraft": "\xD6\u011Fretmen i\xE7in",
+  "Keine Verbindung": "Ba\u011Flant\u0131 yok",
+  "Mini-Server nicht gefunden": "Mini sunucu bulunamad\u0131",
+  "PIN der Lehrkraft": "\xD6\u011Fretmenin PIN'i",
+  "Wird gepr\xFCft \u2026": "Kontrol ediliyor \u2026",
+  /* Klassentafel: Reste, die auf Türkisch deutsch blieben (14.09.2026) */
+  "(du)": "(sen)",
+  "Anfeuern": "Tezah\xFCrat",
+  "Die Klasse ist gerade nicht da. Dein eigener Fortschritt ist in Sicherheit \u2014 sobald wieder Internet da ist, sind auch die anderen wieder hier.": "S\u0131n\u0131f \u015Fu anda burada de\u011Fil. Senin ilerlemen g\xFCvende \u2014 internet gelince arkada\u015Flar\u0131n da geri gelir.",
+  "Diese Woche": "Bu hafta",
+  "Gesamt": "Toplam",
+  "Kind": "\xE7ocuk",
+  "Kinder": "\xE7ocuk",
+  "Level": "Seviye",
+  "denken an dich.": "seni d\xFC\u015F\xFCn\xFCyor.",
+  "denkt an dich.": "seni d\xFC\u015F\xFCn\xFCyor.",
+  "geht gerade nicht": "\u015Fu anda olmuyor",
+  "gesendet": "g\xF6nderildi",
+  "{a} von {b} Suren auswendig": "{b} sureden {a} tanesi ezber",
+  "{a} von {b} XP diese Woche": "bu hafta {b} XP'den {a}",
+  "{name} anfeuern": "{name} i\xE7in tezah\xFCrat",
+  "\u2026 l\xE4dt": "\u2026 y\xFCkleniyor",
+  "\u2026 unterwegs": "\u2026 yolda",
+  /* Vergessene PIN, Notfall-Wort, Klassen-Code (14.09.2026) */
+  "Beim Anlegen deines Klassenzimmers wurde dir ein Notfall-Wort gezeigt. Damit setzt du hier eine neue PIN \u2014 der Code und alle Kinder bleiben.": "S\u0131n\u0131f\u0131n\u0131 olu\u015Ftururken sana bir acil durum kelimesi g\xF6sterilmi\u015Fti. Onunla burada yeni bir PIN belirlersin \u2014 kod ve b\xFCt\xFCn \xE7ocuklar kal\u0131r.",
+  "Bitte das Notfall-Wort eingeben, das beim Anlegen angezeigt wurde.": "L\xFCtfen olu\u015Ftururken g\xF6sterilen acil durum kelimesini gir.",
+  "Damit kannst du deine PIN neu setzen, falls du sie vergisst. Es wird dir nur dieses eine Mal gezeigt.": "PIN'ini unutursan onunla yenisini belirleyebilirsin. Sadece bu bir kez g\xF6sterilir.",
+  "Deine Lehrkraft hat dich aus der Klasse genommen. Melde dich neu an.": "\xD6\u011Fretmenin seni s\u0131n\u0131ftan \xE7\u0131kard\u0131. L\xFCtfen yeniden giri\u015F yap.",
+  "Die PIN ist neu gesetzt. Melde dich damit an.": "PIN yenilendi. Onunla giri\u015F yap.",
+  "Die neue PIN braucht 4 bis 8 Ziffern.": "Yeni PIN 4 ile 8 rakam aras\u0131nda olmal\u0131.",
+  "Frag deine Lehrkraft nach dem Klassen-Code \u2014 vier Ziffern. Sobald du ihn eingibst, siehst du hier deine Klasse, und ihr k\xF6nnt euch gegenseitig anfeuern.": "\xD6\u011Fretmeninden s\u0131n\u0131f kodunu iste \u2014 d\xF6rt rakam. Girdi\u011Fin anda s\u0131n\u0131f\u0131n\u0131 burada g\xF6r\xFCrs\xFCn ve birbirinizi destekleyebilirsiniz.",
+  "Neue PIN": "Yeni PIN",
+  "Neue PIN setzen": "Yeni PIN belirle",
+  "Notfall-Wort": "Acil durum kelimesi",
+  "Notfall-Wort \u2014 jetzt aufschreiben": "Acil durum kelimesi \u2014 \u015Fimdi not al",
+  "PIN vergessen?": "PIN'i mi unuttun?",
+  "Im Code steht auch, womit du dich noch schwertust. Schick ihn nur deiner Lehrkraft, nicht in eine Gruppe.": "Kodun i\xE7inde neyde zorland\u0131\u011F\u0131n da yaz\u0131yor. Onu sadece \xF6\u011Fretmenine g\xF6nder, gruba de\u011Fil.",
+  /* Der Stapelname stand auf tuerkischen Bildschirmen deutsch da (14.09.2026) */
+  "Tecvid \u2014 sch\xF6n lesen": "Tecvid \u2014 g\xFCzel okumak",
+  /* Schueler entfernen: sagen, was wirklich geschieht (14.09.2026) */
+  "{name} aus deiner Liste streichen?": "{name} listenden silinsin mi?",
+  "{name} aus der Klasse entfernen?\n\nDas Konto und der auf dem Server gespeicherte Lernstand werden gel\xF6scht. Auf dem Ger\xE4t des Kindes bleibt sein Fortschritt erhalten; meldet es sich neu an, ist es wieder dabei.": "{name} s\u0131n\u0131ftan \xE7\u0131kar\u0131ls\u0131n m\u0131?\n\nHesab\u0131 ve sunucuda saklanan \xF6\u011Frenme durumu silinir. \xC7ocu\u011Fun cihaz\u0131nda ilerlemesi kal\u0131r; yeniden giri\u015F yaparsa tekrar aran\u0131zda olur.",
+  "\xD6ffne zuerst dein Klassenzimmer mit Code und PIN \u2014 dann kannst du hier eine PIN f\xFCr dieses Ger\xE4t festlegen.": "\xD6nce s\u0131n\u0131f\u0131n\u0131 kod ve PIN ile a\xE7 \u2014 sonra burada bu cihaz i\xE7in bir PIN belirleyebilirsin.",
+  "Jedes Kind, das deinen Klassen-Code eingegeben hat, steht hier. Die Liste aktualisiert sich w\xE4hrend des Unterrichts von selbst.": "S\u0131n\u0131f kodunu giren her \xE7ocuk burada g\xF6r\xFCn\xFCr. Liste ders s\u0131ras\u0131nda kendili\u011Finden yenilenir.",
+  "\u25B4 Filter verbergen": "\u25B4 Filtreyi gizle",
+  "\u25BE Nur eine bestimmte Klasse anzeigen": "\u25BE Sadece belirli bir s\u0131n\u0131f\u0131 g\xF6ster",
+  "Klassen-Code, vier Ziffern (leer = alle)": "S\u0131n\u0131f kodu, d\xF6rt rakam (bo\u015F = hepsi)"
 };
 
 ;
@@ -4840,7 +4891,7 @@ window.SURAHS_DATA = [
     try {
       const r = await SS.req("cards", {
         method: "POST",
-        body: JSON.stringify({ tpw: SS.TEACHER_PW, q: key, a: a || void 0, ar: ar || void 0 })
+        body: JSON.stringify(Object.assign({ q: key, a: a || void 0, ar: ar || void 0 }, SS.teacherAuth()))
       });
       if (r.body && r.body.ok) {
         map[key] = { ts: Date.now() };
@@ -4864,7 +4915,7 @@ window.SURAHS_DATA = [
     try {
       const r = await SS.req("cards", {
         method: "POST",
-        body: JSON.stringify({ tpw: SS.TEACHER_PW, q: key, del: true })
+        body: JSON.stringify(Object.assign({ q: key, del: true }, SS.teacherAuth()))
       });
       if (r.body && r.body.ok) {
         delete map[key];
@@ -4910,8 +4961,8 @@ window.SURAHS_DATA = [
 
 ;
 /* ---- app/config.js ---- */
-window.APP_BUILD = "11.9";
-window.APP_VERSION = "Version 11.9 \xB7 14.09.2026";
+window.APP_BUILD = "11.11";
+window.APP_VERSION = "Version 11.11 \xB7 15.09.2026";
 window.GEMEINDE_NAME = "";
 window.APP_URL = "https://elif-be.de";
 window.SUPABASE_URL = "";
@@ -5566,7 +5617,6 @@ window.Classroom = /* @__PURE__ */ function() {
   const META_KEY = "lern_sync_meta_v1";
   const TEACHER_FLAG = "lern_teacher_v1";
   const EP_KEY = "lern_endpoint_v1";
-  const TEACHER_PW = "1907";
   const DEFAULT_CLASS = "ALLE";
   const KEYS = [
     "s34a_srs_v1",
@@ -5585,7 +5635,14 @@ window.Classroom = /* @__PURE__ */ function() {
     "eb_student_name_v1",
     "eb_hifz_v1",
     "eb_replay_v1",
-    "eb_inf_v1"
+    "eb_inf_v1",
+    /* (14.09.2026) Zwei Schlüssel fehlten hier und wurden deshalb NIE
+       abgeglichen: die gekauften Kostüme samt Münzen (eb_axi_kostuem_v1) und
+       die Lernzeit (eb_lernzeit_v1). Wer auf dem Tablet ein Kostüm kaufte,
+       stand auf dem Handy wieder ohne da — und die Minuten, die ein Kind den
+       Eltern zeigen wollte, fingen auf jedem Gerät bei null an. */
+    "eb_axi_kostuem_v1",
+    "eb_lernzeit_v1"
   ];
   const PREFIXES = ["s34a_mastered_"];
   const isSyncedKey = (k) => KEYS.indexOf(k) >= 0 || PREFIXES.some((p) => String(k).indexOf(p) === 0);
@@ -5613,6 +5670,23 @@ window.Classroom = /* @__PURE__ */ function() {
       suppressTouch = false;
     }
   };
+  const GERAET_KEY = "eb_geraet_v1";
+  function geraeteId() {
+    let g = lsGetRaw(GERAET_KEY);
+    if (!g || !/^[a-z0-9]{8,40}$/i.test(g)) {
+      try {
+        const b = new Uint8Array(12);
+        (window.crypto || {}).getRandomValues ? window.crypto.getRandomValues(b) : b.forEach((_, i) => {
+          b[i] = (i * 7 + 13) % 256;
+        });
+        g = Array.from(b).map((x) => x.toString(16).padStart(2, "0")).join("");
+      } catch (e) {
+        g = "g" + String(Date.now()) + String(performance.now()).replace(".", "");
+      }
+      lsSetRaw(GERAET_KEY, g);
+    }
+    return g;
+  }
   function account() {
     return parse(lsGetRaw(ACC_KEY)) || null;
   }
@@ -5663,16 +5737,26 @@ window.Classroom = /* @__PURE__ */ function() {
     for (const base of baseOrder()) {
       const target = buildUrl(base, route, opts.query);
       let res;
+      const uhr = typeof AbortController === "function" ? new AbortController() : null;
+      const wecker = uhr ? setTimeout(() => {
+        try {
+          uhr.abort();
+        } catch (e) {
+        }
+      }, 12e3) : null;
       try {
         res = await fetch(target, {
           method: opts.method || "GET",
           headers: opts.headers || { "Content-Type": "application/json" },
           body: opts.body,
-          cache: "no-store"
+          cache: "no-store",
+          signal: uhr ? uhr.signal : void 0
         });
       } catch (e) {
         sawNetwork = true;
         continue;
+      } finally {
+        if (wecker) clearTimeout(wecker);
       }
       sawHttp = true;
       lastStatus = res.status;
@@ -5771,6 +5855,7 @@ window.Classroom = /* @__PURE__ */ function() {
     if (b === void 0) return a;
     if (typeof a === "number" && typeof b === "number") return Math.max(a, b);
     if (typeof a === "string" && typeof b === "string" && /^\d{4}-\d{2}-\d{2}/.test(a) && /^\d{4}-\d{2}-\d{2}/.test(b)) return a > b ? a : b;
+    if (Array.isArray(a) || Array.isArray(b)) return vereinigeBesitz(a, b);
     if (a && b && typeof a === "object" && typeof b === "object" && !Array.isArray(a) && !Array.isArray(b)) {
       const out = {};
       new Set(Object.keys(a).concat(Object.keys(b))).forEach((k) => {
@@ -5781,6 +5866,31 @@ window.Classroom = /* @__PURE__ */ function() {
     return b;
   }
   const unionMap = (a, b) => Object.assign({}, a || {}, b || {});
+  function vereinigeBesitz(a, b) {
+    if (Array.isArray(a) || Array.isArray(b)) {
+      const out = [];
+      const gesehen = {};
+      [].concat(Array.isArray(a) ? a : [], Array.isArray(b) ? b : []).forEach((x) => {
+        const id = x && typeof x === "object" ? JSON.stringify(x) : String(x);
+        if (!gesehen[id]) {
+          gesehen[id] = 1;
+          out.push(x);
+        }
+      });
+      return out;
+    }
+    if (a && b && typeof a === "object" && typeof b === "object") {
+      const out = {};
+      new Set(Object.keys(a).concat(Object.keys(b))).forEach((k) => {
+        out[k] = vereinigeBesitz(a[k], b[k]);
+      });
+      return out;
+    }
+    if (typeof a === "number" && typeof b === "number") return Math.max(a, b);
+    if (a === void 0) return b;
+    if (b === void 0) return a;
+    return b;
+  }
   function ohneErsatzstimme(raw) {
     try {
       const o = JSON.parse(raw);
@@ -5797,14 +5907,20 @@ window.Classroom = /* @__PURE__ */ function() {
     if (remoteRaw === void 0 || remoteRaw === null) return localRaw;
     if (localRaw === void 0 || localRaw === null) return remoteRaw;
     if (remoteRaw === localRaw) return localRaw;
+    if (String(key).indexOf("s34a_mastered_") === 0) return remoteRaw || localRaw;
     const r = parse(remoteRaw), l = parse(localRaw);
     if (r === void 0 || l === void 0) return localRaw;
     try {
       if (key === "s34a_srs_v1") {
+        const jetzt = Date.now() + 36e5;
+        const echt = (x) => {
+          const t = Number(x && x.updatedAt || 0) || 0;
+          return t > jetzt ? 0 : t;
+        };
         const out = Object.assign({}, r);
         Object.keys(l || {}).forEach((ck) => {
           const a = out[ck], b = l[ck];
-          out[ck] = !a || b && (b.updatedAt || 0) >= (a.updatedAt || 0) ? b : a;
+          out[ck] = !a || b && echt(b) >= echt(a) ? b : a;
         });
         return JSON.stringify(out);
       }
@@ -5824,6 +5940,9 @@ window.Classroom = /* @__PURE__ */ function() {
         return JSON.stringify(out.slice(0, 200));
       }
       if (key === "s34a_xp_v1" || key === "s34a_lesson_v1") return JSON.stringify(deepNumMax(r, l));
+      if (key === "s34a_monsters_v1" || key === "eb_axi_kostuem_v1" || key === "s34a_hearts_v1")
+        return JSON.stringify(vereinigeBesitz(r, l));
+      if (key === "eb_lernzeit_v1") return JSON.stringify(deepNumMax(r, l));
       if (key === "eb_hifz_v1" || key === "eb_replay_v1" || key === "eb_inf_v1") return JSON.stringify(deepNumMax(r, l));
       if (key === "s34a_custom_topics_v1" && Array.isArray(r) && Array.isArray(l)) {
         const byId = {};
@@ -5883,9 +6002,79 @@ window.Classroom = /* @__PURE__ */ function() {
     }
     return { v: 1, n: acc.name, d: (/* @__PURE__ */ new Date()).toISOString().slice(0, 10) };
   }
+  const PARK = "eb_park_";
+  function parkSchluessel() {
+    const out = [];
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.indexOf(PARK) === 0) out.push(k);
+      }
+    } catch (e) {
+    }
+    return out;
+  }
+  function standParken(name) {
+    const n = String(name || "").trim().toLowerCase();
+    if (!n) return;
+    try {
+      lsSetRaw(PARK + n, JSON.stringify({ data: collect().data, ts: Date.now() }));
+      const alle = parkSchluessel();
+      if (alle.length > 3) {
+        alle.map((k) => ({ k, ts: (parse(lsGetRaw(k)) || {}).ts || 0 })).sort((a, b) => a.ts - b.ts).slice(0, alle.length - 3).forEach((x) => {
+          try {
+            localStorage.removeItem(x.k);
+          } catch (e) {
+          }
+        });
+      }
+    } catch (e) {
+    }
+  }
+  function standLeeren() {
+    try {
+      const weg = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && isSyncedKey(k)) weg.push(k);
+      }
+      weg.forEach((k) => {
+        try {
+          localStorage.removeItem(k);
+        } catch (e) {
+        }
+      });
+    } catch (e) {
+    }
+  }
+  function standHolen(name) {
+    const n = String(name || "").trim().toLowerCase();
+    if (!n) return false;
+    const o = parse(lsGetRaw(PARK + n));
+    if (o && o.data) {
+      applyData(o.data);
+      try {
+        localStorage.removeItem(PARK + n);
+      } catch (e) {
+      }
+      return true;
+    }
+    return false;
+  }
+  function standUebergeben(neuerName) {
+    const vorher = account();
+    const alt = vorher && vorher.name ? String(vorher.name).trim().toLowerCase() : "";
+    const neu = String(neuerName || "").trim().toLowerCase();
+    if (alt && neu && alt !== neu) {
+      standParken(vorher.name);
+      standLeeren();
+    }
+    if (neu) standHolen(neu);
+  }
   function localLogin(name, classCode) {
     const n = String(name || "").trim().replace(/\s+/g, " ").slice(0, 40);
     if (n.length < 2) return { error: "Name zu kurz" };
+    standUebergeben(n);
     saveAccount({ name: n, key: null, classCode: String(classCode || "").trim().toUpperCase() || DEFAULT_CLASS, role: "student", local: true });
     try {
       window.Classroom && window.Classroom.setName && window.Classroom.setName(n);
@@ -5896,7 +6085,7 @@ window.Classroom = /* @__PURE__ */ function() {
   }
   async function tryUpgrade(acc) {
     try {
-      const r = await req("auth", { method: "POST", body: JSON.stringify({ action: "join", name: acc.name, pass: "", classCode: acc.classCode || "" }) });
+      const r = await req("auth", { method: "POST", body: JSON.stringify({ action: "join", name: acc.name, pass: "", classCode: acc.classCode || "", device: geraeteId() }) });
       if (r.body && r.body.ok) {
         saveAccount({ name: r.body.name, key: r.body.key, classCode: r.body.classCode || DEFAULT_CLASS, role: r.body.role || "student" });
         return true;
@@ -5926,9 +6115,9 @@ window.Classroom = /* @__PURE__ */ function() {
     setState("syncing");
     try {
       const m = meta();
-      let local = collect();
       const got = await req("sync", { query: { key: acc.key } });
       let baseRev = got.body && got.body.rev || 0;
+      let local = collect();
       if (got.body && got.body.found && got.body.col) {
         const merged = mergeCols(got.body.col, local);
         applyData(merged.data);
@@ -5936,6 +6125,7 @@ window.Classroom = /* @__PURE__ */ function() {
       }
       let done = false;
       for (let attempt = 0; attempt < 3 && !done; attempt++) {
+        local = mergeCols(local, collect());
         const payload = {
           key: acc.key,
           col: local,
@@ -5952,7 +6142,7 @@ window.Classroom = /* @__PURE__ */ function() {
         });
         const rb = r.body || {};
         if (r.status === 409 && rb.col) {
-          const merged = mergeCols(rb.col, local);
+          const merged = mergeCols(rb.col, mergeCols(local, collect()));
           applyData(merged.data);
           local = merged;
           baseRev = rb.rev || 0;
@@ -5962,6 +6152,12 @@ window.Classroom = /* @__PURE__ */ function() {
           saveMeta(Object.assign(m, { rev: rb.rev, lastSync: Date.now(), lastClassPost: Date.now() }));
           done = true;
           break;
+        }
+        if (rb.entfernt) {
+          logout();
+          setState("error", _t("Deine Lehrkraft hat dich aus der Klasse genommen. Melde dich neu an."));
+          syncing = false;
+          return;
         }
         throw new Error(rb.error || _t("Abgleich fehlgeschlagen"));
       }
@@ -5983,7 +6179,7 @@ window.Classroom = /* @__PURE__ */ function() {
     const m = meta();
     if (!force && Date.now() - (m.lastClassPost || 0) < 6e4) return;
     try {
-      await req("class", { method: "POST", body: JSON.stringify({ code: acc.classCode || DEFAULT_CLASS, name: acc.name, summary: buildSummary(acc) }) });
+      await req("class", { method: "POST", body: JSON.stringify({ code: acc.classCode || DEFAULT_CLASS, name: acc.name, key: acc.key, summary: buildSummary(acc) }) });
       saveMeta(Object.assign(meta(), { lastClassPost: Date.now() }));
     } catch (e) {
     }
@@ -6014,7 +6210,7 @@ window.Classroom = /* @__PURE__ */ function() {
     const acc = account();
     if (!acc || !acc.name) return { error: _t("nicht angemeldet") };
     try {
-      const r = await req("cheer", { method: "POST", body: JSON.stringify({ to, from: acc.name, kind: kind || "\u{1F4AA}" }) });
+      const r = await req("cheer", { method: "POST", body: JSON.stringify({ to, from: acc.name, key: acc.key, kind: kind || "\u{1F4AA}" }) });
       return r.body || {};
     } catch (e) {
       return { error: "Server nicht erreichbar" };
@@ -6024,7 +6220,7 @@ window.Classroom = /* @__PURE__ */ function() {
     const acc = account();
     if (!acc || !acc.name) return { cheers: [] };
     try {
-      const r = await req("cheer", { query: { name: acc.name, clear: clear ? 1 : void 0 } });
+      const r = await req("cheer", { query: { name: acc.name, key: acc.key, clear: clear ? 1 : void 0 } });
       return { cheers: r.body && r.body.cheers || [] };
     } catch (e) {
       return { cheers: [], error: "offline" };
@@ -6039,9 +6235,11 @@ window.Classroom = /* @__PURE__ */ function() {
       return { error: "Server nicht erreichbar" };
     }
   }
-  async function listNames() {
+  async function listNames(codeOverride) {
+    const code = String(codeOverride === void 0 ? (account() || {}).classCode || "" : codeOverride).trim().toUpperCase();
+    if (!/^\d{4}$/.test(code)) return [];
     try {
-      const r = await req("auth", { method: "POST", body: JSON.stringify({ action: "list" }) });
+      const r = await req("auth", { method: "POST", body: JSON.stringify({ action: "list", classCode: code }) });
       return r.body && r.body.names || [];
     } catch (e) {
       return [];
@@ -6090,9 +6288,25 @@ window.Classroom = /* @__PURE__ */ function() {
       const j = await join(o.teacher, "", { classCode: r.body.code, teacher: true, pin: o.pin });
       if (!j.ok) return { error: j.error || "Lehrer-Anmeldung hat nicht geklappt" };
       saveClassInfo({ code: r.body.code, name: r.body.name, teacher: r.body.teacher });
-      return { ok: true, code: r.body.code, name: r.body.name };
+      return { ok: true, code: r.body.code, name: r.body.name, notfall: r.body.notfall || "" };
     } catch (e) {
       return { error: e.offline ? "Keine Verbindung" : "Server nicht erreichbar" };
+    }
+  }
+  async function pinNeuSetzen(code, neuePin, o) {
+    o = o || {};
+    try {
+      const r = await req("klasse", { method: "POST", body: JSON.stringify({
+        action: "pinNeu",
+        code: String(code || "").trim(),
+        pin: String(neuePin || "").trim(),
+        notfall: o.notfall ? String(o.notfall).trim().toUpperCase() : void 0,
+        altPin: o.altPin ? String(o.altPin).trim() : void 0
+      }) });
+      if (r.body && r.body.ok) return { ok: true, name: r.body.name };
+      return { error: r.body && r.body.error || _t("Das hat nicht geklappt.") };
+    } catch (e) {
+      return { error: e.offline ? _t("Keine Verbindung") : _t("Server nicht erreichbar") };
     }
   }
   async function teacherLogin(code, pin) {
@@ -6111,13 +6325,33 @@ window.Classroom = /* @__PURE__ */ function() {
   function teacherAuth() {
     const acc = account();
     if (acc && acc.pin) return { pin: acc.pin, code: acc.classCode };
-    return { tpw: TEACHER_PW };
+    if (acc && acc.tpw) return { tpw: acc.tpw };
+    return {};
+  }
+  async function teacherCheck(pw) {
+    const p = String(pw || "").trim();
+    if (!p) return { ok: false };
+    try {
+      const r = await req("class", { query: { tpw: p } });
+      if (r.body && r.body.students) {
+        const acc = account();
+        if (acc) {
+          acc.tpw = p;
+          saveAccount(acc);
+        }
+        return { ok: true };
+      }
+      return { ok: false, error: r.body && r.body.error || _t("Falsches Passwort.") };
+    } catch (e) {
+      return { ok: false, offline: !!e.offline, error: e.offline ? _t("Keine Verbindung") : _t("Mini-Server nicht gefunden") };
+    }
   }
   async function join(name, pass, opts) {
     opts = opts || {};
     const n = String(name || "").trim().replace(/\s+/g, " ").slice(0, 40);
     if (n.length < 2) return { error: "Bitte gib deinen Namen ein (mindestens 2 Buchstaben)." };
-    const body = { action: "join", name: n, pass: pass || "", classCode: String(opts.classCode || "").toUpperCase() };
+    const body = { action: "join", name: n, pass: pass || "", classCode: String(opts.classCode || "").toUpperCase(), device: geraeteId() };
+    if (opts.klassenPin) body.klassenPin = String(opts.klassenPin).trim();
     if (opts.teacher) {
       body.teacher = true;
       body.tpw = opts.teacherPw || "";
@@ -6132,14 +6366,17 @@ window.Classroom = /* @__PURE__ */ function() {
       res.notice = e.offline ? "Gerade keine Verbindung \u2014 du kannst sofort loslegen, der Abgleich l\xE4uft sp\xE4ter automatisch." : "Der Mini-Server antwortet auf dieser Seite noch nicht \u2014 du kannst trotzdem sofort loslegen. Sobald er da ist, verbindet sich dein Konto von selbst.";
       return res;
     }
+    if (r.body && r.body.needTeacher) return { needTeacher: true, error: r.body.error };
     if (r.status === 401 || r.body && r.body.needPass) return { needPass: true, error: r.body && r.body.error };
     if (r.body && r.body.ok) {
+      standUebergeben(r.body.name);
       saveAccount({
         name: r.body.name,
         key: r.body.key,
         classCode: r.body.classCode || DEFAULT_CLASS,
         role: r.body.role || "student",
-        pin: opts.teacher && opts.pin ? opts.pin : void 0
+        pin: opts.teacher && opts.pin ? opts.pin : void 0,
+        tpw: opts.teacher && opts.teacherPw ? opts.teacherPw : void 0
       });
       if (r.body.className) saveClassInfo({ code: r.body.classCode, name: r.body.className, teacher: r.body.teacherName || "" });
       else if (!/^\d{4}$/.test(String(r.body.classCode || ""))) saveClassInfo(null);
@@ -6183,7 +6420,7 @@ window.Classroom = /* @__PURE__ */ function() {
     if (!acc) return { error: "Nicht angemeldet" };
     try {
       if (acc.key) {
-        const r = await req("auth", { method: "POST", body: JSON.stringify({ action: "delete", name: acc.name, pass: pass || "" }) });
+        const r = await req("auth", { method: "POST", body: JSON.stringify({ action: "delete", name: acc.name, pass: pass || "", device: geraeteId() }) });
         if (!(r.body && r.body.ok)) return { error: r.body && r.body.error || "L\xF6schen fehlgeschlagen" };
       }
     } catch (e) {
@@ -6211,6 +6448,11 @@ window.Classroom = /* @__PURE__ */ function() {
     return { ok: true };
   }
   function logout() {
+    const acc = account();
+    if (acc && acc.name) {
+      standParken(acc.name);
+      standLeeren();
+    }
     saveClassInfo(null);
     saveAccount(null);
     try {
@@ -6333,8 +6575,10 @@ window.Classroom = /* @__PURE__ */ function() {
     lookupClass,
     createClass,
     teacherLogin,
+    pinNeuSetzen,
     classInfo,
     teacherAuth,
+    teacherCheck,
     fetchBoard,
     sendCheer,
     fetchCheers,
@@ -6345,7 +6589,6 @@ window.Classroom = /* @__PURE__ */ function() {
     localLogin,
     url,
     req,
-    TEACHER_PW,
     DEFAULT_CLASS,
     // nur fürs Prüfen/Diagnostizieren nach außen gereicht
     _mergeKey: mergeKey,
@@ -10059,6 +10302,8 @@ function AuthModal({ ctx }) {
   });
   const [pass, setPass] = useStateAuth("");
   const [needPass, setNeedPass] = useStateAuth(false);
+  const [needTeacher, setNeedTeacher] = useStateAuth(false);
+  const [klassenPin, setKlassenPin] = useStateAuth("");
   const [showExtra, setShowExtra] = useStateAuth(false);
   const [classCode, setClassCode] = useStateAuth(() => {
     const a = SS && SS.account();
@@ -10100,6 +10345,9 @@ function AuthModal({ ctx }) {
   const [tCode, setTCode] = useStateAuth("");
   const [tLoginPin, setTLoginPin] = useStateAuth("");
   const [neuCode, setNeuCode] = useStateAuth("");
+  const [neuNotfall, setNeuNotfall] = useStateAuth("");
+  const [notfallWort, setNotfallWort] = useStateAuth("");
+  const [notfallPin, setNotfallPin] = useStateAuth("");
   const [teacherPw, setTeacherPw] = useStateAuth("");
   const [busy, setBusy] = useStateAuth(false);
   const [err, setErr] = useStateAuth("");
@@ -10123,13 +10371,16 @@ function AuthModal({ ctx }) {
   };
   React.useEffect(() => {
     let dead = false;
-    if (SS && SS.listNames && !acc) SS.listNames().then((l) => {
-      if (!dead) setNames(l || []);
-    });
+    const code2 = String(classCode || "").trim();
+    if (SS && SS.listNames && !acc && /^\d{4}$/.test(code2)) {
+      SS.listNames(code2).then((l) => {
+        if (!dead) setNames(l || []);
+      });
+    } else if (!dead) setNames([]);
     return () => {
       dead = true;
     };
-  }, []);
+  }, [classCode, acc]);
   if (view === "expert") return /* @__PURE__ */ React.createElement(SupabaseSetupPanel, { ctx, onBack: () => setView("main") });
   if (view === "check") return /* @__PURE__ */ React.createElement(ServerCheckPanel, { ctx, onBack: () => setView("main") });
   if (view === "lehrer") {
@@ -10156,7 +10407,33 @@ function AuthModal({ ctx }) {
       setBusy(false);
       if (r.ok) {
         setNeuCode(r.code);
+        setNeuNotfall(r.notfall || "");
         setView("code");
+      } else setErr(r.error || _t("Das hat nicht geklappt."));
+    };
+    const pinZuruecksetzen = async () => {
+      setErr("");
+      setOkMsg("");
+      if (!/^\d{4}$/.test(tCode)) {
+        setErr(_t("Der Klassen-Code hat vier Ziffern."));
+        return;
+      }
+      if (notfallWort.trim().length < 4) {
+        setErr(_t("Bitte das Notfall-Wort eingeben, das beim Anlegen angezeigt wurde."));
+        return;
+      }
+      if (!/^\d{4,8}$/.test(notfallPin)) {
+        setErr(_t("Die neue PIN braucht 4 bis 8 Ziffern."));
+        return;
+      }
+      setBusy(true);
+      const r = await SS.pinNeuSetzen(tCode, notfallPin, { notfall: notfallWort });
+      setBusy(false);
+      if (r.ok) {
+        setOkMsg(_t("Die PIN ist neu gesetzt. Melde dich damit an."));
+        setTLoginPin(notfallPin);
+        setNotfallWort("");
+        setNotfallPin("");
       } else setErr(r.error || _t("Das hat nicht geklappt."));
     };
     const oeffnen = async () => {
@@ -10180,14 +10457,14 @@ function AuthModal({ ctx }) {
     return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(ModalHead, { title: _t("F\xFCr Lehrkr\xE4fte"), onClose: ctx.closeModal }), /* @__PURE__ */ React.createElement("div", { className: "modal-body" }, /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost btn-sm", style: { marginBottom: 12 }, onClick: () => {
       setErr("");
       setView("main");
-    } }, _t("\u2190 Zur\xFCck")), /* @__PURE__ */ React.createElement("div", { className: "card flat", style: { padding: 16 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 900, fontSize: 17 } }, _t("\u{1F195} Neues Klassenzimmer anlegen")), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 13, margin: "4px 0 12px", lineHeight: 1.45 } }, _t("Du bekommst einen Code mit vier Ziffern. Den gibst du den Kindern \u2014 sie tippen beim Anmelden Namen und Code ein und sind in deiner Klasse. Mehr ist es nicht.")), /* @__PURE__ */ React.createElement("label", { className: "feld" }, _t("Name der Klasse"), /* @__PURE__ */ React.createElement("input", { value: tKlasse, onChange: (e) => setTKlasse(e.target.value), placeholder: _t("z. B. Klasse 3b oder Samstagskurs"), style: inputStyle })), /* @__PURE__ */ React.createElement("label", { className: "feld" }, _t("Dein Name (sehen die Kinder)"), /* @__PURE__ */ React.createElement("input", { value: tName, onChange: (e) => setTName(e.target.value), placeholder: _t("z. B. Frau Y\u0131lmaz"), style: inputStyle })), /* @__PURE__ */ React.createElement("div", { className: "row", style: { gap: 8 } }, /* @__PURE__ */ React.createElement("label", { className: "feld", style: { flex: 1 } }, _t("PIN (4 Ziffern)"), /* @__PURE__ */ React.createElement("input", { type: "password", inputMode: "numeric", value: tPin, onChange: (e) => setTPin(e.target.value.replace(/\D/g, "").slice(0, 8)), placeholder: "\u2022\u2022\u2022\u2022", style: inputStyle })), /* @__PURE__ */ React.createElement("label", { className: "feld", style: { flex: 1 } }, _t("PIN wiederholen"), /* @__PURE__ */ React.createElement("input", { type: "password", inputMode: "numeric", value: tPin2, onChange: (e) => setTPin2(e.target.value.replace(/\D/g, "").slice(0, 8)), placeholder: "\u2022\u2022\u2022\u2022", style: inputStyle }))), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 12.5, marginBottom: 10 } }, _t("Mit Code + PIN \xF6ffnest du dein Klassenzimmer auf jedem Ger\xE4t. Die PIN kennst nur du.")), /* @__PURE__ */ React.createElement("button", { className: "btn btn-primary btn-full", disabled: busy, onClick: anlegen }, busy ? _t("Einen Moment\u2026") : _t("Klassenzimmer anlegen"))), /* @__PURE__ */ React.createElement("div", { className: "card flat", style: { padding: 16, marginTop: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 900, fontSize: 17 } }, _t("\u{1F511} Mein Klassenzimmer \xF6ffnen")), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 13, margin: "4px 0 10px" } }, _t("Du hast schon eins? Code und PIN eingeben.")), /* @__PURE__ */ React.createElement("div", { className: "row", style: { gap: 8 } }, /* @__PURE__ */ React.createElement("input", { inputMode: "numeric", value: tCode, onChange: (e) => setTCode(e.target.value.replace(/\D/g, "").slice(0, 4)), placeholder: _t("Code"), style: { ...inputStyle, flex: 1, textAlign: "center", letterSpacing: 4, fontWeight: 900 } }), /* @__PURE__ */ React.createElement("input", { type: "password", inputMode: "numeric", value: tLoginPin, onChange: (e) => setTLoginPin(e.target.value), onKeyDown: (e) => e.key === "Enter" && oeffnen(), placeholder: "PIN", style: { ...inputStyle, flex: 1, textAlign: "center" } })), /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost btn-full", style: { marginTop: 10 }, disabled: busy, onClick: oeffnen }, _t("\xD6ffnen"))), err && /* @__PURE__ */ React.createElement("div", { style: { color: "var(--rose)", fontWeight: 700, fontSize: 13.5, marginTop: 10, textAlign: "center" } }, err), /* @__PURE__ */ React.createElement("details", { style: { marginTop: 14 } }, /* @__PURE__ */ React.createElement("summary", { className: "muted", style: { fontSize: 12.5, cursor: "pointer" } }, _t("Alter Weg: Sammelklasse mit Lehrer-Passwort")), /* @__PURE__ */ React.createElement("div", { className: "row", style: { gap: 8, marginTop: 8 } }, /* @__PURE__ */ React.createElement("input", { value: name, onChange: (e) => setName(e.target.value), placeholder: _t("Dein Name"), style: { ...inputStyle, flex: 1 } }), /* @__PURE__ */ React.createElement("input", { type: "password", value: teacherPw, onChange: (e) => setTeacherPw(e.target.value), placeholder: _t("Lehrer-Passwort"), style: { ...inputStyle, flex: 1 } })), /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost btn-full", style: { marginTop: 8 }, disabled: busy, onClick: () => {
+    } }, _t("\u2190 Zur\xFCck")), /* @__PURE__ */ React.createElement("div", { className: "card flat", style: { padding: 16 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 900, fontSize: 17 } }, _t("\u{1F195} Neues Klassenzimmer anlegen")), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 13, margin: "4px 0 12px", lineHeight: 1.45 } }, _t("Du bekommst einen Code mit vier Ziffern. Den gibst du den Kindern \u2014 sie tippen beim Anmelden Namen und Code ein und sind in deiner Klasse. Mehr ist es nicht.")), /* @__PURE__ */ React.createElement("label", { className: "feld" }, _t("Name der Klasse"), /* @__PURE__ */ React.createElement("input", { value: tKlasse, onChange: (e) => setTKlasse(e.target.value), placeholder: _t("z. B. Klasse 3b oder Samstagskurs"), style: inputStyle })), /* @__PURE__ */ React.createElement("label", { className: "feld" }, _t("Dein Name (sehen die Kinder)"), /* @__PURE__ */ React.createElement("input", { value: tName, onChange: (e) => setTName(e.target.value), placeholder: _t("z. B. Frau Y\u0131lmaz"), style: inputStyle })), /* @__PURE__ */ React.createElement("div", { className: "row", style: { gap: 8 } }, /* @__PURE__ */ React.createElement("label", { className: "feld", style: { flex: 1 } }, _t("PIN (4 Ziffern)"), /* @__PURE__ */ React.createElement("input", { type: "password", inputMode: "numeric", value: tPin, onChange: (e) => setTPin(e.target.value.replace(/\D/g, "").slice(0, 8)), placeholder: "\u2022\u2022\u2022\u2022", style: inputStyle })), /* @__PURE__ */ React.createElement("label", { className: "feld", style: { flex: 1 } }, _t("PIN wiederholen"), /* @__PURE__ */ React.createElement("input", { type: "password", inputMode: "numeric", value: tPin2, onChange: (e) => setTPin2(e.target.value.replace(/\D/g, "").slice(0, 8)), placeholder: "\u2022\u2022\u2022\u2022", style: inputStyle }))), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 12.5, marginBottom: 10 } }, _t("Mit Code + PIN \xF6ffnest du dein Klassenzimmer auf jedem Ger\xE4t. Die PIN kennst nur du.")), /* @__PURE__ */ React.createElement("button", { className: "btn btn-primary btn-full", disabled: busy, onClick: anlegen }, busy ? _t("Einen Moment\u2026") : _t("Klassenzimmer anlegen"))), /* @__PURE__ */ React.createElement("div", { className: "card flat", style: { padding: 16, marginTop: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 900, fontSize: 17 } }, _t("\u{1F511} Mein Klassenzimmer \xF6ffnen")), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 13, margin: "4px 0 10px" } }, _t("Du hast schon eins? Code und PIN eingeben.")), /* @__PURE__ */ React.createElement("div", { className: "row", style: { gap: 8 } }, /* @__PURE__ */ React.createElement("input", { inputMode: "numeric", value: tCode, onChange: (e) => setTCode(e.target.value.replace(/\D/g, "").slice(0, 4)), placeholder: _t("Code"), style: { ...inputStyle, flex: 1, textAlign: "center", letterSpacing: 4, fontWeight: 900 } }), /* @__PURE__ */ React.createElement("input", { type: "password", inputMode: "numeric", value: tLoginPin, onChange: (e) => setTLoginPin(e.target.value), onKeyDown: (e) => e.key === "Enter" && oeffnen(), placeholder: "PIN", style: { ...inputStyle, flex: 1, textAlign: "center" } })), /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost btn-full", style: { marginTop: 10 }, disabled: busy, onClick: oeffnen }, _t("\xD6ffnen"))), err && /* @__PURE__ */ React.createElement("div", { style: { color: "var(--rose)", fontWeight: 700, fontSize: 13.5, marginTop: 10, textAlign: "center" } }, err), okMsg && /* @__PURE__ */ React.createElement("div", { style: { color: "var(--success-3)", fontWeight: 800, fontSize: 13.5, marginTop: 10, textAlign: "center" } }, okMsg), /* @__PURE__ */ React.createElement("details", { style: { marginTop: 12 } }, /* @__PURE__ */ React.createElement("summary", { className: "muted", style: { fontSize: 12.5, cursor: "pointer" } }, _t("PIN vergessen?")), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 12.5, margin: "6px 0 8px", lineHeight: 1.45 } }, _t("Beim Anlegen deines Klassenzimmers wurde dir ein Notfall-Wort gezeigt. Damit setzt du hier eine neue PIN \u2014 der Code und alle Kinder bleiben.")), /* @__PURE__ */ React.createElement("div", { className: "row", style: { gap: 8 } }, /* @__PURE__ */ React.createElement("input", { value: notfallWort, onChange: (e) => setNotfallWort(e.target.value.toUpperCase()), placeholder: _t("Notfall-Wort"), style: { ...inputStyle, flex: 1, textAlign: "center", letterSpacing: 2 } }), /* @__PURE__ */ React.createElement("input", { type: "password", inputMode: "numeric", value: notfallPin, onChange: (e) => setNotfallPin(e.target.value.replace(/\D/g, "").slice(0, 8)), placeholder: _t("Neue PIN"), style: { ...inputStyle, flex: 1, textAlign: "center" } })), /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost btn-full", style: { marginTop: 8 }, disabled: busy, onClick: pinZuruecksetzen }, _t("Neue PIN setzen"))), /* @__PURE__ */ React.createElement("details", { style: { marginTop: 10 } }, /* @__PURE__ */ React.createElement("summary", { className: "muted", style: { fontSize: 12.5, cursor: "pointer" } }, _t("Alter Weg: Sammelklasse mit Lehrer-Passwort")), /* @__PURE__ */ React.createElement("div", { className: "row", style: { gap: 8, marginTop: 8 } }, /* @__PURE__ */ React.createElement("input", { value: name, onChange: (e) => setName(e.target.value), placeholder: _t("Dein Name"), style: { ...inputStyle, flex: 1 } }), /* @__PURE__ */ React.createElement("input", { type: "password", value: teacherPw, onChange: (e) => setTeacherPw(e.target.value), placeholder: _t("Lehrer-Passwort"), style: { ...inputStyle, flex: 1 } })), /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost btn-full", style: { marginTop: 8 }, disabled: busy, onClick: () => {
       setTeacher(true);
       setCode("");
       setTimeout(() => submit(), 0);
     } }, _t("Als Lehrkraft der Sammelklasse anmelden")))));
   }
   if (view === "code") {
-    return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(ModalHead, { title: _t("Dein Klassenzimmer steht"), onClose: ctx.closeModal }), /* @__PURE__ */ React.createElement("div", { className: "modal-body", style: { textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "grid", placeItems: "center" } }, /* @__PURE__ */ React.createElement(Axolotl, { size: 100, mood: "cheer" })), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 14, marginTop: 4 } }, _t("Das ist der Code f\xFCr deine Kinder:")), /* @__PURE__ */ React.createElement("div", { className: "klassen-code" }, neuCode), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 13.5, lineHeight: 1.45 } }, _t('Die Kinder \xF6ffnen die App, tippen \u201ENamen" und diesen \u201ECode" ein \u2014 fertig, sie sind in deiner Klasse. Schreib ihn an die Tafel oder schick ihn in die Eltern-Gruppe.')), okMsg && /* @__PURE__ */ React.createElement("div", { style: { color: "var(--success-3)", fontWeight: 800, marginTop: 8 } }, okMsg), /* @__PURE__ */ React.createElement("div", { className: "col", style: { gap: 8, marginTop: 14 } }, /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost btn-full", onClick: () => teilenKlasse(neuCode) }, "\u{1F4E4} ", _t("Code + Installier-Link teilen")), /* @__PURE__ */ React.createElement("a", { className: "btn btn-ghost btn-full", href: installLink(neuCode), target: "_blank", rel: "noopener" }, _t("\u{1F5A8}\uFE0F Aushang f\xFCr die Klassent\xFCr")), /* @__PURE__ */ React.createElement("button", { className: "btn btn-primary btn-full btn-lg", onClick: () => {
+    return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement(ModalHead, { title: _t("Dein Klassenzimmer steht"), onClose: ctx.closeModal }), /* @__PURE__ */ React.createElement("div", { className: "modal-body", style: { textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "grid", placeItems: "center" } }, /* @__PURE__ */ React.createElement(Axolotl, { size: 100, mood: "cheer" })), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 14, marginTop: 4 } }, _t("Das ist der Code f\xFCr deine Kinder:")), /* @__PURE__ */ React.createElement("div", { className: "klassen-code" }, neuCode), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 13.5, lineHeight: 1.45 } }, _t('Die Kinder \xF6ffnen die App, tippen \u201ENamen" und diesen \u201ECode" ein \u2014 fertig, sie sind in deiner Klasse. Schreib ihn an die Tafel oder schick ihn in die Eltern-Gruppe.')), neuNotfall && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 14, padding: "12px 14px", borderRadius: 14, background: "var(--accent-soft, #FFF6E0)", border: "1.5px dashed var(--gold, #F5B000)" } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 900, fontSize: 13.5 } }, "\u{1F511} ", _t("Notfall-Wort \u2014 jetzt aufschreiben")), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 900, fontSize: 24, letterSpacing: 3, margin: "6px 0", fontFamily: "ui-monospace, monospace" } }, neuNotfall), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 12.5, lineHeight: 1.45 } }, _t("Damit kannst du deine PIN neu setzen, falls du sie vergisst. Es wird dir nur dieses eine Mal gezeigt."))), okMsg && /* @__PURE__ */ React.createElement("div", { style: { color: "var(--success-3)", fontWeight: 800, marginTop: 8 } }, okMsg), /* @__PURE__ */ React.createElement("div", { className: "col", style: { gap: 8, marginTop: 14 } }, /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost btn-full", onClick: () => teilenKlasse(neuCode) }, "\u{1F4E4} ", _t("Code + Installier-Link teilen")), /* @__PURE__ */ React.createElement("a", { className: "btn btn-ghost btn-full", href: installLink(neuCode), target: "_blank", rel: "noopener" }, _t("\u{1F5A8}\uFE0F Aushang f\xFCr die Klassent\xFCr")), /* @__PURE__ */ React.createElement("button", { className: "btn btn-primary btn-full btn-lg", onClick: () => {
       ctx.closeModal();
       ctx.go && ctx.go("teacher");
     } }, _t("Zum Klassenzimmer")))));
@@ -10242,11 +10519,16 @@ function AuthModal({ ctx }) {
       return;
     }
     setBusy(true);
-    const res = await SS.join(n, pass.trim(), { classCode: code || classCode.trim(), teacher, teacherPw: teacherPw.trim() });
+    const res = await SS.join(n, pass.trim(), { classCode: code || classCode.trim(), teacher, teacherPw: teacherPw.trim(), klassenPin: klassenPin.trim() });
     setBusy(false);
     if (res.ok) {
       window.Sound && window.Sound.streakSecured && window.Sound.streakSecured();
       ctx.closeModal();
+      return;
+    }
+    if (res.needTeacher) {
+      setNeedTeacher(true);
+      setErr(res.error || _t("Diesen Namen gibt es schon. Frag kurz deine Lehrkraft \u2014 sie tippt ihre PIN ein."));
       return;
     }
     if (res.needPass) {
@@ -10290,7 +10572,18 @@ function AuthModal({ ctx }) {
       placeholder: _t("Geheimwort"),
       style: { ...inputStyle, marginTop: 8, textAlign: "center" }
     }
-  ), err && /* @__PURE__ */ React.createElement("div", { style: { color: "var(--rose, #D64545)", fontWeight: 700, fontSize: 13.5, marginTop: 8, textAlign: "center" } }, err), notice && /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 12.5, marginTop: 8, textAlign: "center" } }, notice), known.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 14 } }, /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 12.5, fontWeight: 700, marginBottom: 6, textAlign: "center" } }, _t("Schon mal dabei gewesen? Tipp deinen Namen an:")), /* @__PURE__ */ React.createElement("div", { className: "row", style: { gap: 6, flexWrap: "wrap", justifyContent: "center" } }, known.slice(0, 40).map((x) => /* @__PURE__ */ React.createElement(
+  ), needTeacher && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 10, padding: "10px 12px", borderRadius: 12, background: "var(--brand-soft, #EEEBFF)" } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800, fontSize: 13.5, marginBottom: 6 } }, "\u{1F9D1}\u200D\u{1F3EB} ", _t("F\xFCr die Lehrkraft")), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 12.5, marginBottom: 8, lineHeight: 1.45 } }, _t("Dieses Ger\xE4t kennt den Namen noch nicht. Tippe einmal die PIN deines Klassenzimmers ein \u2014 danach geht es hier immer.")), /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      type: "password",
+      inputMode: "numeric",
+      value: klassenPin,
+      onChange: (e) => setKlassenPin(e.target.value),
+      onKeyDown: (e) => e.key === "Enter" && submit(),
+      placeholder: _t("PIN der Lehrkraft"),
+      style: { ...inputStyle, textAlign: "center" }
+    }
+  )), err && /* @__PURE__ */ React.createElement("div", { style: { color: "var(--rose, #D64545)", fontWeight: 700, fontSize: 13.5, marginTop: 8, textAlign: "center" } }, err), notice && /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 12.5, marginTop: 8, textAlign: "center" } }, notice), known.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 14 } }, /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 12.5, fontWeight: 700, marginBottom: 6, textAlign: "center" } }, _t("Schon mal dabei gewesen? Tipp deinen Namen an:")), /* @__PURE__ */ React.createElement("div", { className: "row", style: { gap: 6, flexWrap: "wrap", justifyContent: "center" } }, known.slice(0, 40).map((x) => /* @__PURE__ */ React.createElement(
     "button",
     {
       key: x.name,
@@ -13627,6 +13920,7 @@ window.LessonScreen = LessonScreen;
     const [stale, setStale] = useState(!!cached);
     const [err, setErr] = useState("");
     const [busy, setBusy] = useState(false);
+    const [ohneKlasse, setOhneKlasse] = useState(false);
     const load = useCallback(function() {
       const SS = window.SimpleSync;
       if (!SS || !SS.fetchBoard) {
@@ -13637,6 +13931,7 @@ window.LessonScreen = LessonScreen;
       SS.fetchBoard().then(function(r) {
         setBusy(false);
         if (r && r.ok) {
+          setOhneKlasse(!!r.ohneKlasse);
           setBoard(r.board);
           setStale(false);
           setErr("");
@@ -13646,17 +13941,33 @@ window.LessonScreen = LessonScreen;
     }, []);
     useEffect(function() {
       load();
-      const t = setInterval(load, 9e4);
-      const vis = function() {
-        if (!document.hidden) load();
+      let t = null;
+      const an = function() {
+        if (!t) t = setInterval(function() {
+          if (!document.hidden) load();
+        }, 18e4);
       };
+      const aus = function() {
+        if (t) {
+          clearInterval(t);
+          t = null;
+        }
+      };
+      const vis = function() {
+        if (document.hidden) aus();
+        else {
+          load();
+          an();
+        }
+      };
+      an();
       document.addEventListener("visibilitychange", vis);
       return function() {
-        clearInterval(t);
+        aus();
         document.removeEventListener("visibilitychange", vis);
       };
     }, [load]);
-    return { board, stale, err, busy, reload: load };
+    return { board, stale, err, busy, reload: load, ohneKlasse };
   }
   function useCheers() {
     const [list, setList] = useState([]);
@@ -13665,15 +13976,21 @@ window.LessonScreen = LessonScreen;
       if (!SS || !SS.fetchCheers) return void 0;
       let alive = true;
       const pull = function() {
+        if (document.hidden) return;
         SS.fetchCheers(false).then(function(r) {
           if (alive) setList(r && r.cheers || []);
         });
       };
       pull();
-      const t = setInterval(pull, 6e4);
+      const t = setInterval(pull, 12e4);
+      const vis = function() {
+        if (!document.hidden) pull();
+      };
+      document.addEventListener("visibilitychange", vis);
       return function() {
         alive = false;
         clearInterval(t);
+        document.removeEventListener("visibilitychange", vis);
       };
     }, []);
     return list;
@@ -13730,7 +14047,7 @@ window.LessonScreen = LessonScreen;
     );
   }
   function ClassCard({ ctx }) {
-    const { board, stale, err, busy, reload } = useBoard();
+    const { board, stale, err, busy, reload, ohneKlasse } = useBoard();
     const cheers = useCheers();
     const [tab, setTab] = useState("woche");
     const [pick, setPick] = useState(null);
@@ -13741,6 +14058,11 @@ window.LessonScreen = LessonScreen;
       return /* @__PURE__ */ React.createElement("div", { className: "card", style: { padding: 18 } }, /* @__PURE__ */ React.createElement("h2", { style: { margin: "0 0 6px", fontSize: 20 } }, _t("\u{1F91D} Unsere Klasse")), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 14, lineHeight: 1.6 } }, _t("Melde dich mit deinem Namen an \u2014 dann siehst du hier, wie weit deine Mitsch\xFCler sind, und ihr k\xF6nnt euch gegenseitig anfeuern.")), /* @__PURE__ */ React.createElement("button", { className: "btn btn-primary", style: { marginTop: 10 }, onClick: function() {
         ctx.openModal("auth");
       } }, _t("Mit Namen anmelden")));
+    }
+    if (ohneKlasse) {
+      return /* @__PURE__ */ React.createElement("div", { className: "card", style: { padding: 18 } }, /* @__PURE__ */ React.createElement("h2", { style: { margin: "0 0 6px", fontSize: 20 } }, _t("\u{1F91D} Unsere Klasse")), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 14, lineHeight: 1.6 } }, _t("Frag deine Lehrkraft nach dem Klassen-Code \u2014 vier Ziffern. Sobald du ihn eingibst, siehst du hier deine Klasse, und ihr k\xF6nnt euch gegenseitig anfeuern.")), /* @__PURE__ */ React.createElement("button", { className: "btn btn-primary", style: { marginTop: 10 }, onClick: function() {
+        ctx.openModal("auth");
+      } }, _t("Klassen-Code eingeben")));
     }
     const list = (board || []).filter(function(b) {
       return !b.teacher;
@@ -13775,53 +14097,66 @@ window.LessonScreen = LessonScreen;
       if (!window.SimpleSync || !window.SimpleSync.sendCheer) return;
       setSent(function(s) {
         const o = Object.assign({}, s);
-        o[name] = kind;
+        o[name] = "unterwegs";
         return o;
       });
-      try {
-        if (window.Sound) window.Sound.correct();
-      } catch (e) {
-      }
+      setPick(null);
       window.SimpleSync.sendCheer(name, kind).then(function(r) {
-        if (r && r.limited) setSent(function(s) {
+        setSent(function(s) {
           const o = Object.assign({}, s);
-          o[name] = "limit";
+          if (r && r.limited) o[name] = "limit";
+          else if (r && r.sent) {
+            o[name] = kind;
+            try {
+              if (window.Sound) window.Sound.correct();
+            } catch (e) {
+            }
+          } else o[name] = "daneben";
           return o;
         });
       });
-      setPick(null);
     }
-    return /* @__PURE__ */ React.createElement("div", { className: "card", style: { padding: 18 } }, /* @__PURE__ */ React.createElement("div", { className: "row", style: { justifyContent: "space-between", alignItems: "center", marginBottom: 4, gap: 8, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("h2", { style: { margin: 0, fontSize: 20 } }, _t("\u{1F91D} Unsere Klasse")), /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost", style: { padding: "5px 12px", fontSize: 12.5 }, onClick: reload }, busy ? "\u2026 l\xE4dt" : "\u{1F504} Auffrischen")), cheers.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "cb-inbox" }, /* @__PURE__ */ React.createElement("b", null, cheers[cheers.length - 1].kind, " ", _t("Du wirst angefeuert!")), " ", function() {
+    return /* @__PURE__ */ React.createElement("div", { className: "card", style: { padding: 18 } }, /* @__PURE__ */ React.createElement("div", { className: "row", style: { justifyContent: "space-between", alignItems: "center", marginBottom: 4, gap: 8, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("h2", { style: { margin: 0, fontSize: 20 } }, _t("\u{1F91D} Unsere Klasse")), /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost", style: { padding: "5px 12px", fontSize: 12.5 }, onClick: reload }, busy ? _t("\u2026 l\xE4dt") : "\u{1F504} " + _t("Auffrischen"))), cheers.length > 0 && /* @__PURE__ */ React.createElement("div", { className: "cb-inbox" }, /* @__PURE__ */ React.createElement("b", null, cheers[cheers.length - 1].kind, " ", _t("Du wirst angefeuert!")), " ", function() {
       const f = [];
       cheers.forEach(function(c) {
         if (f.indexOf(c.from) < 0) f.push(c.from);
       });
-      return f.slice(0, 4).join(", ") + (f.length > 4 ? " und " + (f.length - 4) + " weitere" : "");
-    }(), " ", cheers.length === 1 ? "denkt" : "denken", " an dich."), err && !board && /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 13.5, lineHeight: 1.6 } }, _t("Die Klassenliste ist gerade nicht erreichbar ({fehler}). Dein eigener Fortschritt ist davon nicht betroffen \u2014 sobald wieder Internet da ist, erscheint sie von selbst.", { fehler: err })), stale && board && /* @__PURE__ */ React.createElement("div", { className: "cb-stale" }, _t("Zuletzt gespeicherter Stand \u2014 wird gerade aufgefrischt \u2026")), board && list.length === 0 && /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 13.5, lineHeight: 1.6 } }, _t("Noch ist niemand sonst da. Sobald deine Mitsch\xFCler ihren Namen eingeben, stehen sie hier.")), board && list.length > 0 && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "cb-goal" }, /* @__PURE__ */ React.createElement("div", { className: "cb-goal-head" }, _t("\u{1F3AF} Das schafft ihr zusammen")), /* @__PURE__ */ React.createElement("div", { className: "cb-goal-row" }, /* @__PURE__ */ React.createElement("span", null, "\u{1F3C6} ", totalSuren, " von ", surenZiel, " Suren auswendig"), /* @__PURE__ */ React.createElement("span", { className: "muted" }, list.length, " ", list.length === 1 ? "Kind" : "Kinder")), /* @__PURE__ */ React.createElement("div", { className: "xp-bar" }, /* @__PURE__ */ React.createElement("div", { className: "fill", style: { width: Math.min(100, Math.round(100 * totalSuren / surenZiel)) + "%" } })), /* @__PURE__ */ React.createElement("div", { className: "cb-goal-row", style: { marginTop: 8 } }, /* @__PURE__ */ React.createElement("span", null, "\u{1F525} ", totalWeek, " von ", wochenZiel, " XP diese Woche")), /* @__PURE__ */ React.createElement("div", { className: "xp-bar" }, /* @__PURE__ */ React.createElement("div", { className: "fill", style: { width: Math.min(100, Math.round(100 * totalWeek / wochenZiel)) + "%" } }))), meRow && (vorMir || hinterMir) && /* @__PURE__ */ React.createElement("div", { className: "cb-nudge" }, vorMir ? /* @__PURE__ */ React.createElement(React.Fragment, null, "\u{1F440} ", _t("{name} ist diese Woche nur {n} XP vor dir \u2014 eine Runde, und du bist vorbei!", { name: vorMir.n, n: Math.max(1, vorMir.w7 - meRow.w7) })) : /* @__PURE__ */ React.createElement(React.Fragment, null, "\u{1F947} ", _t("Du f\xFChrst diese Woche! {name} ist dir {n} XP auf den Fersen.", { name: hinterMir.n, n: Math.max(1, meRow.w7 - hinterMir.w7) }))), /* @__PURE__ */ React.createElement("div", { className: "sur-tabs", style: { margin: "12px 0 8px" } }, /* @__PURE__ */ React.createElement("button", { className: "sur-tab" + (tab === "woche" ? " is-active" : ""), onClick: function() {
+      return f.slice(0, 4).join(", ") + (f.length > 4 ? _t(" und {n} weitere", { n: f.length - 4 }) : "");
+    }(), " ", cheers.length === 1 ? _t("denkt an dich.") : _t("denken an dich.")), err && !board && /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 13.5, lineHeight: 1.6 } }, _t("Die Klasse ist gerade nicht da. Dein eigener Fortschritt ist in Sicherheit \u2014 sobald wieder Internet da ist, sind auch die anderen wieder hier.")), stale && board && /* @__PURE__ */ React.createElement("div", { className: "cb-stale" }, _t("Zuletzt gespeicherter Stand \u2014 wird gerade aufgefrischt \u2026")), board && list.length === 0 && /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 13.5, lineHeight: 1.6 } }, _t("Noch ist niemand sonst da. Sobald deine Mitsch\xFCler ihren Namen eingeben, stehen sie hier.")), board && list.length > 0 && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { className: "cb-goal" }, /* @__PURE__ */ React.createElement("div", { className: "cb-goal-head" }, _t("\u{1F3AF} Das schafft ihr zusammen")), /* @__PURE__ */ React.createElement("div", { className: "cb-goal-row" }, /* @__PURE__ */ React.createElement("span", null, "\u{1F3C6} ", _t("{a} von {b} Suren auswendig", { a: totalSuren, b: surenZiel })), /* @__PURE__ */ React.createElement("span", { className: "muted" }, list.length, " ", list.length === 1 ? _t("Kind") : _t("Kinder"))), /* @__PURE__ */ React.createElement("div", { className: "xp-bar" }, /* @__PURE__ */ React.createElement("div", { className: "fill", style: { width: Math.min(100, Math.round(100 * totalSuren / surenZiel)) + "%" } })), /* @__PURE__ */ React.createElement("div", { className: "cb-goal-row", style: { marginTop: 8 } }, /* @__PURE__ */ React.createElement("span", null, "\u{1F525} ", _t("{a} von {b} XP diese Woche", { a: totalWeek, b: wochenZiel }))), /* @__PURE__ */ React.createElement("div", { className: "xp-bar" }, /* @__PURE__ */ React.createElement("div", { className: "fill", style: { width: Math.min(100, Math.round(100 * totalWeek / wochenZiel)) + "%" } }))), meRow && (vorMir || hinterMir) && /* @__PURE__ */ React.createElement("div", { className: "cb-nudge" }, vorMir ? /* @__PURE__ */ React.createElement(React.Fragment, null, "\u{1F440} ", _t("{name} ist diese Woche nur {n} XP vor dir \u2014 eine Runde, und du bist vorbei!", { name: vorMir.n, n: Math.max(1, vorMir.w7 - meRow.w7) })) : /* @__PURE__ */ React.createElement(React.Fragment, null, "\u{1F947} ", _t("Du f\xFChrst diese Woche! {name} ist dir {n} XP auf den Fersen.", { name: hinterMir.n, n: Math.max(1, meRow.w7 - hinterMir.w7) }))), /* @__PURE__ */ React.createElement("div", { className: "sur-tabs", style: { margin: "12px 0 8px" } }, /* @__PURE__ */ React.createElement("button", { className: "sur-tab" + (tab === "woche" ? " is-active" : ""), onClick: function() {
       setTab("woche");
-    } }, "\u{1F525} Diese Woche"), /* @__PURE__ */ React.createElement("button", { className: "sur-tab" + (tab === "gesamt" ? " is-active" : ""), onClick: function() {
+    } }, "\u{1F525} ", _t("Diese Woche")), /* @__PURE__ */ React.createElement("button", { className: "sur-tab" + (tab === "gesamt" ? " is-active" : ""), onClick: function() {
       setTab("gesamt");
-    } }, "\u2B50 Gesamt"), /* @__PURE__ */ React.createElement("button", { className: "sur-tab" + (tab === "auswendig" ? " is-active" : ""), onClick: function() {
+    } }, "\u2B50 ", _t("Gesamt")), /* @__PURE__ */ React.createElement("button", { className: "sur-tab" + (tab === "auswendig" ? " is-active" : ""), onClick: function() {
       setTab("auswendig");
-    } }, "\u{1F3C6} Auswendig")), /* @__PURE__ */ React.createElement("div", { className: "cb-list" }, rows.slice(0, 25).map(function(b, i) {
+    } }, "\u{1F3C6} ", _t("Auswendig"))), /* @__PURE__ */ React.createElement("div", { className: "cb-list" }, function() {
+      const zeigen = rows.slice(0, 25).map(function(b, i) {
+        return { b, i };
+      });
+      const ich = rows.map(function(x) {
+        return x.n;
+      }).indexOf(myName);
+      if (ich >= 25) zeigen.push({ b: rows[ich], i: ich, luecke: true });
+      return zeigen;
+    }().map(function(eintrag) {
+      const b = eintrag.b, i = eintrag.i;
       const mine = b.n === myName;
       const medal = i === 0 ? "\u{1F947}" : i === 1 ? "\u{1F948}" : i === 2 ? "\u{1F949}" : i + 1 + ".";
-      return /* @__PURE__ */ React.createElement("div", { key: b.n, className: "cb-row" + (mine ? " is-me" : "") }, /* @__PURE__ */ React.createElement("span", { className: "cb-rank" }, medal), /* @__PURE__ */ React.createElement("span", { className: "cb-name" }, b.n, mine ? " (du)" : ""), /* @__PURE__ */ React.createElement("span", { className: "cb-val" }, tab === "woche" ? /* @__PURE__ */ React.createElement(React.Fragment, null, b.w7, " XP ", b.streak > 0 ? /* @__PURE__ */ React.createElement("em", null, "\u{1F525}", b.streak) : null) : tab === "gesamt" ? /* @__PURE__ */ React.createElement(React.Fragment, null, b.xp, " XP ", /* @__PURE__ */ React.createElement("em", null, "Level ", b.lvl)) : /* @__PURE__ */ React.createElement(React.Fragment, null, b.hzd, " \u{1F3C6} ", /* @__PURE__ */ React.createElement("em", null, b.hzv, " ", _t("Verse")))), !mine && (sent[b.n] ? /* @__PURE__ */ React.createElement("span", { className: "cb-sent" }, sent[b.n] === "limit" ? _t("genug f\xFCr heute \u{1F642}") : sent[b.n] + _t(" gesendet")) : /* @__PURE__ */ React.createElement(
+      return /* @__PURE__ */ React.createElement(React.Fragment, { key: b.n }, eintrag.luecke && /* @__PURE__ */ React.createElement("div", { className: "cb-luecke" }, "\u22EF"), /* @__PURE__ */ React.createElement("div", { className: "cb-row" + (mine ? " is-me" : "") }, /* @__PURE__ */ React.createElement("span", { className: "cb-rank" }, medal), /* @__PURE__ */ React.createElement("span", { className: "cb-name" }, b.n, mine ? " " + _t("(du)") : ""), /* @__PURE__ */ React.createElement("span", { className: "cb-val" }, tab === "woche" ? /* @__PURE__ */ React.createElement(React.Fragment, null, b.w7, " XP ", b.streak > 0 ? /* @__PURE__ */ React.createElement("em", null, "\u{1F525}", b.streak) : null) : tab === "gesamt" ? /* @__PURE__ */ React.createElement(React.Fragment, null, b.xp, " XP ", /* @__PURE__ */ React.createElement("em", null, _t("Level"), " ", b.lvl)) : /* @__PURE__ */ React.createElement(React.Fragment, null, b.hzd, " \u{1F3C6} ", /* @__PURE__ */ React.createElement("em", null, b.hzv, " ", _t("Verse")))), !mine && (sent[b.n] ? /* @__PURE__ */ React.createElement("span", { className: "cb-sent" }, sent[b.n] === "limit" ? _t("genug f\xFCr heute \u{1F642}") : sent[b.n] === "unterwegs" ? _t("\u2026 unterwegs") : sent[b.n] === "daneben" ? _t("geht gerade nicht") : sent[b.n] + " " + _t("gesendet")) : /* @__PURE__ */ React.createElement(
         "button",
         {
           className: "cb-cheer",
-          title: "\u201E" + b.n + "\u201C anfeuern",
+          title: _t("{name} anfeuern", { name: b.n }),
           onClick: function() {
             setPick(pick === b.n ? null : b.n);
           }
         },
         "\u{1F4AA}",
-        /* @__PURE__ */ React.createElement("span", null, "Anfeuern")
+        /* @__PURE__ */ React.createElement("span", null, _t("Anfeuern"))
       )), pick === b.n && /* @__PURE__ */ React.createElement("div", { className: "cb-picker" }, KINDS.map(function(k) {
         return /* @__PURE__ */ React.createElement("button", { key: k.k, className: "cb-pick", title: k.t, onClick: function() {
           cheer(b.n, k.k);
         } }, k.k, /* @__PURE__ */ React.createElement("em", null, k.t));
-      })));
+      }))));
     })), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 12, marginTop: 10, lineHeight: 1.6 } }, _t("Die Wochen-Tafel z\xE4hlt nur die letzten 7 Tage \u2014 wer neu dazukommt, kann sofort vorne mitspielen."), " ", _t("Unter \u2B50 Gesamt z\xE4hlen alle Punkte seit dem ersten Tag; dort geht nie etwas verloren. Anfeuern geht dreimal am Tag pro Mitsch\xFCler, und es sind nur diese vier Zeichen m\xF6glich."))));
   }
   window.ClassBoard = { ClassCard, CheerBanner, KINDS };
@@ -17423,7 +17758,7 @@ function ClassroomCard({ ctx }) {
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   };
-  return /* @__PURE__ */ React.createElement("div", { className: "card", style: { padding: 16, marginTop: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800, fontSize: 16 } }, "\u{1F3EB} ", _t("Klassenzimmer")), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 13, margin: "4px 0 10px" } }, _t("Kopiere deinen Fortschritts-Code und schick ihn deiner Lehrkraft \u2014 so sieht sie, wie weit du bist.")), /* @__PURE__ */ React.createElement("div", { className: "row", style: { gap: 8, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement(
+  return /* @__PURE__ */ React.createElement("div", { className: "card", style: { padding: 16, marginTop: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800, fontSize: 16 } }, "\u{1F3EB} ", _t("Klassenzimmer")), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 13, margin: "4px 0 10px" } }, _t("Kopiere deinen Fortschritts-Code und schick ihn deiner Lehrkraft \u2014 so sieht sie, wie weit du bist.")), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 12.5, margin: "0 0 10px", lineHeight: 1.45 } }, _t("Im Code steht auch, womit du dich noch schwertust. Schick ihn nur deiner Lehrkraft, nicht in eine Gruppe.")), /* @__PURE__ */ React.createElement("div", { className: "row", style: { gap: 8, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement(
     "input",
     {
       value: name,
@@ -20894,7 +21229,7 @@ function TeacherCorner({ ctx }) {
   }, [teacherUnlocked, code]);
   if (!teacherUnlocked) {
     const setup = !hasPin;
-    const submit = () => {
+    const submit = async () => {
       const p = pw.trim();
       const unlock = () => {
         setTeacherUnlocked(true);
@@ -20904,12 +21239,11 @@ function TeacherCorner({ ctx }) {
           setTeacherAll(true);
         }
       };
-      if (p === (SS ? SS.TEACHER_PW : "1907")) {
-        if (!hasPin) CR.setPin(p);
-        unlock();
-        return;
-      }
       if (setup) {
+        if (!(SS && SS.isTeacher && SS.isTeacher())) {
+          setErr(_t("\xD6ffne zuerst dein Klassenzimmer mit Code und PIN \u2014 dann kannst du hier eine PIN f\xFCr dieses Ger\xE4t festlegen."));
+          return;
+        }
         if (p.length < 4) {
           setErr(_t("Mindestens 4 Zeichen."));
           return;
@@ -20920,9 +21254,24 @@ function TeacherCorner({ ctx }) {
         }
         CR.setPin(p);
         unlock();
-      } else if (p === CR.getPin()) {
+        return;
+      }
+      if (p && p === CR.getPin()) {
         unlock();
-      } else setErr(_t("Falsche PIN."));
+        return;
+      }
+      if (SS && SS.teacherCheck) {
+        setErr(_t("Wird gepr\xFCft \u2026"));
+        const r = await SS.teacherCheck(p);
+        if (r && r.ok) {
+          if (!hasPin) CR.setPin(p);
+          unlock();
+          return;
+        }
+        setErr(r && r.error || _t("Falsche PIN."));
+        return;
+      }
+      setErr(_t("Falsche PIN."));
     };
     return /* @__PURE__ */ React.createElement("div", { className: "page", style: { maxWidth: 440 } }, /* @__PURE__ */ React.createElement("div", { className: "card", style: { padding: 30, textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { className: "gemeinde-kopf" }, /* @__PURE__ */ React.createElement(GemeindeLogo, { size: 76 })), /* @__PURE__ */ React.createElement("h1", { style: { fontSize: 24, marginTop: 10 } }, "\u{1F512} ", _t("Klassenzimmer")), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { marginBottom: 14 } }, _t("Nur f\xFCr Lehrkr\xE4fte.")), /* @__PURE__ */ React.createElement("button", { className: "btn btn-primary btn-full btn-lg", style: { marginBottom: 16 }, onClick: () => ctx.openModal("auth") }, "\u{1F9D1}\u200D\u{1F3EB} ", _t("Klassenzimmer anlegen oder \xF6ffnen")), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 13, marginBottom: 14, lineHeight: 1.45 } }, _t("Neu: Jede Lehrkraft legt ihr eigenes Klassenzimmer an und bekommt einen 4-stelligen Code f\xFCr die Kinder. Der Knopf oben f\xFChrt hin. Darunter der alte Weg f\xFCr die Sammelklasse:")), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { marginBottom: 10, fontSize: 12.5 } }, setup ? _t("Lehrer-Passwort eingeben (oder eigene PIN festlegen).") : _t("PIN oder Lehrer-Passwort eingeben.")), /* @__PURE__ */ React.createElement(
       "input",
@@ -20984,7 +21333,8 @@ function TeacherCorner({ ctx }) {
     setTimeout(() => setMsg(""), 4e3);
   };
   const removeOne = async (e) => {
-    if (!window.confirm(e.n + " wirklich entfernen?")) return;
+    const frage = e.src === "auto" && SS ? _t("{name} aus der Klasse entfernen?\n\nDas Konto und der auf dem Server gespeicherte Lernstand werden gel\xF6scht. Auf dem Ger\xE4t des Kindes bleibt sein Fortschritt erhalten; meldet es sich neu an, ist es wieder dabei.", { name: e.n }) : _t("{name} aus deiner Liste streichen?", { name: e.n });
+    if (!window.confirm(frage)) return;
     if (e.src === "auto" && SS) {
       await SS.removeStudentRemote(e.n, code);
       loadClass(code);
@@ -21016,12 +21366,12 @@ function TeacherCorner({ ctx }) {
         force((x) => x + 1);
       }
     }
-  ), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 800 } }, _t("\u{1F513} Lehrer-Modus: alle Lektionen ohne Freischaltung \xF6ffnen"))), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 12.5, marginTop: 4 } }, _t("Gilt nur auf diesem Ger\xE4t \u2014 zum Vorbereiten und Vorf\xFChren jeder Lektion. Zum Testen aus Sch\xFCler-Sicht einfach ausschalten."))), /* @__PURE__ */ React.createElement("div", { className: "card", style: { padding: 16, marginTop: 12 } }, /* @__PURE__ */ React.createElement("div", { className: "row", style: { justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800 } }, "\u{1F4E1} Live-Klasse ", loading ? "\xB7 l\xE4dt\u2026" : ""), /* @__PURE__ */ React.createElement("div", { className: "row", style: { gap: 8, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost", onClick: () => loadClass(code) }, "\u{1F504} Aktualisieren"), /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost", onClick: () => ctx && ctx.openModal && ctx.openModal("servercheck") }, _t("\u{1F527} Verbindung pr\xFCfen")))), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 13, margin: "6px 0 0" } }, "Jedes Kind, das in der App seinen ", /* @__PURE__ */ React.createElement("b", null, _t("Namen")), " eintr\xE4gt, steht hier \u2014 ohne Code, ohne Einladung. Die Liste aktualisiert sich w\xE4hrend des Unterrichts von selbst."), /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost", style: { marginTop: 8, fontSize: 12.5 }, onClick: () => setShowGroup((g) => !g) }, showGroup ? "\u25B4 Gruppenfilter verbergen" : _t("\u25BE Nur eine bestimmte Gruppe anzeigen")), showGroup && /* @__PURE__ */ React.createElement("div", { className: "row", style: { gap: 8, flexWrap: "wrap", marginTop: 8 } }, /* @__PURE__ */ React.createElement(
+  ), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 800 } }, _t("\u{1F513} Lehrer-Modus: alle Lektionen ohne Freischaltung \xF6ffnen"))), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 12.5, marginTop: 4 } }, _t("Gilt nur auf diesem Ger\xE4t \u2014 zum Vorbereiten und Vorf\xFChren jeder Lektion. Zum Testen aus Sch\xFCler-Sicht einfach ausschalten."))), /* @__PURE__ */ React.createElement("div", { className: "card", style: { padding: 16, marginTop: 12 } }, /* @__PURE__ */ React.createElement("div", { className: "row", style: { justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800 } }, "\u{1F4E1} Live-Klasse ", loading ? "\xB7 l\xE4dt\u2026" : ""), /* @__PURE__ */ React.createElement("div", { className: "row", style: { gap: 8, flexWrap: "wrap" } }, /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost", onClick: () => loadClass(code) }, "\u{1F504} Aktualisieren"), /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost", onClick: () => ctx && ctx.openModal && ctx.openModal("servercheck") }, _t("\u{1F527} Verbindung pr\xFCfen")))), /* @__PURE__ */ React.createElement("div", { className: "muted", style: { fontSize: 13, margin: "6px 0 0" } }, _t("Jedes Kind, das deinen Klassen-Code eingegeben hat, steht hier. Die Liste aktualisiert sich w\xE4hrend des Unterrichts von selbst.")), /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost", style: { marginTop: 8, fontSize: 12.5 }, onClick: () => setShowGroup((g) => !g) }, showGroup ? _t("\u25B4 Filter verbergen") : _t("\u25BE Nur eine bestimmte Klasse anzeigen")), showGroup && /* @__PURE__ */ React.createElement("div", { className: "row", style: { gap: 8, flexWrap: "wrap", marginTop: 8 } }, /* @__PURE__ */ React.createElement(
     "input",
     {
       value: code,
       onChange: (e) => setCode(e.target.value.toUpperCase()),
-      placeholder: _t("Gruppe, z. B. KLASSE4A (leer = alle)"),
+      placeholder: _t("Klassen-Code, vier Ziffern (leer = alle)"),
       style: { flex: "1 1 160px", minWidth: 0, padding: "10px 12px", borderRadius: 10, border: "1px solid var(--line)", background: "var(--surface)", font: "inherit", textTransform: "uppercase" }
     }
   ), /* @__PURE__ */ React.createElement("button", { className: "btn btn-primary", disabled: loading, onClick: () => loadClass(code) }, _t("Anzeigen")), !!code && /* @__PURE__ */ React.createElement("button", { className: "btn btn-ghost", onClick: () => {
@@ -21164,7 +21514,7 @@ function TeacherCorner({ ctx }) {
         style: { marginTop: 6, color: "var(--rose, #D64545)" },
         onClick: () => removeOne(e)
       },
-      "Sch\xFCler entfernen"
+      _t("Sch\xFCler entfernen")
     )));
   })));
 }

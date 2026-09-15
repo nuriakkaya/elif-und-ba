@@ -102,3 +102,28 @@ dir jedes Mal dazu, was sich geändert hat.
   Dateien pro Vorgang; dieses Paket bleibt darunter. Falls doch etwas fehlt,
   einfach nochmal **Add file → Upload files** für den fehlenden Ordner — es
   schadet nichts, eine Runde zweimal zu machen.
+
+---
+
+## Einmalig nach Version 11.11: das Lehrer-Passwort
+
+Bis Version 11.10 stand das Lehrer-Passwort im Code der App und war damit für
+jeden lesbar, der die Seite öffnete. Es ist entfernt. Damit gibt es zwei Wege
+in die Lehrer-Ansicht:
+
+**Der gute Weg (nichts zu tun):** Klassenzimmer anlegen → vierstelliger Code +
+eigene PIN. Die PIN liegt nur als Hash auf dem Server. Beim Anlegen bekommst
+du einmalig ein **Notfall-Wort** — schreib es auf, damit setzt du die PIN neu,
+falls du sie vergisst.
+
+**Der alte Weg (Sammelklasse „ALLE"):** funktioniert nur noch, wenn in Netlify
+eine Umgebungsvariable gesetzt ist:
+
+1. Netlify öffnen → deine Seite → **Site configuration**
+2. **Environment variables** → **Add a variable**
+3. Key: `EB_LEHRER_PW` · Value: ein Passwort, das du dir ausdenkst
+   (mindestens 4 Zeichen, gern länger — es steht nirgends im Code)
+4. Speichern, dann **Deploys → Trigger deploy → Deploy site**
+
+Ohne diese Variable ist der Sammelklassen-Weg abgeschaltet. Das ist Absicht:
+Ein Passwort, das in der App mitgeliefert wird, ist kein Passwort.

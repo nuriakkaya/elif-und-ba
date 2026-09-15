@@ -43,7 +43,7 @@ body{background:var(--bg);color:var(--tinte);font-family:'Nunito','Nunito Sans',
 h1,h2,h3{margin:0;line-height:1.05;letter-spacing:-.025em;text-wrap:balance}
 p{margin:0}
 a{color:var(--link)} a:hover{color:var(--violett)}
-:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:12px}
+:focus-visible{outline:3px solid var(--violett-3,#5142C2);outline-offset:3px;border-radius:12px;box-shadow:0 0 0 6px rgba(255,255,255,.92)}
 .sprites{position:absolute;width:0;height:0;overflow:hidden}
 .wrap{width:min(1180px,100% - clamp(32px,8vw,96px));margin:0 auto}
 .eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
@@ -655,7 +655,7 @@ html.js .schritt-bild svg{width:auto;height:clamp(210px,42vh,344px)}
         </div>
         <div class="schritt-text">
           <span class="schritt-nr" aria-hidden="true">1</span>
-          <p data-i18n="ios1">Tippe unten auf das Teilen-Symbol.</p>
+          <p id="ios-schritt1" data-i18n="ios1">Tippe unten auf das Teilen-Symbol.</p>
         </div>
         <p class="axi-sagt">
           <svg viewBox="0 0 120 110" aria-hidden="true" focusable="false"><use href="#axi-kopf"/></svg>
@@ -676,7 +676,7 @@ html.js .schritt-bild svg{width:auto;height:clamp(210px,42vh,344px)}
             </g>
             <g font-size="11" font-weight="700" fill="#565080">
               <rect x="30" y="232" width="160" height="34" rx="10" fill="#fff" stroke="var(--rand)" stroke-width="1.5"/>
-              <text x="42" y="253" font-size="9.5" textLength="112" lengthAdjust="spacingAndGlyphs" data-i18n="ios2_r1">Lesezeichen hinzufügen</text>
+              <text x="42" y="253" font-size="9.5" data-i18n="ios2_r1">Lesezeichen hinzufügen</text>
               <rect x="30" y="274" width="160" height="38" rx="10" fill="#EEEBFF" stroke="#6A5AE0" stroke-width="2"/>
               <text x="42" y="297" fill="#1F1B3A" font-weight="800" data-i18n="ios2_menu">Zum Home-Bildschirm</text>
               <rect x="30" y="320" width="160" height="34" rx="10" fill="#fff" stroke="var(--rand)" stroke-width="1.5"/>
@@ -791,7 +791,7 @@ html.js .schritt-bild svg{width:auto;height:clamp(210px,42vh,344px)}
   </div>
   <p class="aushang-code" id="aushang-code" hidden><span data-i18n="klasse_label">Klassen-Code</span> <b></b></p>
   <p class="aushang-url" id="aushang-url">elif-be.de</p>
-  <p class="aushang-fuss"><span id="aushang-gemeinde"></span> · <span data-i18n="footer_frei">Kostenlos, ohne Werbung, ohne Konto — nur ein Name.</span></p>
+  <p class="aushang-fuss"><span id="aushang-gemeinde"></span><span data-i18n="footer_frei">Kostenlos, ohne Werbung, ohne Konto — nur ein Name.</span></p>
 </section>
 
 <script src="app/config.js"></script>
@@ -837,6 +837,10 @@ html.js .schritt-bild svg{width:auto;height:clamp(210px,42vh,344px)}
     qr_hero_text: "Telefonla okut",
     hinweis_titel: "Buradan yükleme olmaz.",
     hinweis_ios: "Üstteki ⋯ simgesine dokun ve „Safari'de aç\"ı seç.",
+    btn_safari: "Safari'de aç",
+    btn_trotzdem: "Yine de uygulamaya geç",
+    hinweis_safari: "Yüklemek için Safari gerekir. Üstteki ⋯ simgesine dokun ve „Safari'de aç\"ı seç.",
+    ios1_tablet: "Üstteki Paylaş simgesine dokun.",
     hinweis_android: "Üstteki ⋮ simgesine dokun ve „Chrome'da aç\"ı seç.",
     hinweis_and_titel: "Yükleme menüde duruyor.",
     hinweis_and_menue: "Üstteki ⋮ simgesine dokun ve „Uygulamayı yükle\"yi seç.",
@@ -904,6 +908,11 @@ html.js .schritt-bild svg{width:auto;height:clamp(210px,42vh,344px)}
     hinweis_and_menue: "Tippe oben auf ⋮ und wähle „App installieren“.",
     hinweis_desk_titel: "Installieren steckt im Browser-Menü.",
     hinweis_desk: "Klicke oben rechts auf ⋮ und wähle „App installieren“ — oder scanne den QR-Code mit dem Handy.",
+    /* Auf dem iPhone kann nur Safari zum Home-Bildschirm hinzufügen. (14.09.2026) */
+    btn_safari: "In Safari öffnen",
+    btn_trotzdem: "Trotzdem weiter zur App",
+    hinweis_safari: "Zum Installieren brauchst du Safari. Tippe oben auf ⋯ und wähle „In Safari öffnen“.",
+    ios1_tablet: "Tippe oben auf das Teilen-Symbol.",
     version: "Version"
   };
   /* Alle übrigen deutschen Texte stehen im HTML und werden dort ausgelesen. */
@@ -970,19 +979,40 @@ html.js .schritt-bild svg{width:auto;height:clamp(210px,42vh,344px)}
     var ver = window.APP_VERSION || "";
     $("#gemeinde").textContent = name;
     $("#gemeinde").hidden = !name;
-    $("#version").textContent = ver ? t("version") + " " + ver : "";
-    $("#aushang-gemeinde").textContent = name;
+    /* app/config.js liefert bereits „Version 11.9 · 14.09.2026" — das Wort
+       also nicht ein zweites Mal davorsetzen. (14.09.2026) */
+    $("#version").textContent = ver ? (/^\s*(Version|Sürüm|Surum)\b/i.test(ver) ? ver : t("version") + " " + ver) : "";
+    /* Der Trennpunkt gehoert zum Namen — sonst beginnt die Fusszeile mit
+       einem einsamen „ · ", solange GEMEINDE_NAME leer ist. (14.09.2026) */
+    $("#aushang-gemeinde").textContent = name ? name + " · " : "";
   }
 
   /* ---------- QR ---------- */
+  /* Die mitgelieferte Bibliothek (vendor/qrcode.min.js) heisst QRCode und malt
+     in ein Element — sie hat kein EBQR.svg(). Der Aufruf hier ging deshalb ins
+     Leere: kein QR-Code auf der Seite und ein leerer Rahmen auf dem gedruckten
+     Aushang. Die App macht es an ihrer eigenen Stelle richtig
+     (app/main.js: new window.QRCode(el, {...})); genauso jetzt auch hier.
+     (14.09.2026) */
   function zeichneQR() {
-    if (!window.EBQR) return;
-    var url = seitenLink(), svg;
-    try { svg = EBQR.svg(url, { dark: "#1F1B3A", light: "#FFFFFF", margin: 3, label: "QR-Code: " + kurz(url) }); }
-    catch (e) { return; }
-    ["#qr-gross", "#qr-hero", "#aushang-qr"].forEach(function (sel) { var el = $(sel); if (el) el.innerHTML = svg; });
+    var url = seitenLink();
     $("#qr-adresse").textContent = kurz(url).replace(/\//g, "/\u200B");
     $("#aushang-url").textContent = kurz(url);
+    if (!window.QRCode) return;
+    [["#qr-gross", 190], ["#qr-hero", 130], ["#aushang-qr", 300]].forEach(function (paar) {
+      var el = $(paar[0]);
+      if (!el) return;
+      el.innerHTML = "";
+      try {
+        new window.QRCode(el, {
+          text: url, width: paar[1], height: paar[1],
+          colorDark: "#1F1B3A", colorLight: "#FFFFFF",
+          correctLevel: window.QRCode.CorrectLevel ? window.QRCode.CorrectLevel.M : undefined
+        });
+        var bild = el.querySelector("img, canvas");
+        if (bild) { bild.setAttribute("alt", "QR-Code: " + kurz(url)); bild.style.display = "block"; bild.style.margin = "0 auto"; }
+      } catch (e) { /* ohne QR bleibt der Link darunter lesbar */ }
+    });
   }
 
   /* ---------- Umgebung ---------- */
@@ -991,6 +1021,12 @@ html.js .schritt-bild svg{width:auto;height:clamp(210px,42vh,344px)}
   var istIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   var istAndroid = /Android/i.test(ua);
   var mobil = istIOS || istAndroid || /Mobi/i.test(ua);
+  /* Auf dem iPhone kann NUR Safari zum Home-Bildschirm hinzufuegen. Chrome,
+     Firefox, Edge und Opera zeigen dort denselben Menue-Eintrag nicht — wer
+     ihnen die Safari-Anleitung gibt, schickt Eltern auf die Suche nach einem
+     Knopf, den es nicht gibt. (14.09.2026) */
+  var iosFremd = /iPad|iPhone|iPod/.test(ua) && /CriOS|FxiOS|EdgiOS|OPiOS/i.test(ua);
+  var istTablet = /iPad/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   var standalone = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
   var angebot = null, installiert = false, modus = "";
 
@@ -1001,7 +1037,7 @@ html.js .schritt-bild svg{width:auto;height:clamp(210px,42vh,344px)}
       reihe2 = $("#reihe-zwei"), hinweis = $("#hinweis");
 
   function setzeModus() {
-    modus = standalone ? "standalone" : installiert ? "installiert" : inApp ? "inapp" : !mobil ? "desktop" : istIOS ? "ios" : "android";
+    modus = standalone ? "standalone" : installiert ? "installiert" : (inApp || iosFremd) ? "inapp" : !mobil ? "desktop" : istIOS ? "ios" : "android";
 
     hinweis.hidden = true;
     reihe2.hidden = true;
@@ -1014,29 +1050,47 @@ html.js .schritt-bild svg{width:auto;height:clamp(210px,42vh,344px)}
       btnP.href = appLink();
       btnN.hidden = true;
     } else if (modus === "inapp") {
-      btnP.textContent = t("btn_browser");
+      /* Eine Webseite kann aus dem eingebauten Browser von WhatsApp oder
+         Instagram nicht ausbrechen — das kann nur der Mensch ueber das
+         ⋯-Menue, und genau das steht im Kasten darueber. Der Knopf hiess
+         trotzdem „Im Browser oeffnen" und versprach damit etwas, das er nicht
+         leistet; jetzt sagt er, was er wirklich tut. (14.09.2026) */
+      btnP.textContent = t("btn_trotzdem");
       btnP.href = appLink();
       btnN.hidden = true;
       $("#hinweis-titel").textContent = t("hinweis_titel");
-      $("#hinweis-text").textContent = t(istAndroid ? "hinweis_android" : "hinweis_ios");
+      $("#hinweis-text").textContent = (iosFremd && !inApp) ? t("hinweis_safari")
+        : t(istAndroid ? "hinweis_android" : "hinweis_ios");
+      if (iosFremd && !inApp) btnP.textContent = t("btn_safari");
       hinweis.hidden = false;
     } else if (modus === "desktop") {
       btnP.textContent = t("btn_desktop");
       btnP.href = appLink();
       btnN.hidden = true;
-      reihe2.hidden = false;
+      /* Den Installieren-Knopf nur zeigen, wenn der Browser die Installation
+         wirklich anbietet (Chrome/Edge melden sich mit beforeinstallprompt).
+         Firefox und Safari am Rechner koennen das nicht — dort fuehrte der
+         Knopf nur zu einer Erklaerung, warum es nicht geht. (14.09.2026) */
+      reihe2.hidden = !angebot;
       btnI2.textContent = t("btn_install");
-      btnI2.hidden = false;
+      btnI2.hidden = !angebot;
     } else {
       btnP.textContent = t("btn_install");
       btnP.href = appLink();
       btnN.textContent = t("btn_browser");
       btnN.href = appLink();
       if (modus === "ios") btnP.setAttribute("aria-haspopup", "dialog");
+      /* Chrome schickt `beforeinstallprompt` erst kurz nach dem Laden. Sofort
+         zu warnen hiess: Die Warnung blitzt bei jedem Android-Besuch auf und
+         verschwindet wieder. Deshalb eine Atempause — und nur, wenn bis dahin
+         wirklich kein Angebot kam. (14.09.2026) */
       if (modus === "android" && !angebot) {
         $("#hinweis-titel").textContent = t("hinweis_and_titel");
         $("#hinweis-text").textContent = t("hinweis_and_menue");
-        hinweis.hidden = false;
+        clearTimeout(window.__andWarte);
+        window.__andWarte = setTimeout(function () {
+          if (!angebot && modus === "android") hinweis.hidden = false;
+        }, 1800);
       }
       if (!wenigBewegung) { void btnP.offsetWidth; btnP.classList.add("pulst"); }
     }
@@ -1092,6 +1146,11 @@ html.js .schritt-bild svg{width:auto;height:clamp(210px,42vh,344px)}
     schritte.forEach(function (li, n) { li.hidden = (n !== schrittNr); });
     $$(".fortschritt-spur i").forEach(function (b, n) { b.classList.toggle("an", n <= schrittNr); });
     $("#fortschritt-text").textContent = t("fortschritt").replace("%s", String(schrittNr + 1));
+    /* Auf dem iPad sitzt das Teilen-Symbol OBEN in der Leiste, auf dem iPhone
+       unten. Derselbe Satz fuer beide schickt die Haelfte der Leute an die
+       falsche Bildschirmkante. (14.09.2026) */
+    var s1 = $("#ios-schritt1");
+    if (s1) s1.textContent = t(istTablet ? "ios1_tablet" : "ios1");
     btnZ.hidden = schrittNr === 0;
     btnW.textContent = t(schrittNr === schritte.length - 1 ? "btn_fertig" : "btn_weiter");
     if (fokus) $("#anleitung-panel").focus();
