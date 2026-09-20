@@ -38,10 +38,6 @@
     streak: 'streak.mp3',
     master: 'master.mp3',
     tick: 'tick.mp3',
-    // (11.0) Belohnungsklänge, erzeugt mit tools/toene.py
-    bonus: 'bonus.m4a',
-    perfect: 'perfect.m4a',
-    chest: 'chest.m4a',
   };
 
   // Pro Klang ein Original-Element + Klone für Überlappungen.
@@ -95,12 +91,7 @@
     // Richtige Antwort (v2, 06.08.2026): tiefes, weiches "du-dum" auf Filz-
     // Marimba (G4→C5) — bewusst leise und rund, damit die arabische
     // Aussprache direkt danach angenehm darüberliegen kann.
-    // (11.0) Mit jeder richtigen Antwort in Folge steigt der Ton ein Stück —
-    // die Serie wird hörbar. Ab der siebten bleibt er oben.
-    correct: function (combo) {
-      const c = Math.max(1, Math.min(8, (combo | 0) || 1));
-      play('correct', { volume: 0.45 + (c - 1) * 0.02, rate: 1 + (c - 1) * 0.035 }); vibrate([8]);
-    },
+    correct: function () { play('correct', { volume: 0.45 }); vibrate([8]); },
 
     // Falsche Antwort: ein einzelner weicher Tiefton — "hm, nochmal", ohne Härte.
     wrong: function () { play('wrong', { volume: 0.4 }); vibrate([18]); },
@@ -127,11 +118,6 @@
     // Dezente Bausteine
     sparkle: function () { play('combo', { volume: 0.45, rate: 1.15 }); },
     tick: function () { play('tick', { volume: 0.5 }); },
-    // (11.0) Belohnungsschleifen
-    bonus: function () { play('bonus', { volume: 0.8 }); vibrate([12, 30, 12, 30, 20]); },      // Überraschungs-Geschenk
-    perfect: function () { play('perfect', { volume: 0.9 }); vibrate([20, 30, 20, 30, 60]); },  // perfekte Runde
-    chest: function () { play('chest', { volume: 0.9 }); vibrate([40, 30, 15, 30, 15]); },      // Tageskiste
-    star: function (i) { play('combo', { volume: 0.32, rate: 1.12 + (i | 0) * 0.12 }); },        // Sterne nacheinander
   };
 
   window.Sound = Sound;

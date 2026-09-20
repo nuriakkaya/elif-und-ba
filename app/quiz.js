@@ -145,7 +145,7 @@ function tintAr(s) {
 }
 
 /* ============== EINZELNE KARTE (ein Auftritt) ============== */
-function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor, combo }) {
+function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor }) {
   const { card, mode, gen } = item;
   const kind = gen.kind;
   const isBlitz = mode === 'blitz';
@@ -226,7 +226,7 @@ function CardPlayer({ item, topicId, onDone, onDisableBlitz, xpFactor, combo }) 
     if (window.Sound && !res.blitz && !res.usedReveal && !res.usedExplain) {
       // Lehrkarten: nur ein dezenter Tick — kein "richtig"-Jingle für bloßes Ansehen.
       if (res.teach) { window.Sound.tick && window.Sound.tick(); }
-      else { res.correct ? window.Sound.correct((combo | 0) + 1) : window.Sound.wrong(); }
+      else { res.correct ? window.Sound.correct() : window.Sound.wrong(); }
     }
     // (06.08.2026) Aussprache kommt jetzt FAST sofort (60 ms statt 160 ms) —
     // der Feedback-Ton ist leiser abgemischt, die Stimme liegt klar darüber.
@@ -992,10 +992,7 @@ function QuizScreen({ go, stackName, questionStyle, questions, topicId, roundSiz
   const raw = (questions && questions.length) ? questions : window.QUESTIONS_DATA;
   const data = raw.filter(q => (q.options && q.options.length > 0) || (q.a && q.a.trim()));
 
-  // (11.0) Prüfhaken: ?pruef=1&phase=ende öffnet sofort das Rundenende mit fünf
-  // richtigen Antworten — nur zum Anschauen des Bildschirms, nie im Alltag.
-  const pruefEnde = /[?&]pruef=1/.test(location.search) && /[?&]phase=ende/.test(location.search);
-  const [phase, setPhase] = useState(pruefEnde ? 'roundEnd' : 'quiz'); // quiz | roundEnd | streak
+  const [phase, setPhase] = useState('quiz'); // quiz | roundEnd | streak
   // Regel-Intro: startet NICHT mehr automatisch (13.08.2026, Nutzerwunsch
   // "das Regelintro kann raus" — auf kleinen Handys nur ein Umweg).
   // Über den ℹ️-Knopf in der Kopfzeile bleibt es freiwillig abrufbar.
@@ -1018,7 +1015,7 @@ function QuizScreen({ go, stackName, questionStyle, questions, topicId, roundSiz
   const [roundXp, setRoundXp] = useState(0);
   const [roundCoins, setRoundCoins] = useState(0);
   const [popup, setPopup] = useState(null);
-  const [log, setLog] = useState(() => pruefEnde ? data.slice(0, 5).map(c => ({ card: c, correct: true, blitz: false })) : []);
+  const [log, setLog] = useState([]);
   const [streakInfo, setStreakInfo] = useState(null);
   const [streakShown, setStreakShown] = useState(false);
   // Herzen-System (Blueprint Phase 14, app/hearts.js): Stand live abonnieren,
@@ -1054,28 +1051,6 @@ function QuizScreen({ go, stackName, questionStyle, questions, topicId, roundSiz
   // die nächste Voll-Meisterung erneut gefeiert).
   const [mastered, setMastered] = useState(false);
   const masteredTimer = useRef(null);
-  /* (11.0) Axi sitzt oben in der Kopfzeile und reagiert auf jede Antwort:
-     jubelt kurz bei richtig, guckt traurig bei falsch, dann wieder freundlich.
-     Das ist der kleine Mitfuehl-Moment, der eine Lern-App lebendig macht. */
-  /* (11.0) Level-Aufstieg als eigener Moment: Karte mit Axi, Konfetti, Fanfare. */
-  const [levelUp, setLevelUp] = useState(null);
-  const levelTimer = useRef(null);
-  const zeigeLevelUp = (li) => {
-    setLevelUp(li);
-    if (window.XP) window.XP.addCoins(3);
-    window.Celebrate && window.Celebrate.bigCelebration({ count: 70 });
-    if (levelTimer.current) clearTimeout(levelTimer.current);
-    levelTimer.current = setTimeout(() => setLevelUp(null), 3400);
-  };
-  useEffect(() => () => { if (levelTimer.current) clearTimeout(levelTimer.current); }, []);
-  const [axiLaune, setAxiLaune] = useState('happy');
-  const axiTimer = useRef(null);
-  const zeigeAxi = (laune) => {
-    setAxiLaune(laune);
-    if (axiTimer.current) clearTimeout(axiTimer.current);
-    axiTimer.current = setTimeout(() => setAxiLaune('happy'), laune === 'cheer' ? 1500 : 1800);
-  };
-  useEffect(() => () => { if (axiTimer.current) clearTimeout(axiTimer.current); }, []);
   useEffect(() => () => { if (masteredTimer.current) clearTimeout(masteredTimer.current); }, []);
   const checkMastered = () => {
     if (!window.SRS || !topicId || !data.length) return;
@@ -1142,7 +1117,6 @@ function QuizScreen({ go, stackName, questionStyle, questions, topicId, roundSiz
     const it = item;
     // Lehrkarten (Koran Typ A) sind reine Ansicht: kein SRS, keine XP, kein Log.
     if (res.teach) { advance(queue); return; }
-    zeigeAxi(res.correct ? 'cheer' : 'sad');
     // ---- SRS-Fortschritt
     // Gezieltes Buchstaben-Training (Koran): Karten fremder Lektionen tragen ihre
     // Heimat-Lektion in _topicId — dort wird der Fortschritt verbucht, damit die
@@ -1182,10 +1156,8 @@ function QuizScreen({ go, stackName, questionStyle, questions, topicId, roundSiz
       if (r.milestone) {
         showPopup({ combo: nc, mult: r.mult, xp: r.xp, coins: r.coins });
         window.Sound && window.Sound.comboMilestone(r.mult);
-        window.Celebrate && window.Celebrate.burst({ count: 28, duration: 1600, top: '40%' });
       }
-      const liNeu = window.XP.levelInfo();
-      if (liNeu.level > levelBefore) { window.Sound && window.Sound.levelUp(); zeigeLevelUp(liNeu); }
+      if (window.XP.levelInfo().level > levelBefore) window.Sound && window.Sound.levelUp();
       if (t.extended) {
         setStreakInfo(t);
         window.Sound && window.Sound.streakSecured();
@@ -1324,7 +1296,7 @@ function QuizScreen({ go, stackName, questionStyle, questions, topicId, roundSiz
   const qpSkin = /^quran-/.test(String(topicId || ''));
 
   return (
-    <div className={'quiz-shell' + (qpSkin ? ' qp-skin' : '') + (combo >= 3 ? ' hat-combo' : '')}>
+    <div className={'quiz-shell' + (qpSkin ? ' qp-skin' : '')}>
       {masteredEl}
       <div className="xp-float-layer">
         {floats.map(f => <span key={f.id} className={'xp-float' + (f.big ? ' xp-float-big' : '')}>{f.text}</span>)}
@@ -1341,7 +1313,7 @@ function QuizScreen({ go, stackName, questionStyle, questions, topicId, roundSiz
       <div className="quiz-topbar">
         <button className="icon-btn" onClick={() => go('deck')}><Icon.Close /></button>
         <div className="quiz-stack">
-          <span className="quiz-axi"><Axolotl size={40} mood={axiLaune}/></span>
+          <span className="stack-dot hide-sm" style={{ background: 'var(--stack-blue)' }} />
           <span className="quiz-stack-name">{stackName}</span>
           <span className="muted hide-sm" style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>· Runde {round}</span>
         </div>
@@ -1360,20 +1332,9 @@ function QuizScreen({ go, stackName, questionStyle, questions, topicId, roundSiz
       </div>
 
       <div className="quiz-stage">
-        <CardPlayer key={playSeq} item={item} topicId={topicId} onDone={onDone} onDisableBlitz={onDisableBlitz} xpFactor={xpFactor} combo={combo} />
+        <CardPlayer key={playSeq} item={item} topicId={topicId} onDone={onDone} onDisableBlitz={onDisableBlitz} xpFactor={xpFactor} />
       </div>
 
-      {levelUp && (
-        <div className="levelup-overlay" onClick={() => setLevelUp(null)}>
-          <div className="levelup-card">
-            <Axolotl size={130} mood="cheer"/>
-            <div className="levelup-eyebrow">Level-Aufstieg!</div>
-            <div className="levelup-title">Level {levelUp.level}</div>
-            <div className="levelup-sub">Du bist jetzt <b>{levelUp.title}</b></div>
-            <div className="levelup-muenzen">+3 🪙 für den Shop</div>
-          </div>
-        </div>
-      )}
       {popup && (
         <div className="combo-popup">
           <div className="combo-popup-top">
@@ -1482,49 +1443,6 @@ function PostRoundSocial() {
   );
 }
 
-/* ============== ANFEUERN AM RUNDENENDE (11.0) ==============
-   Direkt nach der eigenen Runde ist die Laune am besten — der richtige
-   Moment, zwei Mitschüler:innen ein Zeichen zu schicken. Gleiche Regeln wie
-   in „Unsere Klasse" (app/classboard.js): nur die vier Zeichen, drei pro Tag
-   und Person. Ohne Anmeldung oder Klasse erscheint nichts. Wer diese Woche
-   am wenigsten hat, steht oben — Zurufe sollen dorthin, wo sie helfen. */
-function RundenAnfeuern() {
-  const SS = window.SimpleSync;
-  const KINDS = (window.ClassBoard && window.ClassBoard.KINDS) || [{ k: '💪', t: 'Du schaffst das!' }, { k: '👏', t: 'Maschallah!' }, { k: '🔥', t: 'Stark!' }, { k: '🤲', t: 'Ich bete für dich' }];
-  const [leute, setLeute] = useState([]);
-  const [sent, setSent] = useState({});
-  useEffect(() => {
-    let alive = true;
-    if (!SS || !SS.fetchBoard || !SS.account || !SS.account()) return undefined;
-    SS.fetchBoard().then(r => {
-      if (!alive || !r || !r.ok) return;
-      const andere = (r.board || []).filter(b => !b.teacher && b.n !== r.me);
-      andere.sort((a, b) => (a.w7 || 0) - (b.w7 || 0));
-      setLeute(andere.slice(0, 2));
-    }).catch(() => {});
-    return () => { alive = false; };
-  }, []);
-  if (!leute.length) return null;
-  const cheer = (name, kind) => {
-    setSent(s => ({ ...s, [name]: kind }));
-    window.Sound && window.Sound.sparkle && window.Sound.sparkle();
-    SS.sendCheer(name, kind).then(r => { if (r && r.limited) setSent(s => ({ ...s, [name]: 'limit' })); });
-  };
-  return (
-    <div className="anfeuern">
-      <div className="anfeuern-kopf">💪 Feuer deine Klasse an<span>Ein Zeichen, das gut tut — und das zurückkommt.</span></div>
-      {leute.map(b => (
-        <div key={b.n} className="anfeuern-zeile">
-          <span className="anfeuern-name">{b.n}<small>{b.w7 > 0 ? b.w7 + ' XP diese Woche' : 'diese Woche noch nichts'}{b.streak > 0 ? ' · 🔥 ' + b.streak : ''}</small></span>
-          {sent[b.n]
-            ? <span className="anfeuern-ok">{sent[b.n] === 'limit' ? 'Heute schon 3× — das reicht 😊' : sent[b.n] + ' geschickt ✓'}</span>
-            : <span className="anfeuern-knoepfe">{KINDS.map(k => <button key={k.k} title={k.t} onClick={() => cheer(b.n, k.k)}>{k.k}</button>)}</span>}
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function RoundEnd({ go, stackName, topicId, data, log, roundXp, roundCoins, onNext }) {
   const [more, setMore] = useState(false);
   const stats = (topicId && window.SRS) ? window.SRS.topicStats(topicId, data) : null;
@@ -1555,7 +1473,7 @@ function RoundEnd({ go, stackName, topicId, data, log, roundXp, roundCoins, onNe
     left: Math.random() * 100,
     delay: Math.random() * 0.9,
     dur: 2.2 + Math.random() * 1.6,
-    color: ['#FFD35C', '#6A5AE0', '#FF7A9E', '#2EC46E', '#7F71F5', '#FFFFFF'][i % 6],
+    color: ['#F0B84E', '#0E6B57', '#D9962B', '#2E9E6B', '#12866C', '#FDF4E5'][i % 6],
     rot: Math.random() * 360,
   }))).current;
   const rows = [
@@ -1584,46 +1502,6 @@ function RoundEnd({ go, stackName, topicId, data, log, roundXp, roundCoins, onNe
   const tagesziel = window.XP ? window.XP.streakStatus() : null;
   const serie = window.XP ? (window.XP.state().streakDays || 0) : 0;
 
-  /* (11.0) Drei Belohnungsschleifen am Rundenende:
-     - Sterne (3 = fehlerfrei, 2 = höchstens zwei Fehler, 1 = geschafft) —
-       jedes Kind will beim nächsten Mal einen Stern mehr.
-     - Perfekte Runde: +10 XP, eigene Fanfare, zählt für die Tagesaufgabe.
-     - Überraschung: manchmal gibt es ein Geschenk (5–25 XP). Nicht planbar —
-       genau das macht es spannend, und es bleibt fair, weil es nur obendrauf
-       kommt und nie etwas wegnimmt. */
-  const fehler = log.filter(e => !e.correct && !e.blitz).length;
-  const gewertet = log.filter(e => !e.blitz).length;
-  const sterne = gewertet === 0 ? 0 : fehler === 0 ? 3 : fehler <= 2 ? 2 : 1;
-  const perfekt = gewertet >= 3 && fehler === 0;
-  const [extra, setExtra] = useState({ perfekt: 0, geschenk: 0 });
-  const extraRef = useRef(false);
-  useEffect(() => {
-    if (extraRef.current) return;
-    extraRef.current = true;
-    const e = { perfekt: 0, geschenk: 0 };
-    if (perfekt && window.XP) {
-      e.perfekt = window.XP.addBonus(10);
-      window.XP.addCoins(2);
-      try { localStorage.setItem('eb_perfekt_' + heuteKey(), '1'); } catch (x) {}
-    }
-    if (window.XP && gewertet >= 3 && Math.random() < 0.28) {
-      const r = Math.random();
-      e.geschenk = window.XP.addBonus(r < 0.5 ? 5 : r < 0.8 ? 10 : r < 0.95 ? 15 : 25);
-    }
-    const timers = [];
-    for (let i = 0; i < sterne; i++) timers.push(setTimeout(() => { window.Sound && window.Sound.star && window.Sound.star(i); }, 350 + i * 260));
-    if (e.perfekt) timers.push(setTimeout(() => {
-      setExtra(x => ({ ...x, perfekt: e.perfekt }));
-      window.Sound && window.Sound.perfect && window.Sound.perfect();
-      window.Celebrate && window.Celebrate.burst({ count: 50, duration: 2600, top: '30%' });
-    }, 1150));
-    if (e.geschenk) timers.push(setTimeout(() => {
-      setExtra(x => ({ ...x, geschenk: e.geschenk }));
-      window.Sound && window.Sound.bonus && window.Sound.bonus();
-    }, e.perfekt ? 2300 : 1300));
-    return () => timers.forEach(clearTimeout);
-  }, []);
-
   return (
     <div className="quiz-shell roundend">
       <div className="confetti-layer">
@@ -1647,9 +1525,6 @@ function RoundEnd({ go, stackName, topicId, data, log, roundXp, roundCoins, onNe
             </div>
           )}
           <div className="roundend-title">Maschallah!<br/><span className="roundend-title-accent">Runde geschafft</span></div>
-          <div className="re-sterne" aria-label={sterne + ' von 3 Sternen'}>
-            {[0, 1, 2].map(i => <span key={i} className={'re-stern' + (i < sterne ? ' ist-an' : '')} style={{ animationDelay: (0.35 + i * 0.26) + 's' }}>★</span>)}
-          </div>
           <div className="re-xp">
             <b>+{xpShown}</b><span>XP</span>
           </div>
@@ -1662,12 +1537,6 @@ function RoundEnd({ go, stackName, topicId, data, log, roundXp, roundCoins, onNe
               </span>
             )}
           </div>
-          {(extra.perfekt > 0 || extra.geschenk > 0) && (
-            <div className="re-extras">
-              {extra.perfekt > 0 && <div className="re-extra ist-perfekt">✨ Perfekte Runde! <b>+{extra.perfekt} XP</b> · <b>+2 🪙</b></div>}
-              {extra.geschenk > 0 && <div className="re-extra ist-geschenk">🎁 Überraschung! <b>+{extra.geschenk} XP</b></div>}
-            </div>
-          )}
           {window.Replay && window.Replay.factor(topicId, data) < 1 && (
             <div className="muted" style={{ textAlign: 'center', fontSize: 13, maxWidth: 420, lineHeight: 1.55 }}>
               {window.Replay.note(window.Replay.factor(topicId, data))}
@@ -1711,7 +1580,6 @@ function RoundEnd({ go, stackName, topicId, data, log, roundXp, roundCoins, onNe
             </div>
           </div>
 
-          <RundenAnfeuern />
           {/* Post-Runden-Engagement (26.07.2026): Mini-Liga-Stand + Serien-Hinweis */}
           <PostRoundSocial />
 
@@ -1752,11 +1620,6 @@ function AnsweredCard({ entry, topicId }) {
       </div>
     </div>
   );
-}
-
-function heuteKey() {
-  const d = new Date();
-  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 
 /* ============== SERIEN-SCREEN (Tages-Streak nach der Runde) ============== */

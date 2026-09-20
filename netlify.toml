@@ -15,21 +15,6 @@
 
 # Doppelte Absicherung zusätzlich zu _redirects: /api/... → Klassen-Server.
 [[redirects]]
-  from = "/installieren"
-  to = "/installieren.html"
-  status = 200
-
-[[redirects]]
-  from = "/yukle"
-  to = "/installieren.html"
-  status = 200
-
-[[redirects]]
-  from = "/start"
-  to = "/installieren.html"
-  status = 200
-
-[[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/sync/:splat"
   status = 200

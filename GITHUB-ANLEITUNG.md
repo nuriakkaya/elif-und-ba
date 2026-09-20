@@ -32,23 +32,14 @@ Diesen Ordner offen lassen.
 
 1. Auf der leeren Seite steht ein Link **„uploading an existing file"** —
    darauf klicken. (Alternativ: **Add file → Upload files**.)
-2. Im entpackten Ordner **alles markieren** (Cmd+A bzw. Strg+A) — also alle
-   Dateien **und** die Ordner `app`, `vendor`, `netlify`, `assets`, `fonts`,
-   `media`.
+2. Im entpackten Ordner **alles markieren** (Strg+A bzw. Cmd+A) — also alle
+   Dateien **und** die Ordner `app`, `vendor`, `netlify`, `assets`, `fonts`.
 3. Alles in das große Feld im Browser ziehen. Warten, bis die Liste vollständig
-   ist — so viele, wie das Werkzeug beim Bauen gemeldet hat (zurzeit **77 Dateien**).
+   ist (98 Dateien).
 4. Unten auf **Commit changes** klicken.
 
 > Wichtig: Nicht den äußeren Ordner ziehen, sondern **seinen Inhalt**.
 > Nach dem Hochladen muss `index.html` in der Dateiliste ganz oben stehen.
-
-> **Eine Runde genügt.** GitHub nimmt 100 Dateien je Vorgang, und dieses Paket
-> hat zurzeit 77. Die fast 1.000 Aussprachen liegen darin als 22 Bündel — eine Datei je
-> Lektion. Früher waren es einzelne Töne, und das hieß acht Runden Ziehen und
-> Ablegen; wer eine vergaß, hatte stumme Karten, ohne dass die App etwas sagte.
-
-Zum Nachzählen, ob alles oben ist: `/check.html` auf der fertigen Seite zeigt,
-wie viele Töne gefunden wurden.
 
 ## Schritt 5 — Netlify mit GitHub verbinden
 
@@ -67,7 +58,7 @@ wie viele Töne gefunden wurden.
 Die neue Adresse öffnen (z. B. `zufallsname-1234.netlify.app`) und dahinter
 **`/check.html`** anhängen. Dort muss oben grün stehen:
 
-> ✅ Alles in Ordnung — Der Klassen-Server läuft, Speicher: dauerhaft ✓
+> ✅ Alles in Ordnung — Der Klassen-Server läuft (Version 8.6), Speicher: dauerhaft ✓
 
 Dann: zurück zur App, **Anmelden**, Namen eintippen — fertig. Im Klassenzimmer
 (Lehrer-Passwort `1907`) erscheint jedes Kind automatisch.
@@ -84,13 +75,9 @@ nicht versehentlich die alte öffnen.
 ## Ab jetzt: Update in 1 Minute
 
 Neue ZIP von mir → entpacken → auf GitHub ins Repository gehen →
-**Add file → Upload files** → hineinziehen → **Commit changes**.
+**Add file → Upload files** → Inhalt hineinziehen → **Commit changes**.
 Netlify baut automatisch neu. Nach ein bis zwei Minuten ist die neue Version
 online; die App holt sie sich beim nächsten Öffnen von selbst.
-
-**Wenn sich nur die App geändert hat und keine Töne**, genügt Runde 1 — die
-Tonordner müssen nur hoch, wenn neue Aufnahmen dazugekommen sind. Ich schreibe
-dir jedes Mal dazu, was sich geändert hat.
 
 ## Wenn etwas klemmt
 
@@ -99,31 +86,5 @@ dir jedes Mal dazu, was sich geändert hat.
 - **`/check.html` bleibt rot** → Screenshot davon schicken. Dort steht jede
   geprüfte Adresse mit Statuscode.
 - **GitHub lädt nicht alle Dateien hoch** → die Weboberfläche schafft 100
-  Dateien pro Vorgang; dieses Paket bleibt darunter. Falls doch etwas fehlt,
-  einfach nochmal **Add file → Upload files** für den fehlenden Ordner — es
-  schadet nichts, eine Runde zweimal zu machen.
-
----
-
-## Einmalig nach Version 11.11: das Lehrer-Passwort
-
-Bis Version 11.10 stand das Lehrer-Passwort im Code der App und war damit für
-jeden lesbar, der die Seite öffnete. Es ist entfernt. Damit gibt es zwei Wege
-in die Lehrer-Ansicht:
-
-**Der gute Weg (nichts zu tun):** Klassenzimmer anlegen → vierstelliger Code +
-eigene PIN. Die PIN liegt nur als Hash auf dem Server. Beim Anlegen bekommst
-du einmalig ein **Notfall-Wort** — schreib es auf, damit setzt du die PIN neu,
-falls du sie vergisst.
-
-**Der alte Weg (Sammelklasse „ALLE"):** funktioniert nur noch, wenn in Netlify
-eine Umgebungsvariable gesetzt ist:
-
-1. Netlify öffnen → deine Seite → **Site configuration**
-2. **Environment variables** → **Add a variable**
-3. Key: `EB_LEHRER_PW` · Value: ein Passwort, das du dir ausdenkst
-   (mindestens 4 Zeichen, gern länger — es steht nirgends im Code)
-4. Speichern, dann **Deploys → Trigger deploy → Deploy site**
-
-Ohne diese Variable ist der Sammelklassen-Weg abgeschaltet. Das ist Absicht:
-Ein Passwort, das in der App mitgeliefert wird, ist kein Passwort.
+  Dateien pro Vorgang; dieses Paket hat bewusst nur 98. Falls doch etwas fehlt,
+  einfach nochmal **Add file → Upload files** für den fehlenden Ordner.

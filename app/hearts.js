@@ -52,11 +52,6 @@
   ];
 
   // Klassen-Edition (05.08.2026): Herzen & Schlüssel sind für alle Schüler
-  // unbegrenzt — das System ist AUS. (11.0) Die Variable selbst fehlte seit dem
-  // Umbau: state() griff auf ein `enabled` zu, das nur existierte, weil
-  // setEnabled(false) aus main.js es vorher als stille globale Variable anlegte.
-  // Wurde der Lernbildschirm direkt geöffnet, gab es einen Absturz.
-  let enabled = false;
 
   function load() {
     try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; }

@@ -3,8 +3,6 @@
 # nach einem Update weiterhin die alte Version.
 /index.html
   Cache-Control: no-cache, must-revalidate
-/installieren.html
-  Cache-Control: no-cache, must-revalidate
 /version.json
   Cache-Control: no-store
 /sw.js

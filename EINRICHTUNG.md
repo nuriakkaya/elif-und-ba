@@ -1,4 +1,4 @@
-# 🌙 Elif & Ba — Einrichtung & Update (Version 11.0)
+# 🌙 Elif & Ba — Einrichtung & Update (Version 8.6)
 
 **Das Wichtigste in einem Satz:** Ein Kind tippt auf *Anmelden*, schreibt seinen
 **Namen**, drückt einmal — und ist im Kurs. Kein Anmeldecode, kein Passwort,
@@ -45,45 +45,10 @@ nicht und funktioniert auch dann, wenn die App selbst noch alt ist:
 
 Adresse: deine Netlify-Adresse + `/check.html`.
 
-## 🏫 Klassenzimmer in drei Schritten (neu in 11.0)
-
-Jede Lehrkraft hat ihr eigenes Klassenzimmer — ohne Technik, ohne Passwörter
-von anderen. Es braucht nur einen **Code mit vier Ziffern**.
-
-**Als Lehrkraft (einmalig, 1 Minute):**
-
-1. App öffnen → oben rechts **„Anmelden"** → unten **„🧑‍🏫 Ich bin Lehrkraft"**.
-2. **„Neues Klassenzimmer anlegen"**: Name der Klasse (z. B. „Klasse 3b"),
-   dein Name, eine PIN (4 Ziffern, nur für dich) → **„Klassenzimmer anlegen"**.
-3. Es erscheint dein **Klassen-Code**, z. B. **4821**. Schreib ihn an die
-   Tafel, schick ihn in die Eltern-Gruppe (Knopf „Teilen") oder druck den
-   **Aushang** für die Klassentür (Knopf „Aushang" — mit QR-Code, der die
-   Kinder direkt zur App mit deinem Code führt).
-
-**Die Kinder:** App öffnen → **„Anmelden"** → **Namen** und **Code** eintippen →
-„Los geht's!". Sie sehen sofort „✅ Klasse 3b bei Frau Yılmaz" und sind drin.
-Wer über den Aushang oder den Link kommt, hat den Code schon vorausgefüllt.
-
-**Danach:** Tab **„Klasse"** → das Klassenzimmer öffnet sich ohne Passwort
-(du bist mit Code + PIN ausgewiesen). Oben steht dein Code, darunter jedes
-Kind mit seinem Stand — sobald es sich anmeldet, noch vor der ersten Karte.
-Auf einem anderen Gerät: „Anmelden" → „Ich bin Lehrkraft" → „Mein
-Klassenzimmer öffnen" → Code + PIN.
-
-**Gut zu wissen:**
-- Ein Kind kann die Klasse wechseln: „Anmelden" → Konto → neuen Code eingeben.
-- Ohne Code landet ein Kind wie bisher in der Sammelklasse.
-- Die Sammelklasse mit dem zentralen Lehrer-Passwort gibt es weiterhin
-  („Alter Weg" unter „Ich bin Lehrkraft").
-- Die PIN ist nur für dich. Vergessen? Dann einfach ein neues Klassenzimmer
-  anlegen und den Kindern den neuen Code geben — sie tippen ihn einmal ein
-  und nehmen ihren Fortschritt mit.
-
 ## 👧👦 So melden sich die Kinder an
 
 1. App öffnen → oben rechts **„Anmelden“**.
-2. **Namen eingeben**, darunter den **Klassen-Code** der Lehrkraft (vier
-   Ziffern; ohne Code → Sammelklasse) → „Los geht's! 🚀“. **Fertig.**
+2. **Namen eingeben** → „Los geht's! 🚀“. **Fertig.**
 3. Wer schon einmal da war, tippt seinen Namen einfach in der Liste
    **„Schon mal dabei gewesen?“** an — ein Fingertipp genügt.
 4. Auf einem zweiten Gerät denselben Namen eingeben → der Fortschritt ist da.
@@ -122,16 +87,9 @@ Ein Klick auf ein Kind öffnet die Einzelheiten:
    geht auch sofort.
 5. **„🔓 Lehrer-Modus“**: alle Lektionen ohne Freischaltung — zum Vorbereiten
    und Vorführen.
-6. Mehrere Klassen? **Leg ein Klassenzimmer an** (Anmelden → „🧑‍🏫 Ich bin
-   Lehrkraft" → „Neues Klassenzimmer anlegen"). Du bekommst einen Code mit vier
-   Ziffern; die Kinder tippen ihn beim Anmelden ein und sind in deiner Klasse.
-   Nur diese Kinder siehst du, und nur sie sehen einander in der Klassentafel.
-
-   > *Bis Version 11.10 stand hier, man solle einen Gruppennamen wie
-   > `KLASSE4A` eintragen. Diesen Weg gibt es nicht mehr: Die Kinder haben
-   > kein Feld dafür, und die Lehrkraft bekäme eine leere Liste. Seit 11.11
-   > ist der vierstellige Code der einzige — und der bessere — Weg, denn nur
-   > er trennt die Klassen wirklich, auch in der Tafel der Kinder.*
+6. Mehrere Klassen? Unter **„▾ Nur eine bestimmte Gruppe anzeigen“** einen
+   Gruppennamen eintragen (z. B. `KLASSE4A`) und denselben den Kindern unter
+   „▾ Mehr“ eintragen lassen. Ohne Gruppe sind alle in einer Sammelliste.
 
 ## ✏️ Die Buchstaben-Werkstatt (ausgebaut am 12.08.2026)
 
@@ -776,143 +734,6 @@ dorthin war kurzzeitig blockiert.
 
 ---
 
-## Version 11.0 — „Axi ist da" (07.09.2026)
-
-Ein großes Design-Update. Am Lernstoff, am Punktesystem und an den Daten ändert
-sich nichts — die Kinder finden alles wieder, es sieht nur besser aus und lebt.
-
-### 1. Axi, der Axolotl — das Maskottchen ist zurück und lebendig
-
-Der Wiedehopf aus 10.0 ist in Rente. Zurück ist der lila Axolotl von früher,
-neu gezeichnet und zum ersten Mal wirklich lebendig: Er **atmet, blinzelt,
-schaut sich um**, die Kiemen wippen, der Schwanz wedelt. Und er hat Gefühle:
-
-- **Startseite:** Axi sitzt oben rechts mit einer Sprechblase („Los geht's,
-  Ayşe!", „Nur noch 3!", „Tagesziel geschafft! 🎉"). Ist das Tagesziel
-  erreicht, **jubelt** er mit den Armen in der Luft. Spät abends, wenn noch
-  nichts gemacht wurde, **schläft** er (Zzz) — bis jemand eine Runde spielt.
-- **Lernbildschirm:** Axi sitzt klein in der Kopfzeile und reagiert auf jede
-  Antwort — kurz jubeln bei richtig, ein trauriger Blick mit Träne bei falsch,
-  dann wieder freundlich.
-- **Rundenende, Serien-Bildschirm, Ladebildschirm:** überall Axi statt Vogel.
-
-Axi ist reines SVG mit CSS-Bewegung (Datei `app/icons.js`, Abschnitt „AXI"),
-keine Bilddatei, keine Bibliothek — die App bleibt so leicht wie vorher.
-„Weniger Bewegung" in den Geräte-Einstellungen wird respektiert.
-
-### 2. Neue Farbwelt: Nachthimmel & Axolotl
-
-Warmes Papier und Smaragd sind Geschichte. Zurück zum kühlen Blau-Lila von
-früher — aber satter und klarer, wie bei den großen Lern-Apps: weißer Grund
-mit einem Hauch Lavendel, **kräftiges Violett** als Leitfarbe, Gold für
-Belohnungen, Grün für richtig, Koralle (Axis Kiemen) für Wärme. Der
-Dunkelmodus ist komplett mitgezogen (tiefes Nachtblau, helles Violett).
-
-Alle Knöpfe haben eine fühlbare Unterkante und sinken beim Antippen ein,
-Karten haben 2-px-Ränder und große Rundungen, die untere Leiste am Handy
-zeigt den aktiven Bereich als farbige Pille. Auch die App-Icons auf dem
-Home-Bildschirm sind neu (Axi auf Violett).
-
-### 3. Belohnungsschleifen — warum die Kinder wiederkommen
-
-Nach dem Vorbild der großen Lern-Apps, aber fair: nichts nimmt etwas weg,
-alles kommt obendrauf.
-
-- **Sterne am Rundenende:** 3 Sterne für fehlerfrei, 2 für höchstens zwei
-  Fehler, 1 fürs Durchhalten — mit Ton und Pop, einer nach dem anderen.
-- **Perfekte Runde:** +10 XP, eigene Fanfare, Konfetti.
-- **Überraschung:** in etwa jeder vierten Runde ein Geschenk (5–25 XP). Nie
-  planbar — genau das macht es spannend.
-- **Level-Aufstieg** ist jetzt ein eigener Moment: große Karte mit Axi,
-  Fanfare, Konfetti, neuer Titel.
-- **Combo hörbar und sichtbar:** mit jeder richtigen Antwort in Folge steigt
-  der Ton ein Stück; ab drei in Folge pulsiert ein goldener Rand um den
-  ganzen Bildschirm und die Combo-Pille pocht.
-- **Tagesaufgaben auf der Startseite:** drei kleine Ziele (Tagesziel,
-  eine perfekte Runde, Goldtag). Sind alle drei geschafft, wackelt die
-  **Tageskiste** — öffnen bringt 5 Münzen.
-- **Serie in Gefahr:** ab 17 Uhr ohne Runde bekommt die Tagesziel-Karte
-  einen pulsierenden Goldrand, Axi guckt besorgt und sagt „Deine 7-Tage-Serie
-  wartet!".
-- **Drei neue Klänge** (Geschenk, perfekte Runde, Tageskiste), erzeugt mit
-  `tools/toene.py` — gleicher Glockenspiel-Charakter wie die vorhandenen.
-
-### 4. Schrift: Nunito
-
-Die runde, freundliche **Nunito** liegt jetzt im Paket (`fonts/nunito-*.woff2`,
-OFL-Lizenz, ~75 KB) und ist die Hausschrift — auch offline. Arabisch bleibt
-Scheherazade New.
-
-### 4b. Noch drei Schleifen (08.09.2026)
-
-- **Wochen-Rückblick:** sonntags die laufende, montags die vergangene Woche
-  auf der Startseite — sieben Balken, XP, Lerntage, perfekte Runden,
-  Goldtage, ein Satz von Axi und „Woche teilen" (für die Eltern-Gruppe).
-  `?woche=1` zeigt die Karte an jedem Tag.
-- **Axis Kleiderschrank (Shop):** sieben Kostüme für Münzen — Blume,
-  Schleife, Brille, Mütze, Fes, Kopfhörer, Krone. Einmal gekauft, jederzeit
-  anziehen; Axi trägt es überall. Der Shop ist über die Münzen-Pille bei den
-  Tagesaufgaben erreichbar (er war seit dem Umbau gar nicht mehr verlinkt).
-  Gespeichert wird lokal auf dem Gerät.
-- **Kein echtes Geld — nirgends.** Der alte „Unlimited · Upgraden"-Kasten
-  aus der Gizmo-Kopie ist aus dem Shop entfernt. Münzen entstehen nur beim
-  Lernen: 3er-/5er-Combo +1, perfekte Runde +2, Level-Aufstieg +3,
-  Tageskiste +5 — der Shop zeigt das oben an.
-- **Anfeuern am Rundenende:** direkt nach der Runde zwei Mitschüler:innen
-  (die mit den wenigsten Punkten der Woche zuerst) mit 💪 👏 🔥 🤲 anfeuern —
-  gleiche Regeln wie in „Unsere Klasse", nur mit Anmeldung sichtbar.
-
-### 4c. Logo der Gemeinde
-
-Das rote Oval (`assets/logo-gemeinde.jpg`) steht im Anmelde-Fenster, unten in
-der Seitenleiste am Rechner, als Fußzeile der Startseite am Handy und über der
-Klassenzimmer-Sperre. Den Namen daneben trägst du in `app/config.js` ein:
-`window.GEMEINDE_NAME = '…'` — leer heißt: nur das Logo.
-
-### 4d. Landingpage zum Installieren
-
-`deine-adresse.netlify.app/installieren` (auch `…/installieren.html`) ist die
-Seite für alle, die die App aufs Gerät holen sollen — Kinder, Eltern,
-Kolleg:innen. Sie erkennt das Gerät selbst:
-
-- **Android / Chrome / Edge:** echter Knopf „Jetzt installieren" (der Browser
-  fragt einmal nach), sonst die Anleitung über das ⋮-Menü.
-- **iPhone / iPad:** Apple erlaubt keinen Knopf — darum die bebilderte
-  Anleitung: Safari → Teilen → „Zum Home-Bildschirm" → „Hinzufügen".
-- **Aus WhatsApp/Instagram geöffnet:** Hinweis „In Safari/Chrome öffnen",
-  weil Installieren aus diesen Apps heraus nicht geht.
-- **QR-Code** der Seite, „Link kopieren" (öffnet am Handy das Teilen-Menü)
-  und **„Aushang drucken"** — ein A4-Blatt mit großem QR-Code und drei
-  Schritten für die Klassentür.
-
-Der Name der Gemeinde kommt aus `app/config.js` (`GEMEINDE_NAME`).
-
-### 5. Kleine Reparaturen
-
-- Der Lernbildschirm stürzte ab, wenn er direkt geöffnet wurde (fehlende
-  Variable im Herzen-System). Behoben.
-- Gespeicherte Akzentfarben aus alten Farbwelten (Smaragd, Periwinkle) werden
-  als „Standard" erkannt und folgen jetzt der aktuellen Palette — sonst wäre
-  bei Altnutzern das alte Grün hängen geblieben.
-
-### 6. Für Prüfung und Lesezeichen
-
-- `index.html#decks`, `#progress`, `#duel`, `#teacher` öffnen direkt diesen
-  Bereich. `?dunkel=1` startet im Dunkelmodus.
-- `?pruef=1&phase=ende` zeigt sofort das Rundenende.
-- `?pruef=1` schreibt nach vier Sekunden eine kleine Prüfausgabe (Fehler,
-  zu breite Elemente) unten in die Seite — für automatische Bildschirmtests.
-
-### 7. Selbst bauen
-
-Der Quelltext liegt weiter in `app/`. Die Bauwerkzeuge (`tools/bauen.mjs`,
-`tools/server.mjs`, `tools/toene.py`) liegen nur im Arbeitsordner auf dem Mac,
-nicht im Hochlade-Paket — GitHub nimmt im Browser höchstens 100 Dateien auf
-einmal an, und dieses Paket bleibt bewusst darunter. Nach Änderungen:
-
-    node tools/bauen.mjs --release      # erzeugt app/bundle.js
-    node tools/server.mjs               # Test unter http://localhost:8811
-
 ## Version 10.0 — „Jetzt fühlt es sich wie eine App an" (06.09.2026)
 
 Diese Version ändert nichts am Lernstoff und nichts am Punktesystem. Sie ändert,
@@ -1141,95 +962,72 @@ Wenn alles sitzt, wird aus den bearbeiteten Dateien das **feste Tonpaket**
 gebaut, das mit der App ausgeliefert wird — dann klingt sie für jeden, der sie
 herunterlädt, gleich, auch offline und ohne Server.
 
----
+### Version 10.6 — Klassen-Beitritt repariert + Rangliste für die Lehrkraft (20.09.2026)
 
-## 🔗 Einmal einrichten: GitHub + Netlify (ca. 10 Minuten)
+#### Der Fehler: „Ich bin beigetreten, kam aber nie an"
 
-Danach lädst du Updates **nie wieder** irgendwo hin — du ersetzt die Dateien
-einmal auf GitHub, und Netlify baut und veröffentlicht die Seite von selbst.
-**Nur so installiert Netlify auch den Mini-Server** (Anmelden, Geräte-Abgleich,
-Klassenzimmer). Beim Ziehen von Dateien auf die „Deploys"-Seite läuft kein
-Build — deshalb konnte es bisher gar nicht klappen.
+Das war kein Missverständnis, sondern ein echter Fehler — an zwei Stellen:
 
-Du brauchst: einen Computer (nicht Handy), die ZIP-Datei, 10 Minuten.
+1. **Der Wechsel blieb auf dem Gerät.** Wer eine Gruppe eintrug, änderte sie nur
+   im eigenen Browser. Der Server bekam zwar eine Kurzmeldung, schrieb aber nur
+   Punktestand und „zuletzt gesehen" ins Konto — die **Klasse blieb die alte**.
+   Da die Lehrkraft ihre Liste genau aus den Konten zusammenstellt, tauchte das
+   Kind dort nie auf. Schlimmer: Beim nächsten Anmelden schickte der Server die
+   **alte** Klasse zurück, und die App übernahm sie — der Beitritt war rückgängig.
 
----
+2. **Lehrkräfte wurden gar nicht gemeldet.** Die Kurzmeldung brach bei
+   Lehrer-Konten sofort ab. Wer als Lehrkraft der Klasse einer Kollegin beitrat,
+   wurde nirgends eingetragen und war für die andere Seite unsichtbar.
 
-## Schritt 1 — ZIP entpacken
+**Behoben:** Die Kurzmeldung schickt jetzt den eigenen Schlüssel mit; damit
+schreibt der Server den Klassenwechsel verbindlich ins Konto und trägt das Kind
+zugleich aus der alten Klasse aus. Lehrkräfte werden ebenfalls gemeldet (in den
+Kinder-Ranglisten stehen sie weiterhin nicht, dafür sorgt die Markierung). Und
+die App prüft nach dem Speichern, ob der Server den Wechsel wirklich übernommen
+hat — wenn nicht, gibt es eine klare Meldung statt stiller Wirkungslosigkeit.
 
-Doppelklick auf die ZIP-Datei. Es entsteht ein Ordner. Öffne ihn: Darin muss
-**`index.html` direkt** liegen (daneben `app`, `netlify`, `netlify.toml`, …).
-Diesen Ordner offen lassen.
+#### Neu: Rangliste im Klassenzimmer
 
-## Schritt 2 — GitHub-Konto (falls noch keins)
+Die Kinder hatten ihre Rangliste längst unter „Unsere Klasse". Der Lehrkraft
+fehlte sie. Im Klassenzimmer steht jetzt über „Wer steht wo?" eine Rangliste mit
+drei Ansichten:
 
-1. **github.com** öffnen → **Sign up** → E-Mail, Passwort, Benutzername.
-2. Kostenlos, keine Zahlungsdaten. E-Mail bestätigen.
+* **📅 Diese Woche** — Punkte der letzten 7 Tage. Das Fenster wandert täglich
+  mit (nicht Montag bis Sonntag), genau wie bei den Kindern — beide Seiten sehen
+  also dieselbe Zahl.
+* **⭐ Gesamt** — alle Punkte seit dem ersten Tag.
+* **🕌 Auswendig** — Zahl der fertig auswendig gelernten Suren und Gebete.
 
-## Schritt 3 — Ablage („Repository") anlegen
+Je Kind stehen dort Platz (🥇🥈🥉), Stufe, Serie, auswendig gelernte Suren und
+der Wert als Balken. Darunter die Wochensumme der ganzen Klasse.
 
-1. Oben rechts auf **+** → **New repository**.
-2. **Repository name:** `elif-und-ba`
-3. **Public** ausgewählt lassen. Sonst nichts ankreuzen (kein README!).
-4. **Create repository**.
+### Version 10.7 — Aussprache, Werkstatt raus, hörbare Fortschritts-Kacheln (20.09.2026)
 
-## Schritt 4 — Dateien hochladen
+**1. Das Kind spricht den Buchstaben, nicht die Erklärung.**
+Beim Nachsprech-Bonus galten bisher auch die beschreibenden Formen
+„peltek se" und „peltek zel" als richtig. Die zählen nicht mehr — gefragt ist
+der Buchstabe selbst: **Se** und **Zel**. Reine Schreibvarianten
+(cim/jim, vav/waw, kaf/qaf …) bleiben natürlich erlaubt.
 
-1. Auf der leeren Seite steht ein Link **„uploading an existing file"** —
-   darauf klicken. (Alternativ: **Add file → Upload files**.)
-2. Im entpackten Ordner **alles markieren** (Strg+A bzw. Cmd+A) — also alle
-   Dateien **und** die Ordner `app`, `vendor`, `netlify`, `assets`, `fonts`.
-3. Alles in das große Feld im Browser ziehen. Warten, bis die Liste vollständig
-   ist (98 Dateien).
-4. Unten auf **Commit changes** klicken.
+**2. Die Buchstaben-Werkstatt ist komplett entfernt.**
+Sie hat ihren Zweck erfüllt: Die Buchstabennamen sind geklärt, die Aussprache
+kommt aus den Aufnahmen. Entfernt wurden der ganze Bildschirm, beide Einstiege
+(Einstellungen und Klassenzimmer) und das Modul `app/cardedits.js`, das die
+Karten beim Start überschrieben hat.
 
-> Wichtig: Nicht den äußeren Ordner ziehen, sondern **seinen Inhalt**.
-> Nach dem Hochladen muss `index.html` in der Dateiliste ganz oben stehen.
+> **Wichtige Nebenwirkung:** Alte Überschreibungen wirken damit nicht mehr.
+> Wer zum Beispiel „thse" gespeichert hatte, sieht jetzt wieder den
+> Auslieferungsstand **„Se"**. Der Lernfortschritt bleibt erhalten — der
+> Karteikasten hängt an der arabischen Seite, nicht an der Umschrift.
+>
+> Das Einsprechen der Aussprache ist **nicht** betroffen: Das Aussprache-Studio
+> im Klassenzimmer bleibt vollständig erhalten, samt Serien-Modus, Sichern und
+> Einlesen bearbeiteter Dateien.
 
-## Schritt 5 — Netlify mit GitHub verbinden
+**3. Im Fortschritt hört man den Buchstaben.**
+Unter „Meine Stapel" → Lektion → **Dein Fortschritt** stehen alle Buchstaben als
+Kacheln mit Prozentring. Ein Tipp darauf spielt den Buchstaben jetzt vor —
+erst die Aufnahme der Lehrkraft, sonst die mitgelieferte. Die längeren Zeilen
+(Silben und Wörter) sind ebenfalls hörbar. Ein kleines 🔊 zeigt es an.
 
-1. **app.netlify.com** öffnen → **Add new site** → **Import an existing project**.
-2. **Deploy with GitHub** → GitHub-Konto autorisieren.
-3. Bei „Pick a repository" das eben angelegte **`elif-und-ba`** auswählen.
-4. Die Bau-Einstellungen liest Netlify aus der mitgelieferten Datei
-   `netlify.toml` — du musst nichts eintragen. Falls doch gefragt wird:
-   - **Build command:** `echo build`
-   - **Publish directory:** `.`
-   - **Functions directory:** `netlify/functions`
-5. **Deploy** klicken und warten, bis **„Published"** erscheint.
-
-## Schritt 6 — Prüfen
-
-Die neue Adresse öffnen (z. B. `zufallsname-1234.netlify.app`) und dahinter
-**`/check.html`** anhängen. Dort muss oben grün stehen:
-
-> ✅ Alles in Ordnung — Der Klassen-Server läuft (Version 8.6), Speicher: dauerhaft ✓
-
-Dann: zurück zur App, **Anmelden**, Namen eintippen — fertig. Im Klassenzimmer
-(Lehrer-Passwort `1907`) erscheint jedes Kind automatisch.
-
-## Schritt 7 — Schöne Adresse (optional)
-
-In Netlify: **Site configuration → Change site name** → z. B. `elif-be`.
-Die Adresse lautet dann `elif-be.netlify.app`. Die alte Netlify-Seite kannst
-du danach löschen (**Site configuration → Delete this site**), damit die Kinder
-nicht versehentlich die alte öffnen.
-
----
-
-## Ab jetzt: Update in 1 Minute
-
-Neue ZIP von mir → entpacken → auf GitHub ins Repository gehen →
-**Add file → Upload files** → Inhalt hineinziehen → **Commit changes**.
-Netlify baut automatisch neu. Nach ein bis zwei Minuten ist die neue Version
-online; die App holt sie sich beim nächsten Öffnen von selbst.
-
-## Wenn etwas klemmt
-
-- **Netlify meldet „Build failed"** → im Deploy-Protokoll die letzte rote Zeile
-  kopieren und mir schicken.
-- **`/check.html` bleibt rot** → Screenshot davon schicken. Dort steht jede
-  geprüfte Adresse mit Statuscode.
-- **GitHub lädt nicht alle Dateien hoch** → die Weboberfläche schafft 100
-  Dateien pro Vorgang; dieses Paket hat bewusst nur 98. Falls doch etwas fehlt,
-  einfach nochmal **Add file → Upload files** für den fehlenden Ordner.
+Die Datei `app/cardedits.js` entfällt; das Paket hat damit **97 Dateien**.

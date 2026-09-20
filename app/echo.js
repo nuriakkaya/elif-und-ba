@@ -30,17 +30,22 @@
   const ECHO_TOPICS = ['quran-harfler'];
 
   /* Erlaubte Schreibweisen je Buchstabenname. Bewusst KEINE Namen
-     anderer Buchstaben — sonst bekäme man den Bonus für den falschen. */
+     anderer Buchstaben — sonst bekäme man den Bonus für den falschen.
+
+     (20.09.2026, Nutzerwunsch) Die BESCHREIBENDEN Formen „peltek se" und
+     „peltek zel" zählen nicht mehr. Das Kind soll den Buchstaben selbst
+     richtig aussprechen — „Se" bzw. „Zel" —, nicht die Erklärung dazu
+     aufsagen. Reine Schreibvarianten (jim/cim, waw/vav …) bleiben erlaubt. */
   const ALIAS = {
     'elif': ['elif', 'alif', 'elf'],
     'be': ['be', 'bee'],
     'te': ['te', 'tee'],
-    'se': ['se', 'peltek se'],
+    'se': ['se'],
     'cim': ['cim', 'jim'],
     'ha': ['ha'],
     'cha': ['cha', 'hı', 'kha', 'chi'],
     'dal': ['dal'],
-    'zel': ['zel', 'peltek zel'],
+    'zel': ['zel'],
     'ra': ['ra'],
     'ze': ['ze'],
     'sin': ['sin'],

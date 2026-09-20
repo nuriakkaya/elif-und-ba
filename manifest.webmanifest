@@ -1,14 +1,14 @@
 {
-  "name": "Elif Be — Kuran lernen",
-  "short_name": "Elif Be",
-  "description": "Kuran lesen lernen für Kinder: Elifba-Kurs Schritt für Schritt, Suren, Wortschatz und Spiele.",
+  "name": "Elif & Ba — Koran lernen",
+  "short_name": "Elif & Ba",
+  "description": "Koran lesen lernen für Kinder: Elifba-Kurs Schritt für Schritt, Suren, Wortschatz und Spiele.",
   "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#F6F5FF",
-  "theme_color": "#6A5AE0",
+  "background_color": "#FAF6EF",
+  "theme_color": "#0E6B57",
   "lang": "de",
   "icons": [
     {

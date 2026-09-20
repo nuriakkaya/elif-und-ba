@@ -63,32 +63,8 @@ function extractJsonArrayAfterKey(text, key) {
   return null;
 }
 
-/* Nur von der eigenen Seite, mit Obergrenze je Absender — wie bei tutor.mjs
-   und fetch-url.mjs. Sonst holt Nuris Server auf seine Rechnung YouTube-Seiten
-   fuer jeden, der die Adresse kennt. (14.09.2026) */
-const ZAEHLER = new Map();
-const STUNDE = 3600000;
-function zuOft(absender) {
-  const jetzt = Date.now();
-  const e = ZAEHLER.get(absender);
-  if (!e || jetzt > e.bis) { ZAEHLER.set(absender, { n: 1, bis: jetzt + STUNDE }); return false; }
-  e.n++;
-  if (ZAEHLER.size > 500) ZAEHLER.clear();
-  return e.n > 30;
-}
-
 export default async (req) => {
   if (req.method !== "POST") return json({ error: "method" }, 405);
-
-  const eigen = new URL(req.url).host;
-  const woher = req.headers.get("origin") || req.headers.get("referer") || "";
-  let fremd = true;
-  try { fremd = !woher || new URL(woher).host !== eigen; } catch (e) { fremd = true; }
-  if (fremd) return json({ error: "Diese Funktion gehört zur App und lässt sich nicht von außen aufrufen." }, 403);
-
-  const absender = req.headers.get("x-nf-client-connection-ip") || req.headers.get("x-forwarded-for") || "?";
-  if (zuOft(absender)) return json({ error: "Gerade zu viele Anfragen — bitte später noch einmal." }, 429);
-
   const b = await req.json().catch(() => null);
   const rawUrl = b && typeof b.url === "string" ? b.url.trim() : "";
   const videoId = extractVideoId(rawUrl);
