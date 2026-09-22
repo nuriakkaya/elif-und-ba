@@ -962,72 +962,65 @@ Wenn alles sitzt, wird aus den bearbeiteten Dateien das **feste Tonpaket**
 gebaut, das mit der App ausgeliefert wird — dann klingt sie für jeden, der sie
 herunterlädt, gleich, auch offline und ohne Server.
 
-### Version 10.6 — Klassen-Beitritt repariert + Rangliste für die Lehrkraft (20.09.2026)
+---
 
-#### Der Fehler: „Ich bin beigetreten, kam aber nie an"
+## Version 10.7 — die drei Fixes, sonst nichts (21.09.2026)
 
-Das war kein Missverständnis, sondern ein echter Fehler — an zwei Stellen:
+Ausgangspunkt ist **exakt das Paket 10.5 vom 06.09.2026**. Am Aussehen
+wurde nichts geändert: dieselben Farben, dieselbe Startseite, dasselbe
+Quiz. Die `index.html` unterscheidet sich von 10.5 nur durch die
+Versionsnummer und einen angehängten CSS-Block für die neue Rangliste und
+die anklickbaren Kacheln.
 
-1. **Der Wechsel blieb auf dem Gerät.** Wer eine Gruppe eintrug, änderte sie nur
-   im eigenen Browser. Der Server bekam zwar eine Kurzmeldung, schrieb aber nur
-   Punktestand und „zuletzt gesehen" ins Konto — die **Klasse blieb die alte**.
-   Da die Lehrkraft ihre Liste genau aus den Konten zusammenstellt, tauchte das
-   Kind dort nie auf. Schlimmer: Beim nächsten Anmelden schickte der Server die
-   **alte** Klasse zurück, und die App übernahm sie — der Beitritt war rückgängig.
+**1. Die Buchstaben-Werkstatt ist raus.**
+Der Bildschirm zum Umbenennen und Neu-Einsprechen der Buchstaben ist
+komplett entfernt: die Seite selbst, beide Knöpfe (Klassenzimmer und
+Einstellungen) und die Datei `app/cardedits.js`.
 
-2. **Lehrkräfte wurden gar nicht gemeldet.** Die Kurzmeldung brach bei
-   Lehrer-Konten sofort ab. Wer als Lehrkraft der Klasse einer Kollegin beitrat,
-   wurde nirgends eingetragen und war für die andere Seite unsichtbar.
+**2. „thse" ist weg — die Buchstaben heißen „Peltek Se" und „Peltek Zel".**
+Der Grund für das „thse" in der Abfrage war genau diese Werkstatt: Sie hat
+beim Start die Umschriften vom Server überschrieben. Ohne sie steht wieder
+das im Kurs, was im Kurs stehen soll. Die beiden peltek-Buchstaben tragen
+den vollen Namen:
 
-**Behoben:** Die Kurzmeldung schickt jetzt den eigenen Schlüssel mit; damit
-schreibt der Server den Klassenwechsel verbindlich ins Konto und trägt das Kind
-zugleich aus der alten Klasse aus. Lehrkräfte werden ebenfalls gemeldet (in den
-Kinder-Ranglisten stehen sie weiterhin nicht, dafür sorgt die Markierung). Und
-die App prüft nach dem Speichern, ob der Server den Wechsel wirklich übernommen
-hat — wenn nicht, gibt es eine klare Meldung statt stiller Wirkungslosigkeit.
+| Buchstabe | heißt jetzt |
+|---|---|
+| ث | **Peltek Se** |
+| ذ | **Peltek Zel** |
 
-#### Neu: Rangliste im Klassenzimmer
+Das gilt in Lektion 1 (Die Buchstaben) und Lektion 2 (Die Formen), auf den
+Karten, in der Abfrage und in den Fortschritts-Kacheln.
 
-Die Kinder hatten ihre Rangliste längst unter „Unsere Klasse". Der Lehrkraft
-fehlte sie. Im Klassenzimmer steht jetzt über „Wer steht wo?" eine Rangliste mit
-drei Ansichten:
+Beim **Nachsprechen** zählt beides: Sagt das Kind kurz „Se" bzw. „Zel" —
+so soll es den Buchstaben aussprechen —, gilt es als richtig; liest es den
+vollen Namen von der Karte ab, ebenso. Der Name eines *anderen*
+Buchstabens zählt weiterhin nie (wer bei س „se" sagt, bekommt nichts).
 
-* **📅 Diese Woche** — Punkte der letzten 7 Tage. Das Fenster wandert täglich
-  mit (nicht Montag bis Sonntag), genau wie bei den Kindern — beide Seiten sehen
-  also dieselbe Zahl.
-* **⭐ Gesamt** — alle Punkte seit dem ersten Tag.
-* **🕌 Auswendig** — Zahl der fertig auswendig gelernten Suren und Gebete.
+Der Fortschritt der Kinder bleibt erhalten: Die App merkt sich jede Karte
+am arabischen Zeichen, nicht am Namen.
 
-Je Kind stehen dort Platz (🥇🥈🥉), Stufe, Serie, auswendig gelernte Suren und
-der Wert als Balken. Darunter die Wochensumme der ganzen Klasse.
+**3. Das Klassenzimmer funktioniert.**
+Der Fehler „ich bin einer Klasse beigetreten, kam aber nie an" hatte drei
+Ursachen, alle drei sind behoben:
 
-### Version 10.7 — Aussprache, Werkstatt raus, hörbare Fortschritts-Kacheln (20.09.2026)
+* Der Wechsel stand nur auf dem Gerät. Der Server hat die alte Klasse im
+  Konto behalten — beim nächsten Anmelden war sie wieder da. Jetzt wird der
+  Wechsel festgeschrieben (und der Eintrag in der alten Klasse entfernt),
+  sobald der eigene Schlüssel mitkommt. Nur das eigene Konto kann das.
+* Lehrkräfte wurden beim Melden an die Klasse übersprungen. Wer als
+  Lehrkraft der Klasse einer Kollegin beitrat, tauchte dort nie auf.
+* Der Knopf meldete immer „Gespeichert! ✅", auch wenn nichts ankam. Jetzt
+  steht dort, in welche Klasse du eingetragen wurdest — oder was schiefging.
 
-**1. Das Kind spricht den Buchstaben, nicht die Erklärung.**
-Beim Nachsprech-Bonus galten bisher auch die beschreibenden Formen
-„peltek se" und „peltek zel" als richtig. Die zählen nicht mehr — gefragt ist
-der Buchstabe selbst: **Se** und **Zel**. Reine Schreibvarianten
-(cim/jim, vav/waw, kaf/qaf …) bleiben natürlich erlaubt.
+**Dazu, weil ausdrücklich gewünscht:**
 
-**2. Die Buchstaben-Werkstatt ist komplett entfernt.**
-Sie hat ihren Zweck erfüllt: Die Buchstabennamen sind geklärt, die Aussprache
-kommt aus den Aufnahmen. Entfernt wurden der ganze Bildschirm, beide Einstiege
-(Einstellungen und Klassenzimmer) und das Modul `app/cardedits.js`, das die
-Karten beim Start überschrieben hat.
+* **Wochen-Rangliste** im Klassenzimmer, über der Schülerliste, mit drei
+  Ansichten: 📅 Diese Woche (die letzten 7 Tage, das Fenster wandert
+  täglich mit), ⭐ Gesamt und 🕌 Auswendig.
+* **Buchstabe antippen = anhören:** Unter „Meine Stapel" → Lektion →
+  Dein Fortschritt spielt ein Tipp auf eine Kachel den Buchstaben vor —
+  erst die Aufnahme der Lehrkraft, sonst die mitgelieferte. Ein kleines 🔊
+  zeigt es an.
 
-> **Wichtige Nebenwirkung:** Alte Überschreibungen wirken damit nicht mehr.
-> Wer zum Beispiel „thse" gespeichert hatte, sieht jetzt wieder den
-> Auslieferungsstand **„Se"**. Der Lernfortschritt bleibt erhalten — der
-> Karteikasten hängt an der arabischen Seite, nicht an der Umschrift.
->
-> Das Einsprechen der Aussprache ist **nicht** betroffen: Das Aussprache-Studio
-> im Klassenzimmer bleibt vollständig erhalten, samt Serien-Modus, Sichern und
-> Einlesen bearbeiteter Dateien.
-
-**3. Im Fortschritt hört man den Buchstaben.**
-Unter „Meine Stapel" → Lektion → **Dein Fortschritt** stehen alle Buchstaben als
-Kacheln mit Prozentring. Ein Tipp darauf spielt den Buchstaben jetzt vor —
-erst die Aufnahme der Lehrkraft, sonst die mitgelieferte. Die längeren Zeilen
-(Silben und Wörter) sind ebenfalls hörbar. Ein kleines 🔊 zeigt es an.
-
-Die Datei `app/cardedits.js` entfällt; das Paket hat damit **97 Dateien**.
+Das Paket hat weiterhin **97 Dateien** (`cardedits.js` ist weg, sonst
+unverändert).

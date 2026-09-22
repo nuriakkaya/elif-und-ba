@@ -32,20 +32,21 @@
   /* Erlaubte Schreibweisen je Buchstabenname. Bewusst KEINE Namen
      anderer Buchstaben — sonst bekäme man den Bonus für den falschen.
 
-     (20.09.2026, Nutzerwunsch) Die BESCHREIBENDEN Formen „peltek se" und
-     „peltek zel" zählen nicht mehr. Das Kind soll den Buchstaben selbst
-     richtig aussprechen — „Se" bzw. „Zel" —, nicht die Erklärung dazu
-     aufsagen. Reine Schreibvarianten (jim/cim, waw/vav …) bleiben erlaubt. */
+     (21.09.2026) ث und ذ heißen im Kurs „Peltek Se" und „Peltek Zel" —
+     so stehen sie auch auf der Karte. Beim Sprechen zählt beides: das
+     Kind darf den Buchstaben kurz „Se" bzw. „Zel" nennen (so soll es
+     ihn aussprechen) oder den vollen Namen von der Karte ablesen.
+     Reine Schreibvarianten (jim/cim, waw/vav …) bleiben erlaubt. */
   const ALIAS = {
     'elif': ['elif', 'alif', 'elf'],
     'be': ['be', 'bee'],
     'te': ['te', 'tee'],
-    'se': ['se'],
+    'peltek se': ['peltek se', 'se'],
     'cim': ['cim', 'jim'],
     'ha': ['ha'],
     'cha': ['cha', 'hı', 'kha', 'chi'],
     'dal': ['dal'],
-    'zel': ['zel'],
+    'peltek zel': ['peltek zel', 'zel'],
     'ra': ['ra'],
     'ze': ['ze'],
     'sin': ['sin'],
