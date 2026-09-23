@@ -36,7 +36,7 @@ import { Buffer } from "node:buffer";
    kann die App sehen, ob im Netz ein aelterer Stand liegt als auf dem Handy —
    genau das war am 23.09.2026 der Fall: online 11.0, auf den Geraeten 11.11,
    und niemand konnte sagen, warum „irgendwie nichts geht". */
-const VERSION = "11.14";
+const VERSION = "11.16";
 /* LEHRER-PASSWORT — NICHT MEHR IM CODE. (14.09.2026)
 
    Hier stand ein festes vierstelliges Passwort im Klartext. Dieselbe Zeile stand in

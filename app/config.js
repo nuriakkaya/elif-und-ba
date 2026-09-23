@@ -1,7 +1,7 @@
 // Versionsstempel — sichtbar in Einstellungen & Anmelde-Fenster, damit sofort
 // erkennbar ist, ob auf Netlify wirklich die neueste Version läuft.
-window.APP_BUILD = '11.14';
-window.APP_VERSION = 'Version 11.14 · 23.09.2026';
+window.APP_BUILD = '11.16';
+window.APP_VERSION = 'Version 11.16 · 23.09.2026';
 
 // (23.09.2026) Nuri: „alle Level offen, nicht nur für die Lehrer, auch für die
 // Schüler." Mit `true` sind alle 18 Elifba-Lektionen für jedes Kind offen —
