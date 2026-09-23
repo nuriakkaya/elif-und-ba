@@ -18,7 +18,9 @@
      POST auth    → { action:'check'|'register'|'login'|'list' , … }
      GET  sync    ?key=…                            eigener Spielstand
      POST sync    { key, col, baseRev, summary }    speichern + Klassenmeldung
-     GET  class   ?tpw=1907[&code=…]                Klassenliste (Lehrkraft)
+     GET  klasse  ?code=1234                        Klassenzimmer nachschlagen (11.0)
+     POST klasse  { action:'create'|'login'|'rename', … }   anlegen / öffnen
+     GET  class   ?tpw=1907[&code=…] | ?code=…&pin=… Klassenliste (Lehrkraft)
      POST class   { … }                             Kurzmeldung / entfernen
      GET  audio   ?list=1 | ?k=…                    Aussprache-Aufnahmen
      POST audio   { action:'put'|'del', tpw, … }
@@ -29,7 +31,7 @@ import { pbkdf2Sync, randomBytes, timingSafeEqual } from "node:crypto";
 import { gunzipSync } from "node:zlib";
 import { Buffer } from "node:buffer";
 
-const VERSION = "10.7";
+const VERSION = "10.5";
 const TEACHER_PW = "1907";          // Lehrer-Passwort — hier zentral änderbar
 const DEFAULT_CLASS = "ALLE";       // Klasse, in die JEDES Kind automatisch kommt
 const STORE = "site:elifba-sync";   // Blobs-Store (Präfix "site:" = siteweit)
@@ -245,6 +247,21 @@ async function readBody(req) {
    Meldung des Kindes. Dadurch taucht jedes Kind sofort beim Anmelden auf —
    auch wenn es noch keine einzige Karte gelernt hat.
 -------------------------------------------------------------------------- */
+/* ---------- Klassenzimmer mit Code (11.0) ----------
+   klasse:<code> = { code, name, teacher, salt, pinHash, created }
+   Vier Ziffern, die die Lehrkraft beim Anlegen bekommt. Lehrer-Rechte gibt es
+   entweder mit dem alten zentralen Lehrer-Passwort (Sammelklasse) oder mit
+   Code + PIN der eigenen Klasse — dann aber NUR für diese eine Klasse. */
+const istZahlenCode = (c) => /^\d{4}$/.test(String(c || ""));
+async function klasseFor(code) { const c = cleanCode(code); return c ? (await bGet("klasse:" + c)) : null; }
+async function teacherOk(code, tpw, pin) {
+  if (String(tpw || "") === TEACHER_PW) return true;
+  const k = await klasseFor(code);
+  if (!k || !k.pinHash || !pin) return false;
+  const a = Buffer.from(hashOf(String(pin), k.salt), "hex"), b = Buffer.from(k.pinHash, "hex");
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
 async function joinClass(rec) {
   const code = cleanCode(rec.classCode || DEFAULT_CLASS) || DEFAULT_CLASS;
   const reg = (await bGet("class:" + code)) || { students: {} };
@@ -391,8 +408,12 @@ export default async (req) => {
       if (body.action === "join" || body.action === "register" || body.action === "login") {
         let rec = await bGet(ukey);
         const wantTeacher = !!body.teacher;
-        if (wantTeacher && String(body.tpw || "") !== TEACHER_PW)
-          return json({ error: "Lehrer-Passwort falsch" }, 403);
+        if (wantTeacher && !(await teacherOk(wantClass, body.tpw, body.pin)))
+          return json({ error: "Lehrer-Passwort oder PIN falsch" }, 403);
+        // Vierstellige Codes müssen zu einem angelegten Klassenzimmer gehören.
+        if (istZahlenCode(wantClass) && !(await klasseFor(wantClass)))
+          return json({ error: "Diesen Klassen-Code gibt es nicht — frag deine Lehrkraft.", badCode: true }, 404);
+        const klasseInfo = async (c) => { const k = istZahlenCode(c) ? await klasseFor(c) : null; return k ? { className: k.name, teacherName: k.teacher } : {}; };
 
         if (!rec) {
           if (body.action === "login") return json({ error: "Konto nicht gefunden" }, 404);
@@ -410,7 +431,7 @@ export default async (req) => {
           await bSet(ukey, rec);
           await joinClass(rec);
           return json({ ok: true, created: true, key: rec.syncKey, name: rec.name,
-                        classCode: rec.classCode, role: rec.role });
+                        classCode: rec.classCode, role: rec.role, ...(await klasseInfo(rec.classCode)) });
         }
 
         // Konto existiert → Geheimwort prüfen (falls eines gesetzt wurde)
@@ -432,7 +453,52 @@ export default async (req) => {
         await bSet(ukey, rec);
         await joinClass(rec);
         return json({ ok: true, created: false, key: rec.syncKey, name: rec.name,
-                      classCode: rec.classCode || DEFAULT_CLASS, role: rec.role || "student" });
+                      classCode: rec.classCode || DEFAULT_CLASS, role: rec.role || "student",
+                      ...(await klasseInfo(rec.classCode)) });
+      }
+      return json({ error: "Unbekannte Aktion" }, 400);
+    }
+
+    /* ---------- klasse: Klassenzimmer anlegen / nachschlagen / öffnen (11.0) ---------- */
+    if (route === "klasse") {
+      if (req.method === "GET") {
+        const k = await klasseFor(url.searchParams.get("code") || "");
+        if (!k) return json({ ok: true, found: false });
+        return json({ ok: true, found: true, code: k.code, name: k.name, teacher: k.teacher });
+      }
+      if (req.method !== "POST") return json({ error: "Methode nicht unterstützt" }, 405);
+      const body = await readBody(req);
+      if (body.action === "create") {
+        const name = cleanName(body.name), teacher = cleanName(body.teacher), pin = String(body.pin || "").trim();
+        if (name.length < 2) return json({ error: "Bitte einen Namen für die Klasse eingeben" }, 400);
+        if (teacher.length < 2) return json({ error: "Bitte deinen Namen eingeben" }, 400);
+        if (!/^\d{4,8}$/.test(pin)) return json({ error: "Die PIN braucht 4 bis 8 Ziffern" }, 400);
+        let code = "";
+        for (let t = 0; t < 25 && !code; t++) {
+          const c = String(1000 + (randomBytes(2).readUInt16BE(0) % 9000));
+          if (!(await bGet("klasse:" + c))) code = c;
+        }
+        if (!code) return json({ error: "Gerade kein freier Code — bitte nochmal versuchen" }, 500);
+        const salt = randomBytes(16).toString("hex");
+        await bSet("klasse:" + code, { code, name, teacher, salt, pinHash: hashOf(pin, salt), created: Date.now() });
+        return json({ ok: true, code, name, teacher });
+      }
+      if (body.action === "login") {
+        const code = cleanCode(body.code);
+        const k = await klasseFor(code);
+        if (!k) return json({ error: "Diesen Klassen-Code gibt es nicht" }, 404);
+        if (!(await teacherOk(code, body.tpw, body.pin))) return json({ error: "Die PIN stimmt nicht" }, 401);
+        return json({ ok: true, code: k.code, name: k.name, teacher: k.teacher });
+      }
+      if (body.action === "rename") {
+        const code = cleanCode(body.code);
+        const k = await klasseFor(code);
+        if (!k) return json({ error: "Diesen Klassen-Code gibt es nicht" }, 404);
+        if (!(await teacherOk(code, body.tpw, body.pin))) return json({ error: "Die PIN stimmt nicht" }, 401);
+        const name = cleanName(body.name);
+        if (name.length < 2) return json({ error: "Name zu kurz" }, 400);
+        k.name = name; await bSet("klasse:" + code, k);
+        return json({ ok: true, code: k.code, name: k.name, teacher: k.teacher });
       }
       return json({ error: "Unbekannte Aktion" }, 400);
     }
@@ -440,7 +506,11 @@ export default async (req) => {
     /* ---------- class: Klassenzimmer ---------- */
     if (route === "class") {
       if (req.method === "GET") {
-        const isTeacher = (url.searchParams.get("tpw") || "") === TEACHER_PW;
+        const codeQ = cleanCode(url.searchParams.get("code") || "");
+        const globalTeacher = (url.searchParams.get("tpw") || "") === TEACHER_PW;
+        const isTeacher = globalTeacher || await teacherOk(codeQ, "", url.searchParams.get("pin"));
+        // Eine Klassen-Lehrkraft (PIN) sieht nur ihre eigene Klasse, nie „alle".
+        if (isTeacher && !globalTeacher && !codeQ) return json({ error: "Code fehlt" }, 400);
         const me = cleanName(url.searchParams.get("me") || "");
         /* Kinder-Sicht (11.08.2026, „gegenseitig anspornen"): Ohne Lehrer-Passwort,
            aber mit dem eigenen Namen, gibt es eine BEWUSST ABGESPECKTE Liste —
@@ -449,9 +519,13 @@ export default async (req) => {
            letzten 7 Tage. KEINE Schwachstellen, KEINE Lektionsdetails, KEINE
            Zeitstempel-Historie — das bleibt Sache der Lehrkraft. */
         if (!isTeacher && !me) return json({ error: "Lehrer-Passwort erforderlich" }, 403);
-        const code = cleanCode(url.searchParams.get("code") || "");
+        const code = codeQ;
         const students = await rosterFor(code);
-        if (isTeacher) return json({ ok: true, found: true, students, defaultClass: DEFAULT_CLASS });
+        if (isTeacher) {
+          const k = await klasseFor(code);
+          return json({ ok: true, found: true, students, defaultClass: DEFAULT_CLASS,
+                        klasse: k ? { code: k.code, name: k.name, teacher: k.teacher } : null });
+        }
         const board = [];
         for (const nm in students) {
           const s = students[nm] || {};
@@ -475,7 +549,7 @@ export default async (req) => {
         const body = await readBody(req);
         const code = cleanCode(body.code || DEFAULT_CLASS) || DEFAULT_CLASS;
         if (body.remove) {
-          if (String(body.tpw || "") !== TEACHER_PW) return json({ error: "Lehrer-Passwort erforderlich" }, 403);
+          if (!(await teacherOk(code, body.tpw, body.pin))) return json({ error: "Lehrer-Passwort oder PIN erforderlich" }, 403);
           const nm = cleanName(body.remove);
           const reg = (await bGet("class:" + code)) || { students: {} };
           delete reg.students[nm];
@@ -490,31 +564,8 @@ export default async (req) => {
         await bSet("class:" + code, reg);
         const ukey = userKey(name.toLowerCase());
         const rec = await bGet(ukey);
-        if (rec) {
-          rec.summary = { ...(body.summary || {}), ts: Date.now() };
-          rec.lastSeen = Date.now();
-          /* KLASSENWECHSEL (20.09.2026) — vorher der Kern des Fehlers
-             „ich bin beigetreten, kam aber nie an": Der Wechsel stand nur auf
-             dem Gerät. Der Nutzer-Datensatz behielt die alte Klasse, und weil
-             die Lehrkraft ihre Liste genau daraus zusammenstellt, tauchte das
-             Kind dort nie auf — beim nächsten Anmelden kam sogar die alte
-             Klasse zurück. Jetzt wird der Wechsel festgeschrieben, sobald der
-             eigene Schlüssel mitkommt (nur das eigene Konto kann das). */
-          const mitKey = cleanKey(body.key || "");
-          if (mitKey && rec.syncKey && mitKey === rec.syncKey) {
-            const alteKlasse = cleanCode(rec.classCode || DEFAULT_CLASS) || DEFAULT_CLASS;
-            if (alteKlasse !== code) {
-              rec.classCode = code;
-              const altReg = await bGet("class:" + alteKlasse);
-              if (altReg && altReg.students && altReg.students[name]) {
-                delete altReg.students[name];
-                await bSet("class:" + alteKlasse, altReg);
-              }
-            }
-          }
-          await bSet(ukey, rec);
-        }
-        return json({ ok: true, classCode: (rec && rec.classCode) || code });
+        if (rec) { rec.summary = { ...(body.summary || {}), ts: Date.now() }; rec.lastSeen = Date.now(); await bSet(ukey, rec); }
+        return json({ ok: true });
       }
       return json({ error: "Methode nicht unterstützt" }, 405);
     }
@@ -576,7 +627,7 @@ export default async (req) => {
       }
       if (req.method === "POST") {
         const body = await readBody(req);
-        if (String(body.tpw || "") !== TEACHER_PW) return json({ error: "Lehrer-Passwort erforderlich" }, 403);
+        if (!(await teacherOk(body.code, body.tpw, body.pin))) return json({ error: "Lehrer-Passwort oder PIN erforderlich" }, 403);
         const k = cleanKey(body.key);
         if (!k) return json({ error: "key fehlt" }, 400);
         const idx = (await bGet("audio-index")) || { keys: [] };
@@ -620,8 +671,8 @@ export default async (req) => {
       }
       if (req.method === "POST") {
         const body = await readBody(req);
-        if (String(body.tpw || "") !== TEACHER_PW) return json({ error: "Lehrer-Passwort erforderlich" }, 403);
         const c = cleanCode(String(body.code || "")) || DEFAULT_CLASS;
+        if (!(await teacherOk(c, body.tpw, body.pin))) return json({ error: "Lehrer-Passwort oder PIN erforderlich" }, 403);
         const inCfg = body.cfg || {};
         const cfg = {};
         const t = Number(inCfg.tekrar);

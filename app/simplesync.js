@@ -358,24 +358,13 @@
      sofort in der Liste der Lehrkraft steht). */
   async function postClassSummary(force) {
     const acc = account();
-    /* (20.09.2026) Lehrkräfte werden NICHT mehr ausgeschlossen: Wer als
-       Lehrkraft der Klasse einer Kollegin beitritt, wurde vorher nirgends
-       gemeldet — „beigetreten, kam aber nie an". In den Kinder-Ranglisten
-       stehen sie weiterhin nicht, dafür sorgt die Markierung role=teacher. */
-    if (!acc || !acc.key) return;
+    if (!acc || !acc.key || acc.role === 'teacher') return;
     const m = meta();
     if (!force && Date.now() - (m.lastClassPost || 0) < 60000) return;
     try {
-      // Der Schlüssel muss mit: nur damit schreibt der Server einen
-      // Klassenwechsel in das Konto (sonst bliebe die alte Klasse stehen).
-      const r = await req('class', { method: 'POST', body: JSON.stringify({
-        code: acc.classCode || DEFAULT_CLASS, name: acc.name, key: acc.key,
-        role: acc.role || 'student', summary: buildSummary(acc),
-      }) });
+      await req('class', { method: 'POST', body: JSON.stringify({ code: acc.classCode || DEFAULT_CLASS, name: acc.name, summary: buildSummary(acc) }) });
       saveMeta(Object.assign(meta(), { lastClassPost: Date.now() }));
-      return (r && r.body) || {};
-    } catch (e) { return { error: 'offline' }; }
-    return {};
+    } catch (e) {}
   }
 
   /* ==============================================================
@@ -384,7 +373,7 @@
   async function fetchClass(codeOverride) {
     const code = String(codeOverride === undefined ? (account() || {}).classCode || '' : codeOverride).toUpperCase();
     try {
-      const r = await req('class', { query: { code: code === DEFAULT_CLASS ? '' : code, tpw: TEACHER_PW } });
+      const r = await req('class', { query: Object.assign({ code: code === DEFAULT_CLASS ? '' : code }, teacherAuth()) });
       if (r.body && r.body.students) return { ok: true, code: code || DEFAULT_CLASS, students: r.body.students };
       return { error: (r.body && r.body.error) || 'Klasse nicht gefunden' };
     } catch (e) {
@@ -430,7 +419,7 @@
   async function removeStudentRemote(name, codeOverride) {
     const code = String(codeOverride || (account() || {}).classCode || DEFAULT_CLASS).toUpperCase();
     try {
-      const r = await req('class', { method: 'POST', body: JSON.stringify({ code, remove: name, tpw: TEACHER_PW }) });
+      const r = await req('class', { method: 'POST', body: JSON.stringify(Object.assign({ code, remove: name }, teacherAuth())) });
       return r.body || {};
     } catch (e) { return { error: 'Server nicht erreichbar' }; }
   }
@@ -454,12 +443,53 @@
   /* join(): legt an ODER meldet an — das Kind merkt keinen Unterschied.
      Ist der Server nicht da, wird STILL ein Nur-Gerät-Konto angelegt, damit
      niemand vor einer Fehlermeldung steht. Es verbindet sich später selbst. */
+  /* ---------- Klassenzimmer mit Code (11.0) ----------
+     Die Lehrkraft legt ein Klassenzimmer an (Name + eigene PIN) und bekommt
+     einen vierstelligen Code. Kinder tippen Name + Code — fertig. Hier: die
+     Server-Aufrufe dazu und ein kleiner Zwischenspeicher fürs Anzeigen. */
+  const KLASSE_KEY = 'eb_klasse_v1';
+  function classInfo() { try { return JSON.parse(localStorage.getItem(KLASSE_KEY) || 'null'); } catch (e) { return null; } }
+  function saveClassInfo(k) { try { if (k) localStorage.setItem(KLASSE_KEY, JSON.stringify(k)); else localStorage.removeItem(KLASSE_KEY); } catch (e) {} }
+  async function lookupClass(code) {
+    const c = String(code || '').trim();
+    if (!/^\d{4}$/.test(c)) return { found: false, invalid: true };
+    try { const r = await req('klasse', { query: { code: c } }); return r.body || { found: false }; }
+    catch (e) { return { found: false, error: e.offline ? 'Keine Verbindung' : 'Server nicht erreichbar' }; }
+  }
+  async function createClass(o) {
+    try {
+      const r = await req('klasse', { method: 'POST', body: JSON.stringify({ action: 'create', name: o.name, teacher: o.teacher, pin: o.pin }) });
+      if (!(r.body && r.body.ok)) return { error: (r.body && r.body.error) || 'Anlegen hat nicht geklappt' };
+      const j = await join(o.teacher, '', { classCode: r.body.code, teacher: true, pin: o.pin });
+      if (!j.ok) return { error: j.error || 'Lehrer-Anmeldung hat nicht geklappt' };
+      saveClassInfo({ code: r.body.code, name: r.body.name, teacher: r.body.teacher });
+      return { ok: true, code: r.body.code, name: r.body.name };
+    } catch (e) { return { error: e.offline ? 'Keine Verbindung' : 'Server nicht erreichbar' }; }
+  }
+  async function teacherLogin(code, pin) {
+    try {
+      const r = await req('klasse', { method: 'POST', body: JSON.stringify({ action: 'login', code: code, pin: pin }) });
+      if (!(r.body && r.body.ok)) return { error: (r.body && r.body.error) || 'Anmeldung hat nicht geklappt' };
+      const j = await join(r.body.teacher, '', { classCode: r.body.code, teacher: true, pin: pin });
+      if (!j.ok) return { error: j.error || 'Lehrer-Anmeldung hat nicht geklappt' };
+      saveClassInfo({ code: r.body.code, name: r.body.name, teacher: r.body.teacher });
+      return { ok: true, code: r.body.code, name: r.body.name };
+    } catch (e) { return { error: e.offline ? 'Keine Verbindung' : 'Server nicht erreichbar' }; }
+  }
+  /* Lehrer-Nachweis für Server-Anfragen: PIN der eigenen Klasse — sonst das
+     zentrale Lehrer-Passwort (alter Weg, Sammelklasse). */
+  function teacherAuth() {
+    const acc = account();
+    if (acc && acc.pin) return { pin: acc.pin, code: acc.classCode };
+    return { tpw: TEACHER_PW };
+  }
+
   async function join(name, pass, opts) {
     opts = opts || {};
     const n = String(name || '').trim().replace(/\s+/g, ' ').slice(0, 40);
     if (n.length < 2) return { error: 'Bitte gib deinen Namen ein (mindestens 2 Buchstaben).' };
     const body = { action: 'join', name: n, pass: pass || '', classCode: String(opts.classCode || '').toUpperCase() };
-    if (opts.teacher) { body.teacher = true; body.tpw = opts.teacherPw || ''; }
+    if (opts.teacher) { body.teacher = true; body.tpw = opts.teacherPw || ''; if (opts.pin) body.pin = opts.pin; }
     let r;
     try {
       r = await req('auth', { method: 'POST', body: JSON.stringify(body) });
@@ -473,7 +503,10 @@
     }
     if (r.status === 401 || (r.body && r.body.needPass)) return { needPass: true, error: r.body && r.body.error };
     if (r.body && r.body.ok) {
-      saveAccount({ name: r.body.name, key: r.body.key, classCode: r.body.classCode || DEFAULT_CLASS, role: r.body.role || 'student' });
+      saveAccount({ name: r.body.name, key: r.body.key, classCode: r.body.classCode || DEFAULT_CLASS, role: r.body.role || 'student',
+                    pin: (opts.teacher && opts.pin) ? opts.pin : undefined });
+      if (r.body.className) saveClassInfo({ code: r.body.classCode, name: r.body.className, teacher: r.body.teacherName || '' });
+      else if (!/^\d{4}$/.test(String(r.body.classCode || ''))) saveClassInfo(null);
       if ((r.body.role || '') === 'teacher') lsSetRaw(TEACHER_FLAG, '1');
       try { window.Classroom && window.Classroom.setName && window.Classroom.setName(r.body.name); } catch (e) {}
       setState('idle');
@@ -518,23 +551,23 @@
   }
 
   async function setClassCode(code) {
+    const c = String(code || '').trim().toUpperCase();
+    if (/^\d{4}$/.test(c)) { const k = await lookupClass(c); if (k && k.found) saveClassInfo({ code: c, name: k.name, teacher: k.teacher }); else saveClassInfo(null); }
+    else saveClassInfo(null);
+    return setClassCodeAlt(code);
+  }
+  async function setClassCodeAlt(code) {
     const acc = account();
     if (!acc) return { error: 'Nicht angemeldet' };
-    const neuerCode = String(code || '').trim().toUpperCase().replace(/[^A-Z0-9-]/g, '') || DEFAULT_CLASS;
-    acc.classCode = neuerCode;
+    acc.classCode = String(code || '').trim().toUpperCase() || DEFAULT_CLASS;
     saveAccount(acc);
     emit();
-    /* Der Wechsel muss auf dem Server ankommen, sonst steht das Kind beim
-       nächsten Anmelden wieder in der alten Klasse (20.09.2026). */
-    const r = await postClassSummary(true);
-    if (r && r.error) return { ok: true, offline: true, classCode: neuerCode };
-    if (r && r.classCode && r.classCode !== neuerCode) {
-      return { ok: false, error: 'Der Server hat den Wechsel nicht übernommen. Melde dich einmal neu an und versuch es nochmal.' };
-    }
-    return { ok: true, classCode: neuerCode };
+    postClassSummary(true);
+    return { ok: true };
   }
 
   function logout() {
+    saveClassInfo(null);
     saveAccount(null);
     try { localStorage.removeItem(META_KEY); } catch (e) {}
     setState('idle');
@@ -599,7 +632,7 @@
     try {
       const acc = account();
       const code = (acc && acc.classCode) || DEFAULT_CLASS;
-      const r = await req('config', { method: 'POST', body: JSON.stringify({ tpw: TEACHER_PW, code: code, cfg: cfg }) });
+      const r = await req('config', { method: 'POST', body: JSON.stringify(Object.assign({ code: code, cfg: cfg }, teacherAuth())) });
       if (r && r.body && r.body.ok) {
         try { localStorage.setItem(CFG_KEY, JSON.stringify(r.body.cfg || {})); } catch (e) {}
         return { ok: true, cfg: r.body.cfg || {} };
@@ -616,6 +649,7 @@
     join, smartLogin, check, logout, syncNow, setClassCode,
     setPassword, hasPassword, deleteAccount,
     fetchClass, removeStudentRemote, postClassSummary, listNames,
+    lookupClass, createClass, teacherLogin, classInfo, teacherAuth,
     fetchBoard, sendCheer, fetchCheers,
     isTeacher, setTeacherMode,
     ping, diagnose, localLogin, url, req,

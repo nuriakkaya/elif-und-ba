@@ -1,7 +1,7 @@
 // Versionsstempel — sichtbar in Einstellungen & Anmelde-Fenster, damit sofort
 // erkennbar ist, ob auf Netlify wirklich die neueste Version läuft.
-window.APP_BUILD = '10.7';
-window.APP_VERSION = 'Version 10.7 · 21.09.2026';
+window.APP_BUILD = '11.0';
+window.APP_VERSION = 'Version 11.0 · 07.09.2026';
 
 // Supabase-Konfiguration für echte Accounts, Fortschritt-Sync, Freunde und Live-Quiz.
 //
@@ -12,6 +12,10 @@ window.APP_VERSION = 'Version 10.7 · 21.09.2026';
 // Ohne diese beiden Werte läuft die App weiter im reinen Offline-Modus wie bisher
 // (localStorage-Fortschritt, keine Accounts) — sie stürzt nicht ab, zeigt aber
 // beim Anmelden einen Hinweis, dass noch keine Supabase-Verbindung eingerichtet ist.
+// (11.0) Gemeinde/Verein hinter dem Kurs — Name neben dem Logo (assets/logo-gemeinde.jpg).
+// Leer lassen = nur das Logo. Beispiel: 'Türkisch-Islamische Gemeinde Musterstadt'
+window.GEMEINDE_NAME = '';
+
 window.SUPABASE_URL = '';
 window.SUPABASE_ANON_KEY = '';
 

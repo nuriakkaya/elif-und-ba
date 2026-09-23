@@ -30,23 +30,17 @@
   const ECHO_TOPICS = ['quran-harfler'];
 
   /* Erlaubte Schreibweisen je Buchstabenname. Bewusst KEINE Namen
-     anderer Buchstaben — sonst bekäme man den Bonus für den falschen.
-
-     (21.09.2026) ث und ذ heißen im Kurs „Peltek Se" und „Peltek Zel" —
-     so stehen sie auch auf der Karte. Beim Sprechen zählt beides: das
-     Kind darf den Buchstaben kurz „Se" bzw. „Zel" nennen (so soll es
-     ihn aussprechen) oder den vollen Namen von der Karte ablesen.
-     Reine Schreibvarianten (jim/cim, waw/vav …) bleiben erlaubt. */
+     anderer Buchstaben — sonst bekäme man den Bonus für den falschen. */
   const ALIAS = {
     'elif': ['elif', 'alif', 'elf'],
     'be': ['be', 'bee'],
     'te': ['te', 'tee'],
-    'peltek se': ['peltek se', 'se'],
+    'se': ['se', 'peltek se'],
     'cim': ['cim', 'jim'],
     'ha': ['ha'],
     'cha': ['cha', 'hı', 'kha', 'chi'],
     'dal': ['dal'],
-    'peltek zel': ['peltek zel', 'zel'],
+    'zel': ['zel', 'peltek zel'],
     'ra': ['ra'],
     'ze': ['ze'],
     'sin': ['sin'],
