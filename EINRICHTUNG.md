@@ -120,11 +120,21 @@ Ein Klick auf ein Kind öffnet die Einzelheiten:
 - **Fortschritt je Lektion** als Balkenliste.
 4. Die Liste aktualisiert sich alle 45 Sekunden von selbst; „🔄 Aktualisieren“
    geht auch sofort.
-5. **„🔓 Lehrer-Modus“**: alle Lektionen ohne Freischaltung — zum Vorbereiten
-   und Vorführen.
-6. Mehrere Klassen? Unter **„▾ Nur eine bestimmte Gruppe anzeigen“** einen
-   Gruppennamen eintragen (z. B. `KLASSE4A`) und denselben den Kindern unter
-   „▾ Mehr“ eintragen lassen. Ohne Gruppe sind alle in einer Sammelliste.
+5. **„🔓 Lehrer-Modus“**: öffnet auf diesem Gerät zusätzlich das Auswendiglernen
+   und den Unendlich-XP-Modus — zum Vorbereiten und Vorführen. (Die 18 Lektionen
+   selbst sind seit Version 11.14 für alle Kinder offen; wo es weitergeht,
+   bestimmt der Hoca im Unterricht. Schalter: `LEKTIONEN_OFFEN` in
+   `app/config.js`.)
+6. Mehrere Klassen? **Leg ein Klassenzimmer an** (Anmelden → „🧑‍🏫 Ich bin
+   Lehrkraft" → „Neues Klassenzimmer anlegen"). Du bekommst einen Code mit vier
+   Ziffern; die Kinder tippen ihn beim Anmelden ein und sind in deiner Klasse.
+   Nur diese Kinder siehst du, und nur sie sehen einander in der Klassentafel.
+
+   > *Bis Version 11.10 stand hier, man solle einen Gruppennamen wie
+   > `KLASSE4A` eintragen. Diesen Weg gibt es nicht mehr: Die Kinder haben
+   > kein Feld dafür, und die Lehrkraft bekäme eine leere Liste. Seit 11.11
+   > ist der vierstellige Code der einzige — und der bessere — Weg, denn nur
+   > er trennt die Klassen wirklich, auch in der Tafel der Kinder.*
 
 ## ✏️ Die Buchstaben-Werkstatt (ausgebaut am 12.08.2026)
 

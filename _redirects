@@ -8,3 +8,6 @@
 
 # Landingpage zum Installieren (11.0)
 /installieren  /installieren.html  200
+# Kurze Adressen fuer die Landingpage (14.09.2026): elif-be.de/installieren, /yukle (TR), /start
+/yukle         /installieren.html  200
+/start         /installieren.html  200

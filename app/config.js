@@ -1,7 +1,17 @@
 // Versionsstempel — sichtbar in Einstellungen & Anmelde-Fenster, damit sofort
 // erkennbar ist, ob auf Netlify wirklich die neueste Version läuft.
-window.APP_BUILD = '11.0';
-window.APP_VERSION = 'Version 11.0 · 07.09.2026';
+window.APP_BUILD = '11.14';
+window.APP_VERSION = 'Version 11.14 · 23.09.2026';
+
+// (23.09.2026) Nuri: „alle Level offen, nicht nur für die Lehrer, auch für die
+// Schüler." Mit `true` sind alle 18 Elifba-Lektionen für jedes Kind offen —
+// wo es weitergeht, bestimmt der Hoca im Unterricht, nicht die App. Vorher
+// öffnete sich Lektion N erst nach genügend Fragen in Lektion N-1; das war
+// ein Grund für „das Klassenzimmer funktioniert nicht": Der Hoca war bei
+// Lektion 7, die App des Kindes ließ nur bis 3. Auswendiglernen und
+// Unendlich-XP behalten ihre Bedingung (alle Lektionen auf 100 %) — die hat
+// Nuri am 12.08. selbst so gewollt. `false` = Freischaltung wie früher.
+window.LEKTIONEN_OFFEN = true;
 
 // Supabase-Konfiguration für echte Accounts, Fortschritt-Sync, Freunde und Live-Quiz.
 //
@@ -15,6 +25,10 @@ window.APP_VERSION = 'Version 11.0 · 07.09.2026';
 // (11.0) Gemeinde/Verein hinter dem Kurs — Name neben dem Logo (assets/logo-gemeinde.jpg).
 // Leer lassen = nur das Logo. Beispiel: 'Türkisch-Islamische Gemeinde Musterstadt'
 window.GEMEINDE_NAME = '';
+
+// (11.8) Adresse, unter der die App läuft — die Landingpage (installieren.html)
+// verlinkt dorthin („Jetzt lernen“).
+window.APP_URL = 'https://elif-be.de';
 
 window.SUPABASE_URL = '';
 window.SUPABASE_ANON_KEY = '';
@@ -31,3 +45,38 @@ try {
     window.SUPABASE_ANON_KEY = _sbCfg.key;
   }
 } catch (e) { /* localStorage gesperrt: Datei-Werte gelten */ }
+
+/* ==============================================================
+   GIBT ES EINEN EIGENEN MINI-SERVER?  (11.09.2026, am selben Tag korrigiert)
+
+   JA, DEN GIBT ES. Er liegt in netlify/functions/sync.mjs — 899 Zeilen mit
+   den Routen `klasse` (anlegen/anmelden/umbenennen), `auth`, `cards`,
+   `config` und `media`. netlify.toml leitet /api/* dorthin um. Nuri laedt das
+   Projekt zu GitHub, GitHub ist mit Netlify verbunden, Netlify baut — und
+   dabei werden die Functions installiert.
+
+   ICH HATTE DAS FALSCH ANGENOMMEN. In der Nacht zum 11.09.2026 habe ich aus
+   dem Commit „Netlify raus, KI-Funktionen gestrichen" geschlossen, es gebe
+   keinen Server mehr, und diesen Schalter auf `false` gesetzt. Gemessen hatte
+   ich richtig — auf dem Testserver (tools/server.mjs) laufen die Anfragen
+   tatsaechlich ins Leere. Nur ist der Testserver nicht die Wirklichkeit, in
+   der die Kinder lernen. Der Schluss war falsch, die Messung stimmte.
+
+   Der Schalter bleibt, weil er zweierlei taugt:
+
+     · Wer die App auf GitHub Pages oder als lose Dateien ausliefert, hat
+       keinen Mini-Server. Dort spart `false` bei jedem Start fuenf Anfragen,
+       die nur auf ihr Zeitlimit warten.
+     · Zum Pruefen: Mit `false` sieht man sofort, ob ein Bildschirm auch ohne
+       Server einen brauchbaren Weg anbietet.
+
+   Voreinstellung ist `true` — das ist die Wirklichkeit auf Netlify. Im
+   Browser umstellen mit
+       localStorage.setItem('app_eigener_server', '0')
+   ============================================================== */
+window.EIGENER_SERVER = true;
+try {
+  const wahl = localStorage.getItem('app_eigener_server');
+  if (wahl === '0') window.EIGENER_SERVER = false;
+  if (wahl === '1') window.EIGENER_SERVER = true;
+} catch (e) { /* localStorage gesperrt: es bleibt beim Wert oben */ }

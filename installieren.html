@@ -3,318 +3,1503 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Elif &amp; Ba installieren — Koran lesen lernen</title>
-<meta name="description" content="Elif & Ba ist eine App zum Koranlesen-Lernen für Kinder. Hier steht, wie du sie in einer Minute auf Handy, Tablet oder Computer installierst.">
+<title>Elif Be — Kuran lesen lernen</title>
+<meta name="description" content="Kuran lesen lernen — Schritt für Schritt, mit der Stimme des Hoca. Die App der Gemeinde für Kinder von 6 bis 12.">
 <meta name="theme-color" content="#6A5AE0">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="color-scheme" content="light dark">
+<meta name="apple-mobile-web-app-title" content="Elif Be">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Elif &amp; Ba">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<script>document.documentElement.className += " js";</script>
 <style>
-@font-face { font-family:'Nunito'; font-style:normal; font-weight:500 900; font-display:swap;
-  src:url('fonts/nunito-latin-ext.woff2') format('woff2'); unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-@font-face { font-family:'Nunito'; font-style:normal; font-weight:500 900; font-display:swap;
-  src:url('fonts/nunito-latin.woff2') format('woff2'); unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face{font-family:'Nunito';font-style:normal;font-weight:500 900;font-display:swap;
+src:local('Nunito'),url('fonts/nunito-latin-ext.woff2') format('woff2');
+unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;}
+@font-face{font-family:'Nunito';font-style:normal;font-weight:500 900;font-display:swap;
+src:local('Nunito'),url('fonts/nunito-latin.woff2') format('woff2');
+unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}
 
-:root { --bg:#F6F5FF; --bg-2:#ECEAFB; --surface:#fff; --line:#E4E1F5; --line-2:#CFCBEA; --ink:#1E1B3A; --ink-soft:#5A567A; --ink-mute:#8B87A8;
-  --brand:#6A5AE0; --brand-2:#7F71F5; --brand-3:#5142C2; --accent-soft:#EEEBFF; --gold:#F5B000; --gold-2:#FFD35C; --gold-3:#C98A00; --gold-soft:#FFF3D1;
-  --success:#2EC46E; --success-3:#1E9A55; --success-bg:#E2F8EB; --koralle:#FF7A9E; --e-pop:cubic-bezier(.34,1.56,.64,1); }
-* { box-sizing:border-box; }
-html,body { margin:0; }
-body { background:var(--bg); color:var(--ink); font-family:'Nunito',ui-rounded,system-ui,-apple-system,sans-serif; font-size:16px; line-height:1.5; -webkit-font-smoothing:antialiased; }
-a { color:inherit; }
-.wrap { max-width:640px; margin:0 auto; padding:0 18px 60px; }
-.kopf { display:flex; align-items:center; gap:10px; padding:16px 0 4px; font-weight:800; color:var(--ink-soft); font-size:13.5px; }
-.kopf img { height:38px; border-radius:50%; box-shadow:0 3px 10px rgba(46,36,112,.18); }
-.kopf b { display:block; color:var(--ink); font-weight:900; font-size:14.5px; }
-.hero { text-align:center; padding:10px 0 8px; }
-.axi { width:min(58vw,220px); height:auto; display:block; margin:0 auto -6px; overflow:visible; animation:schweben 3.6s ease-in-out infinite; }
-@keyframes schweben { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-8px); } }
-h1 { font-size:clamp(34px,9vw,46px); font-weight:900; letter-spacing:-.03em; margin:4px 0 2px; line-height:1.05; }
-h1 i { font-style:normal; color:var(--koralle); }
-.claim { font-size:17px; font-weight:700; color:var(--ink-soft); margin:0 0 18px; }
-.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; border:0; cursor:pointer; font:inherit; font-weight:900; font-size:17px;
-  padding:15px 24px; border-radius:18px; text-decoration:none; transition:transform .12s, box-shadow .12s; }
-.btn-primary { background:var(--brand); color:#fff; box-shadow:0 5px 0 var(--brand-3), 0 10px 26px rgba(106,90,224,.32); }
-.btn-primary:active { transform:translateY(5px); box-shadow:0 0 0 var(--brand-3); }
-.btn-primary.bereit { background:var(--success); box-shadow:0 5px 0 var(--success-3), 0 10px 26px rgba(46,196,110,.3); animation:pochen 1.6s ease-in-out infinite; }
-@keyframes pochen { 0%,100% { transform:scale(1); } 50% { transform:scale(1.04); } }
-.btn-ghost { background:var(--surface); color:var(--ink); border:2px solid var(--line-2); box-shadow:0 4px 0 var(--line-2); }
-.btn-ghost:active { transform:translateY(4px); box-shadow:0 0 0 var(--line-2); }
-.btn-full { width:100%; }
-.knoepfe { display:grid; gap:10px; max-width:360px; margin:0 auto; }
-.stand { min-height:24px; margin-top:12px; font-weight:800; color:var(--success-3); }
-.hinweis { background:var(--gold-soft); border:2px solid var(--gold-2); border-radius:16px; padding:12px 14px; font-weight:700; color:var(--gold-3); margin:14px 0 0; text-align:left; font-size:14.5px; }
-.hinweis b { font-weight:900; }
-section { margin-top:34px; }
-h2 { font-size:22px; font-weight:900; letter-spacing:-.02em; margin:0 0 4px; }
-.unter { color:var(--ink-soft); font-weight:700; margin:0 0 14px; font-size:14.5px; }
-.tabs { display:flex; gap:4px; padding:4px; background:var(--bg-2); border-radius:999px; }
-.tab { flex:1; border:0; background:transparent; font:inherit; font-weight:800; font-size:14px; padding:10px 6px; border-radius:999px; color:var(--ink-soft); cursor:pointer; white-space:nowrap; }
-.tab.ist-an { background:var(--surface); color:var(--brand); box-shadow:0 2px 8px rgba(46,36,112,.08); }
-.panel { display:none; background:var(--surface); border:2px solid var(--line); border-radius:20px; padding:16px; margin-top:12px; }
-.panel.ist-an { display:block; animation:auf .35s ease both; }
-@keyframes auf { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
-.panel h3 { margin:0 0 10px; font-size:16px; font-weight:900; }
-.schritte { list-style:none; margin:0; padding:0; display:grid; gap:12px; counter-reset:s; }
-.schritte li { display:flex; gap:12px; align-items:flex-start; }
-.nr { flex:0 0 32px; width:32px; height:32px; border-radius:50%; background:var(--brand); color:#fff; display:grid; place-items:center; font-weight:900; font-size:15px; box-shadow:0 3px 0 var(--brand-3); }
-.schritte p { margin:4px 0 0; font-weight:700; }
-.schritte b { font-weight:900; }
-.sym { display:inline-grid; place-items:center; width:26px; height:26px; border-radius:7px; background:var(--accent-soft); color:var(--brand); vertical-align:-7px; margin:0 2px; }
-.sym svg { width:17px; height:17px; }
-.klein { color:var(--ink-mute); font-size:13.5px; font-weight:700; margin:10px 0 0; }
-.warum { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.warum div { background:var(--surface); border:2px solid var(--line); border-radius:18px; padding:14px 12px; }
-.warum span { font-size:26px; display:block; margin-bottom:4px; }
-.warum b { display:block; font-weight:900; margin-bottom:2px; }
-.warum p { margin:0; font-size:13.5px; color:var(--ink-soft); font-weight:700; line-height:1.35; }
-.teilen { background:var(--surface); border:2px solid var(--line); border-radius:20px; padding:18px; text-align:center; }
-#qr { display:inline-block; padding:10px; background:#fff; border-radius:16px; border:2px solid var(--line); }
-#qr img, #qr canvas { display:block; }
-.link { font-weight:800; word-break:break-all; margin:10px 0; color:var(--brand); }
-.teilen .knoepfe { margin-top:8px; }
-footer { margin-top:40px; text-align:center; color:var(--ink-mute); font-weight:700; font-size:13px; }
-footer img { height:34px; border-radius:50%; display:block; margin:0 auto 6px; box-shadow:0 3px 10px rgba(46,36,112,.18); }
-.klasse-box { margin:16px auto 0; max-width:360px; background:var(--surface); border:2px solid var(--brand); border-radius:20px; padding:14px 16px; display:grid; gap:2px; box-shadow:0 5px 0 var(--brand-3); }
-.klasse-box b { font-size:12.5px; color:var(--ink-mute); font-weight:800; }
-.klasse-box #klasse-name { font-weight:900; font-size:17px; }
-.klasse-code { font-size:38px; font-weight:900; letter-spacing:8px; color:var(--brand); padding-left:8px; line-height:1.1; }
-.klasse-box small { font-size:12.5px; color:var(--ink-soft); font-weight:700; }
-.nur-druck { display:none; }
-@media (max-width:380px) { .tab { font-size:12.5px; } .warum { grid-template-columns:1fr; } }
-@media print {
-  body { background:#fff; } .wrap { display:none; }
-  .nur-druck { display:block; text-align:center; padding:30px 20px; font-family:'Nunito',system-ui,sans-serif; }
-  .nur-druck h1 { font-size:44px; } .nur-druck .claim { font-size:22px; }
-  .nur-druck #qr-druck { display:inline-block; margin:10px auto 20px; }
-  .nur-druck ol { text-align:left; display:inline-block; font-size:20px; font-weight:700; line-height:1.6; }
-  .nur-druck .url { font-size:22px; font-weight:900; color:#6A5AE0; margin:8px 0 18px; }
+
+:root{
+  --violett:#6A5AE0; --violett-hell:#7F71F5; --violett-dunkel:#5142C2; --violett-ganzhell:#EEEBFF;
+  --gold:#F5B000; --gold-hell:#FFD35C; --rosa:#FF86A8;
+  --tinte:#1F1B3A; --bg:#FBFAFF; --flaeche:#FFFFFF; --rand:#E2DDFA; --gedaempft:#565080;
+  --knopf:#6A5AE0; --link:#5142C2; --panel:#F3F0FF;
+  --nacht:#14112E; --nacht-2:#1E1850; --nacht-3:#2A2170;
+  --r:24px;
+}
+@media (prefers-color-scheme: dark){
+  :root{--tinte:#F2F0FF; --bg:#0E0C22; --flaeche:#181542; --rand:#2E2866; --gedaempft:#B6B0DE;
+    --violett-ganzhell:#241F52; --link:#B3A8FF; --panel:#181542}
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tinte);font-family:'Nunito','Nunito Sans','Segoe UI',system-ui,-apple-system,sans-serif;
+  font-weight:600;font-size:17px;line-height:1.5;text-wrap:pretty;overflow-x:hidden}
+h1,h2,h3{margin:0;line-height:1.05;letter-spacing:-.025em;text-wrap:balance}
+p{margin:0}
+a{color:var(--link)} a:hover{color:var(--violett)}
+:focus-visible{outline:3px solid var(--violett-3,#5142C2);outline-offset:3px;border-radius:12px;box-shadow:0 0 0 6px rgba(255,255,255,.92)}
+.sprites{position:absolute;width:0;height:0;overflow:hidden}
+.wrap{width:min(1180px,100% - clamp(32px,8vw,96px));margin:0 auto}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.eyebrow::before{content:"";width:22px;height:2px;background:currentColor;border-radius:2px;opacity:.7}
+
+/* Fortschritt */
+.lauf{position:fixed;top:0;left:0;right:0;height:3px;z-index:60;background:transparent;pointer-events:none}
+.lauf i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--gold),var(--gold-hell));transform:scaleX(0);transform-origin:0 50%}
+
+/* Kopf */
+.kopf{position:fixed;top:0;left:0;right:0;z-index:50;padding:12px 0;transition:background .3s,box-shadow .3s}
+.kopf .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.kopf.fest{background:rgba(20,17,46,.72);-webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px);box-shadow:0 1px 0 rgba(255,255,255,.08)}
+.marke{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none}
+.marke svg{width:40px;height:37px;display:block}
+.marke b{font-weight:900;font-size:20px;letter-spacing:-.01em;white-space:nowrap}
+.marke b span{color:var(--rosa)}
+.sprache{display:flex;gap:6px;padding:4px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16)}
+.sprache button{appearance:none;border:0;background:transparent;color:rgba(255,255,255,.78);font:inherit;font-weight:800;font-size:14px;
+  min-width:48px;min-height:40px;padding:0 8px;border-radius:999px;cursor:pointer;letter-spacing:.06em}
+.sprache button[aria-pressed="true"]{background:#fff;color:var(--violett-dunkel)}
+
+/* Hero */
+.hero{position:relative;color:#fff;overflow:hidden;isolation:isolate;
+  background:linear-gradient(165deg,var(--nacht) 0%,var(--nacht-2) 48%,var(--nacht-3) 100%);
+  padding:calc(60px + clamp(12px,3vw,48px)) 0 0}
+.hero-glow{position:absolute;inset:0;z-index:-2;pointer-events:none;
+  background:
+    radial-gradient(52% 40% at 78% 34%,rgba(127,113,245,.55),transparent 70%),
+    radial-gradient(34% 26% at 84% 70%,rgba(245,176,0,.18),transparent 70%),
+    radial-gradient(40% 30% at 12% 90%,rgba(255,134,168,.14),transparent 70%)}
+.hero-muster{position:absolute;inset:-10% -10% 0;z-index:-1;pointer-events:none;opacity:.32;will-change:transform;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'><path d='M48 6l6.2 14.8L69 14.6l-6.2 14.8L78 35.6l-14.8 6.2L69 56.6 54.2 50.4 48 65.2l-6.2-14.8L27 56.6l6.2-14.8L18 35.6l14.8-6.2L27 14.6l14.8 6.2z' fill='none' stroke='%23ffffff' stroke-opacity='.07' stroke-width='1.2'/></svg>");
+  background-size:96px 96px}
+.hero-grid{display:grid;gap:clamp(10px,3vw,48px);align-items:end}
+.hero-text{position:relative;z-index:2;padding-bottom:clamp(36px,6vw,72px)}
+.hero .eyebrow{color:var(--gold-hell)}
+.wortmarke{display:flex;align-items:center;gap:12px;margin-top:12px;font-size:clamp(22px,4.8vw,30px);font-weight:900;letter-spacing:-.02em}
+.wortmarke span{color:var(--rosa)}
+h1{font-size:clamp(32px,7.4vw,64px);font-weight:900;margin-top:8px;max-width:17ch}
+h1 .gold{color:var(--gold-hell)}
+h1 .leise{color:rgba(255,255,255,.72);font-weight:800}
+.aktionen{display:flex;flex-direction:column;align-items:stretch;gap:14px;margin-top:clamp(18px,4vw,36px);max-width:460px}
+.knopf{appearance:none;border:0;cursor:pointer;font:inherit;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  text-align:center;min-height:62px;padding:12px 28px;border-radius:18px;font-weight:800;font-size:clamp(18px,4.6vw,21px);letter-spacing:-.01em;
+  transition:transform .18s ease,background .2s,box-shadow .2s}
+.knopf:active{transform:translateY(1px) scale(.99)}
+.knopf-primaer{background:linear-gradient(180deg,var(--gold-hell),var(--gold));color:#2A1F4D;box-shadow:0 18px 40px -18px rgba(245,176,0,.9),inset 0 1px 0 rgba(255,255,255,.6)}
+.knopf-primaer:hover{background:linear-gradient(180deg,#FFE08A,var(--gold-hell));color:#2A1F4D;transform:translateY(-1px)}
+.knopf-zweit{background:rgba(255,255,255,.1);color:#fff;border:1.5px solid rgba(255,255,255,.28);min-height:56px;font-size:18px}
+.knopf-zweit:hover{background:rgba(255,255,255,.18);color:#fff}
+.nebenlink{display:inline-flex;align-items:center;gap:8px;min-height:48px;font-weight:800;font-size:17px;color:rgba(255,255,255,.86);text-decoration:none;align-self:flex-start}
+.nebenlink::after{content:"→";transition:transform .2s}
+.nebenlink:hover{color:#fff}.nebenlink:hover::after{transform:translateX(4px)}
+.pulst{animation:puls 1.5s ease-in-out .9s 2}
+@keyframes puls{0%,100%{transform:scale(1)}45%{transform:scale(1.035)}}
+.reihe-zwei{display:flex;flex-wrap:wrap;align-items:center;gap:16px}
+.qr-mini{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;background:#fff;border-radius:18px;margin:0}
+.qr-mini .qr-bild{width:104px;height:104px}
+.qr-mini figcaption{font-size:13px;font-weight:800;color:#565080;max-width:13ch;line-height:1.3;text-align:center}
+.qr-bild svg{width:100%;height:100%;display:block;border-radius:6px}
+.hinweis{display:grid;grid-template-columns:72px 1fr;gap:14px;align-items:center;margin-top:22px;max-width:480px;padding:14px 16px;border-radius:20px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2)}
+.hinweis svg{width:72px;height:auto;display:block}
+.hinweis b{display:block;font-weight:900;font-size:17px;margin-bottom:2px}
+.hinweis p{font-size:16px;color:rgba(255,255,255,.82)}
+.klassen-plakette{display:inline-flex;align-items:center;gap:10px;margin-top:18px;padding:8px 16px 8px 14px;border-radius:999px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);font-size:15px;font-weight:800;white-space:nowrap}
+.klassen-plakette b{font-size:22px;font-weight:900;letter-spacing:.1em;color:var(--gold-hell)}
+
+/* Bühne */
+.buehne{position:relative;display:grid;justify-items:center;align-items:end;min-height:168px;order:-1;pointer-events:none}
+.bogen{position:absolute;left:50%;bottom:-6%;width:min(360px,86%);aspect-ratio:3/4.1;transform:translateX(-50%);will-change:transform}
+.bogen svg{width:100%;height:100%;display:block;overflow:visible}
+.hero-rahle{position:relative;width:clamp(104px,27vw,132px);height:auto;display:block;will-change:transform;z-index:2;filter:drop-shadow(0 26px 30px rgba(10,8,30,.5))}
+.blase{position:absolute;z-index:3;padding:10px 16px;background:#fff;color:var(--violett-dunkel);border-radius:16px;font-size:14px;font-weight:900;white-space:nowrap;
+  box-shadow:0 12px 30px -12px rgba(0,0,0,.45);transform:rotate(-3deg)}
+.blase::after{content:"";position:absolute;bottom:-9px;left:22px;border:9px solid transparent;border-top-color:#fff;border-bottom:0}
+.buehne .blase{top:2%;right:4%;left:auto}
+
+/* Marquee */
+.band{position:relative;z-index:2;border-top:1px solid rgba(255,255,255,.1);background:rgba(10,8,30,.35);overflow:hidden;padding:14px 0;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.band-spur{display:flex;gap:0;width:max-content;animation:lauf 60s linear infinite}
+.band-spur span{display:inline-block;padding:0 26px;font-size:clamp(30px,5vw,44px);line-height:1;color:rgba(255,255,255,.45);font-weight:700;direction:rtl;font-family:'Noto Naskh Arabic','Geeza Pro','Scheherazade',serif}
+.band-spur span.g{color:var(--gold);opacity:.9}
+@keyframes lauf{to{transform:translateX(-50%)}}
+
+/* Stationen */
+.stationen{padding:clamp(72px,10vw,140px) 0 clamp(48px,7vw,96px)}
+.stationen-grid{display:grid;gap:clamp(28px,5vw,64px)}
+.stationen-kopf{align-self:start}
+.stationen .eyebrow{color:var(--violett)}
+.stationen h2{font-size:clamp(34px,6.4vw,64px);font-weight:900;margin-top:14px;max-width:12ch}
+.stationen h2 em{font-style:normal;color:var(--violett)}
+.stationen-sub{margin-top:14px;font-size:18px;color:var(--gedaempft);max-width:30ch}
+.punkte{display:none;gap:10px;margin-top:28px;align-items:center}
+.punkte i{width:10px;height:10px;border-radius:99px;background:var(--rand);transition:transform .3s,background .3s}
+.punkte i.an{background:var(--violett);transform:scale(1.35)}
+.punkte svg{width:44px;height:40px;margin-left:6px}
+.stationen-liste{list-style:none;margin:0;padding:0;display:grid;gap:18px}
+.station{position:relative;display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start;padding:clamp(22px,3vw,34px);border-radius:var(--r);
+  background:var(--flaeche);border:1px solid var(--rand);overflow:hidden;transition:transform .35s ease,box-shadow .35s ease}
+.station:hover{transform:translateY(-3px);box-shadow:0 30px 60px -40px rgba(81,66,194,.55)}
+.station::before{content:attr(data-nr);position:absolute;right:14px;bottom:-14px;font-size:clamp(56px,7vw,84px);font-weight:900;line-height:1;letter-spacing:-.06em;
+  color:transparent;-webkit-text-stroke:1.5px var(--rand);pointer-events:none}
+.station>div{padding-right:clamp(40px,10%,72px)}
+.station>svg{width:clamp(62px,9vw,84px);height:auto;display:block;flex:none}
+.station h3{font-size:clamp(20px,2.6vw,25px);font-weight:900;margin-bottom:8px;max-width:18ch;position:relative}
+.station p{font-size:16px;color:var(--gedaempft);position:relative;max-width:44ch}
+
+/* Installieren / Klasse */
+.installieren{padding:0 0 clamp(64px,9vw,120px)}
+.karte-dunkel{position:relative;overflow:hidden;color:#fff;border-radius:calc(var(--r) + 8px);padding:clamp(28px,5vw,64px);
+  background:linear-gradient(160deg,var(--nacht-2),var(--nacht-3) 70%,#3A2E96);isolation:isolate}
+.karte-dunkel::before{content:"";position:absolute;inset:0;z-index:-1;opacity:.6;pointer-events:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'><path d='M48 6l6.2 14.8L69 14.6l-6.2 14.8L78 35.6l-14.8 6.2L69 56.6 54.2 50.4 48 65.2l-6.2-14.8L27 56.6l6.2-14.8L18 35.6l14.8-6.2L27 14.6l14.8 6.2z' fill='none' stroke='%23ffffff' stroke-opacity='.07' stroke-width='1.2'/></svg>");background-size:96px 96px}
+.karte-dunkel::after{content:"";position:absolute;z-index:-1;right:-10%;top:-30%;width:60%;aspect-ratio:1;border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(245,176,0,.22),transparent)}
+.install-grid{display:grid;gap:clamp(28px,4vw,56px);align-items:center}
+.karte-dunkel .eyebrow{color:var(--gold-hell)}
+.karte-dunkel h2{font-size:clamp(30px,5vw,52px);font-weight:900;margin-top:14px;max-width:14ch}
+.karte-dunkel .install-p{margin-top:14px;font-size:17px;color:rgba(255,255,255,.78);max-width:40ch}
+.schritte-kurz{list-style:none;margin:30px 0 0;padding:0;display:grid;gap:16px;counter-reset:s}
+.schritte-kurz li{display:flex;align-items:center;gap:14px;font-size:17px;font-weight:800}
+.schritte-kurz b{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:16px;font-weight:900;color:#2A1F4D;
+  background:linear-gradient(180deg,var(--gold-hell),var(--gold))}
+.qr-karte{margin:0;padding:18px;background:#fff;border-radius:22px;display:grid;gap:12px;justify-items:center;justify-self:center;width:min(100%,300px);
+  box-shadow:0 40px 80px -40px rgba(0,0,0,.6)}
+.qr-karte .qr-bild{width:100%;aspect-ratio:1}
+.qr-karte figcaption{font-size:13px;font-weight:800;color:#565080;text-align:center;overflow-wrap:anywhere}
+.klasse-aktionen{display:flex;flex-direction:column;gap:10px;margin-top:22px;max-width:360px}
+.klasse-code-gross{display:grid;gap:2px;padding:14px 18px;border-radius:16px;background:rgba(255,255,255,.1);border:1px dashed rgba(255,255,255,.4)}
+.klasse-code-gross span{font-size:14px;font-weight:800;color:rgba(255,255,255,.8)}
+.klasse-code-gross b{font-size:34px;font-weight:900;letter-spacing:.16em;line-height:1.1;color:var(--gold-hell)}
+
+/* Fuß */
+footer{padding:0 0 calc(28px + 84px)}
+footer .wrap{display:grid;gap:18px;padding-top:28px;border-top:1px solid var(--rand);font-size:15px;color:var(--gedaempft)}
+.fuss-marke{display:flex;align-items:center;gap:14px}
+.fuss-marke img{height:60px;width:auto;display:block}
+.fuss-marke b{display:block;color:var(--tinte);font-weight:900;font-size:17px}
+.fuss-marke small{font-size:14px}
+
+/* Mobile Leiste */
+.leiste{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:40;
+  transform:translateY(120%);transition:transform .35s cubic-bezier(.22,.7,.3,1);pointer-events:none}
+.leiste.da{transform:none;pointer-events:auto}
+.leiste a{display:flex;align-items:center;justify-content:center;gap:10px;min-height:58px;border-radius:18px;text-decoration:none;font-weight:900;font-size:18px;
+  color:#2A1F4D;background:linear-gradient(180deg,var(--gold-hell),var(--gold));box-shadow:0 20px 40px -16px rgba(20,17,46,.6)}
+.leiste a svg{width:26px;height:24px}
+
+/* Einblenden */
+html.js .enthuellen{opacity:0;transform:translate3d(0,28px,0);transition:opacity .6s ease,transform .7s cubic-bezier(.22,.7,.3,1)}
+html.js .enthuellen.da{opacity:1;transform:none}
+html.js .enthuellen:nth-child(2){transition-delay:.06s}
+html.js .enthuellen:nth-child(3){transition-delay:.12s}
+html.js .enthuellen:nth-child(4){transition-delay:.18s}
+html.js .hero-text>*{animation:auftritt .8s cubic-bezier(.22,.7,.3,1) both}
+html.js .hero-text>*:nth-child(2){animation-delay:.08s}html.js .hero-text>*:nth-child(3){animation-delay:.16s}html.js .hero-text>*:nth-child(4){animation-delay:.26s}html.js .hero-text>*:nth-child(5){animation-delay:.34s}
+@keyframes auftritt{from{opacity:0;transform:translate3d(0,24px,0)}to{opacity:1;transform:none}}
+html.js .buehne{animation:auftritt 1s cubic-bezier(.22,.7,.3,1) .1s both}
+.rahle-atem{animation:atem 4.6s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 90%}
+@keyframes atem{0%,100%{transform:scale(1)}50%{transform:scale(1.022)}}
+50%{transform:rotate(-4deg)}}
+50%{transform:rotate(4deg)}}
+97.5%{transform:scaleY(.12)}}
+.rahle-funken{opacity:0}.rahle-funken use{fill:#F5B000}
+[data-stimmung="froh"] .rahle-funken{animation:funken 1.5s ease-out 2}
+[data-stimmung="froh"] .rahle-atem{animation:hopf .55s cubic-bezier(.3,1.5,.4,1) 3}
+@keyframes funken{0%{opacity:0;transform:scale(.6)}35%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.15)}}
+@keyframes hopf{0%,100%{transform:translateY(0)}40%{transform:translateY(-9px)}}
+.bogen-glut{animation:glut 6s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 60%}
+@keyframes glut{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:.9;transform:scale(1.04)}}
+
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  html.js .enthuellen,html.js .hero-text>*,html.js .buehne{opacity:1 !important;transform:none !important;transition:none !important;animation:none !important}
+  .pulst,.rahle-atem,.band-spur,.bogen-glut,[data-stimmung="froh"] .rahle-atem{animation:none !important}
+  .rahle-funken{opacity:0 !important}
+  .hero-muster,.bogen,.hero-rahle{transform:translateX(-50%) !important}
+  .hero-muster,.hero-rahle{transform:none !important}
+  .leiste{transition:none}
+}
+
+/* Breit */
+@media (min-width:720px){
+  .stationen-liste{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+  .install-grid{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr)}
+  .schritte-kurz{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+  .schritte-kurz li{flex-direction:column;align-items:flex-start;gap:12px;font-size:16px}
+}
+@media (min-width:900px){
+  body{font-size:18px}
+  .hero{padding-top:calc(72px + clamp(20px,4vw,56px))}
+  .wortmarke{margin-top:22px}
+  .hero-grid{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)}
+  h1{font-size:clamp(40px,4.6vw,68px)}
+  .buehne{order:0;min-height:560px;align-self:stretch}
+  .bogen{width:min(440px,100%);bottom:0}
+  .hero-rahle{width:clamp(200px,20vw,280px);margin-bottom:10px}
+  .buehne .blase{top:16%;right:2%;font-size:16px}
+  .aktionen{max-width:580px}
+  .knopf-zweit{flex:0 1 auto}
+  .stationen-grid{grid-template-columns:minmax(0,5fr) minmax(0,7fr)}
+  .stationen-kopf{position:sticky;top:110px}
+  .punkte{display:flex}
+  .stationen-liste{grid-template-columns:1fr;gap:22px}
+  .station:nth-child(even){margin-left:clamp(24px,5vw,72px)}
+  .station:nth-child(odd){margin-right:clamp(24px,5vw,72px)}
+  footer{padding-bottom:40px}
+  .leiste{display:none}
+}
+
+/* ---------- Anleitung ---------- */
+.anleitung{max-width:1120px;margin:40px auto 0}
+.anleitung-panel{background:var(--flaeche);border:1px solid var(--rand);border-radius:26px;padding:22px}
+.anleitung-kopf{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.anleitung h2{font-size:clamp(21px,5.2vw,26px);font-weight:900;max-width:22ch}
+.schliessen{appearance:none;border:1px solid var(--rand);background:var(--panel);color:var(--tinte);
+  width:48px;height:48px;min-width:48px;border-radius:999px;cursor:pointer;font-size:22px;font-weight:800;line-height:1;
+  display:none;align-items:center;justify-content:center}
+.fortschritt{margin-top:16px;display:grid;gap:7px}
+.fortschritt-spur{display:flex;gap:5px}
+.fortschritt-spur i{flex:1;height:7px;border-radius:99px;background:var(--rand)}
+.fortschritt-spur i.an{background:var(--gold)}
+.fortschritt-text{font-size:14px;font-weight:800;color:var(--gedaempft);letter-spacing:.03em}
+.schritte{list-style:none;margin:18px 0 0;padding:0;display:grid;gap:26px;counter-reset:s}
+.schritt{display:grid;gap:14px;justify-items:start}
+.schritt-bild{width:100%;max-width:196px;justify-self:center;display:flex;justify-content:center}
+.schritt-bild svg{width:100%;height:auto;display:block}
+.schritt-text{display:flex;gap:12px;align-items:flex-start}
+.schritt-nr{flex:none;width:34px;height:34px;border-radius:999px;background:var(--knopf);color:#fff;
+  font-weight:900;font-size:17px;display:flex;align-items:center;justify-content:center}
+.schritt-text p{font-size:19px;font-weight:700;line-height:1.35}
+.rahle-sagt{display:flex;gap:10px;align-items:center;padding:10px 14px;border-radius:14px;
+  background:var(--violett-ganzhell);font-size:15px;font-weight:700;color:var(--link)}
+.rahle-sagt svg{width:36px;height:32px;flex:none}
+.anleitung-nav{display:none;gap:10px;margin-top:22px}
+.anleitung-nav .knopf{flex:1;min-height:56px;font-size:18px}
+
+html.js .anleitung{position:fixed;inset:0;margin:0;max-width:none;z-index:50;
+  background:rgba(24,20,58,.62);display:none;padding:12px;overflow:auto}
+html.js .anleitung[data-offen]{display:grid;align-content:start;justify-items:center}
+html.js .anleitung-panel{max-width:470px;width:100%;margin:auto}
+html.js .schliessen{display:flex}
+html.js .anleitung-nav{display:flex}
+html.js .schritte{gap:0}
+html.js .schritt-bild{max-width:none;width:auto}
+html.js .schritt-bild svg{width:auto;height:clamp(210px,42vh,344px)}
+
+
+/* ---------- Aushang (nur Druck) ---------- */
+.aushang{display:none}
+@media print{
+  @page{size:A4 portrait;margin:14mm}
+  html,body{background:#fff !important;color:#000 !important;font-size:12pt;padding:0}
+  body>*{display:none !important}
+  .sprites{display:block !important}
+  #aushang{display:flex !important;flex-direction:column;gap:9mm;min-height:250mm}
+  .aushang-kopf{display:flex;align-items:center;gap:6mm;border-bottom:1.5pt solid #6A5AE0;padding-bottom:5mm}
+  .aushang-kopf svg{width:24mm;height:21.6mm;flex:none}
+  .aushang-logo{height:28mm;width:auto;margin-left:auto;flex:none}
+  .aushang-kopf h2{font-size:30pt;font-weight:900;color:#5142C2}
+  .aushang-kopf p{font-size:14pt;font-weight:700;margin-top:1mm;max-width:70%}
+  .aushang-mitte{display:flex;gap:8mm;align-items:center}
+  .aushang-qr{width:88mm;height:88mm;flex:none;border:1.5pt solid #1F1B3A;padding:3mm;border-radius:4mm}
+  .aushang-qr svg{width:100%;height:100%;display:block}
+  .aushang-schritte{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6mm}
+  .aushang-schritte li{display:flex;gap:4mm;align-items:flex-start;font-size:15pt;font-weight:700}
+  .aushang-schritte b{flex:none;width:9mm;height:9mm;border-radius:50%;background:#6A5AE0;color:#fff;
+    font-size:12pt;display:flex;align-items:center;justify-content:center}
+  .aushang-code{display:flex;align-items:baseline;gap:4mm;border:1.5pt dashed #6A5AE0;
+    border-radius:4mm;padding:4mm 6mm;align-self:flex-start}
+  .aushang-code span{font-size:13pt;font-weight:700}
+  .aushang-code b{font-size:30pt;font-weight:900;letter-spacing:.12em}
+  .aushang-url{font-size:17pt;font-weight:900;color:#5142C2}
+  .aushang-fuss{margin-top:auto;font-size:11pt;font-weight:600;border-top:.75pt solid #B9B2E8;padding-top:4mm}
 }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="kopf"><img src="assets/logo-gemeinde.jpg" alt=""><span><b>Koran-Kurs</b><span class="gemeinde-name">Elif &amp; Ba</span></span></div>
 
-  <header class="hero">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" class="axi" role="img" aria-label="Axi, der Axolotl">
-  
-  <defs>
-    <linearGradient id="kopf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#AFA2FF"/><stop offset=".55" stop-color="#8273F5"/><stop offset="1" stop-color="#5D4DD6"/></linearGradient>
-    <linearGradient id="arm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9385F8"/><stop offset="1" stop-color="#5D4DD6"/></linearGradient>
-    <linearGradient id="bauch" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EEEBFF"/><stop offset="1" stop-color="#CFC6FF"/></linearGradient>
-    <linearGradient id="kieme" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFC2D1"/><stop offset="1" stop-color="#FF86A8"/></linearGradient>
-  </defs>
-  <ellipse class="axo-schatten" cx="120" cy="224" rx="60" ry="7.5" fill="rgba(46,36,112,.14)"/>
-  <g class="axo-koerper">
-    <path class="axo-arm axo-arm-l" d="M86 164 C72 166 62 180 68 194 C76 199 86 190 90 178 Z" fill="url(#arm)"/><path class="axo-arm axo-arm-r" d="M154 164 C168 166 178 180 172 194 C164 199 154 190 150 178 Z" fill="url(#arm)"/>
-    <ellipse cx="120" cy="182" rx="48" ry="34" fill="url(#kopf)"/>
-    <ellipse cx="120" cy="190" rx="30" ry="18" fill="url(#bauch)"/>
-    <ellipse cx="100" cy="212" rx="14" ry="7" fill="#5D4DD6"/><ellipse cx="140" cy="212" rx="14" ry="7" fill="#5D4DD6"/>
-    <g class="axo-kiemen axo-kiemen-l"><g class="axo-kieme"><ellipse cx="58" cy="98" rx="14" ry="9" fill="url(#kieme)" transform="rotate(-25 58 98)"/><circle cx="47" cy="93" r="5" fill="#FFB1C4"/></g><g class="axo-kieme"><ellipse cx="60" cy="120" rx="13" ry="8.5" fill="url(#kieme)" transform="rotate(10 60 120)"/><circle cx="48" cy="123" r="4.6" fill="#FFB1C4"/></g></g><g class="axo-kiemen axo-kiemen-r" transform="matrix(-1 0 0 1 240 0)"><g class="axo-kieme"><ellipse cx="58" cy="98" rx="14" ry="9" fill="url(#kieme)" transform="rotate(-25 58 98)"/><circle cx="47" cy="93" r="5" fill="#FFB1C4"/></g><g class="axo-kieme"><ellipse cx="60" cy="120" rx="13" ry="8.5" fill="url(#kieme)" transform="rotate(10 60 120)"/><circle cx="48" cy="123" r="4.6" fill="#FFB1C4"/></g></g>
-    <ellipse cx="120" cy="106" rx="70" ry="63" fill="url(#kopf)"/>
-    <ellipse cx="92" cy="70" rx="26" ry="13" fill="#fff" opacity=".22"/>
-    <path d="M110 46 q10 -14 20 0 q-10 -4 -20 0z" fill="url(#kieme)"/>
-    <ellipse cx="74" cy="132" rx="14" ry="9" fill="#FF8DA8" opacity=".5"/><ellipse cx="166" cy="132" rx="14" ry="9" fill="#FF8DA8" opacity=".5"/>
-    <g>
-      <ellipse cx="94" cy="106" rx="19" ry="21.5" fill="#fff"/><ellipse cx="146" cy="106" rx="19" ry="21.5" fill="#fff"/>
-      <g class="axo-pupille" transform="">
-        <circle cx="96" cy="109" r="11" fill="#2A2352"/><circle cx="148" cy="109" r="11" fill="#2A2352"/>
-        <circle cx="100.5" cy="103.5" r="4.2" fill="#fff"/><circle cx="152.5" cy="103.5" r="4.2" fill="#fff"/>
-        <circle cx="91.5" cy="114" r="2" fill="#fff" opacity=".9"/><circle cx="143.5" cy="114" r="2" fill="#fff" opacity=".9"/>
-      </g>
-      <g class="axo-lid" transform="translate(0 84.5) scale(1,0) translate(0 -84.5)"><ellipse cx="94" cy="106" rx="20" ry="22.5" fill="url(#kopf)"/><ellipse cx="146" cy="106" rx="20" ry="22.5" fill="url(#kopf)"/></g>
-      
+<svg class="sprites" aria-hidden="true" focusable="false" width="0" height="0"><defs>
+  <linearGradient id="gK" x1="0" y1="0" x2=".35" y2="1">
+    <stop offset="0" stop-color="#AFA2FF"/><stop offset=".55" stop-color="#8273F5"/><stop offset="1" stop-color="#5D4DD6"/>
+  </linearGradient>
+  <linearGradient id="gB" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#EEEBFF"/><stop offset="1" stop-color="#CFC6FF"/>
+  </linearGradient>
+  <linearGradient id="gG" x1="1" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFC2D1"/><stop offset="1" stop-color="#FF86A8"/>
+  </linearGradient>
+  <linearGradient id="gGold" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#FFD35C"/><stop offset="1" stop-color="#F5B000"/>
+  </linearGradient>
+  <!-- Der kleine Rahle. Dieselbe viewBox wie der Axolotl-Kopf davor, damit die
+       neun Stellen, die ihn benutzen, unveraendert bleiben. Bei 28 bis 44 px
+       zaehlt nur die Silhouette: zwei gekreuzte Bretter, das Buch im V. -->
+  <symbol id="rahle-klein" viewBox="0 0 120 110">
+    <defs>
+      <linearGradient id="gRh" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#8A5C2E"/><stop offset="1" stop-color="#5A3A1C"/>
+      </linearGradient>
+      <linearGradient id="gRv" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#C98B4B"/><stop offset=".5" stop-color="#96652F"/><stop offset="1" stop-color="#5E3B1B"/>
+      </linearGradient>
+      <linearGradient id="gRb" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#FDF6E2"/><stop offset="1" stop-color="#D5C08E"/>
+      </linearGradient>
+    </defs>
+    <g transform="rotate(-24 60 63)">
+      <path d="M49.8 29a10.2 10.2 0 0 1 20.4 0V104H49.8z" fill="url(#gRh)"/>
     </g>
-    <path d="M108 138 q6 8 12 0 q6 8 12 0" stroke="#2A2352" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  </g>
-</svg>
-    <h1>Elif <i>&amp;</i> Ba</h1>
-    <p class="claim">Koran lesen lernen — Schritt für Schritt, mit Axi.</p>
-    <div class="knoepfe">
-      <button class="btn btn-primary btn-full" id="install">📲 App installieren</button>
-      <a class="btn btn-ghost btn-full" href="./" id="oeffnen">Im Browser öffnen</a>
-    </div>
-    <div class="klasse-box" id="klasse" hidden>
-      <b>Deine Klasse</b>
-      <span id="klasse-name">Klassen-Code</span>
-      <span class="klasse-code" id="klasse-code"></span>
-      <small>Beim Anmelden: Namen eintippen — der Code ist schon drin.</small>
-    </div>
-    <div class="stand" id="stand"></div>
-    <div class="hinweis" id="inapp" hidden>Du bist gerade in <b>WhatsApp, Instagram oder einer anderen App</b>. Von dort geht Installieren nicht: Tippe oben auf <b>⋯</b> oder <b>⋮</b> und wähle <b>„In Safari öffnen"</b> (iPhone) bzw. <b>„In Chrome öffnen"</b> (Android) — dann klappt es.</div>
-  </header>
+    <g transform="rotate(-6 60 33)">
+      <rect x="43" y="21" width="34" height="23" rx="2" fill="url(#gRb)" stroke="#8D7743" stroke-width="2"/>
+      <rect x="47" y="25" width="26" height="15" rx="1.4" fill="none" stroke="#C9A227" stroke-width="1.8"/>
+      <circle cx="60" cy="32.5" r="3.5" fill="none" stroke="#C9A227" stroke-width="2"/>
+    </g>
+    <g transform="rotate(24 60 63)">
+      <path d="M49.8 19a10.2 10.2 0 0 1 20.4 0V104H49.8z" fill="url(#gRv)"/>
+      <circle cx="60" cy="54" r="4.5" fill="none" stroke="#2A1809" stroke-width="3.4" opacity=".8"/>
+      <circle cx="60" cy="78" r="4.5" fill="none" stroke="#2A1809" stroke-width="3.4" opacity=".8"/>
+    </g>
+  </symbol>
+  <symbol id="stern8" viewBox="0 0 24 24">
+    <path d="M12 0 L14.6 6.1 L21 3 L17.9 9.4 L24 12 L17.9 14.6 L21 21 L14.6 17.9 L12 24 L9.4 17.9 L3 21 L6.1 14.6 L0 12 L6.1 9.4 L3 3 L9.4 6.1 Z"/>
+  </symbol>
+  <symbol id="menue-punkte" viewBox="0 0 120 88">
+    <rect x="4" y="6" width="112" height="76" rx="11" fill="url(#gB)"/>
+    <rect x="12" y="14" width="96" height="18" rx="7" fill="#fff"/>
+    <rect x="20" y="20" width="46" height="6" rx="3" fill="#8273F5" opacity=".6"/>
+    <circle cx="88" cy="23" r="1.9" fill="#5142C2"/><circle cx="94" cy="23" r="1.9" fill="#5142C2"/><circle cx="100" cy="23" r="1.9" fill="#5142C2"/>
+    <circle cx="94" cy="23" r="13" fill="none" stroke="url(#gGold)" stroke-width="3.4"/>
+    <path d="M94 44 L94 62" stroke="url(#gGold)" stroke-width="4" stroke-linecap="round"/>
+    <path d="M87 55 L94 62 L101 55" fill="none" stroke="url(#gGold)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="16" y="44" width="46" height="7" rx="3.5" fill="#8273F5" opacity=".35"/>
+    <rect x="16" y="58" width="34" height="7" rx="3.5" fill="#8273F5" opacity=".25"/>
+  </symbol>
+</defs></svg>
 
-  <section id="anleitung">
-    <h2>So kommt die App aufs Gerät</h2>
-    <p class="unter">Dauert eine Minute. Wähle dein Gerät — wir haben es schon vorausgewählt.</p>
-    <div class="tabs" role="tablist">
-      <button class="tab" data-g="android" role="tab">🤖 Android</button>
-      <button class="tab" data-g="ios" role="tab">🍎 iPhone &amp; iPad</button>
-      <button class="tab" data-g="pc" role="tab">💻 Computer</button>
-    </div>
+<div class="lauf" aria-hidden="true"><i id="lauf"></i></div>
 
-    <div class="panel" data-g="android">
-      <h3>Android (Chrome)</h3>
-      <ol class="schritte">
-        <li><span class="nr">1</span><p>Tippe oben auf <b>„App installieren"</b>. Chrome fragt einmal nach — <b>„Installieren"</b> antippen, fertig.</p></li>
-        <li><span class="nr">2</span><p>Kein Knopf zu sehen? Dann oben rechts auf <span class="sym"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="12" cy="19" r="2.2"/></svg></span> tippen und <b>„App installieren"</b> oder <b>„Zum Startbildschirm hinzufügen"</b> wählen.</p></li>
-        <li><span class="nr">3</span><p>Axi liegt jetzt auf dem Startbildschirm — wie jede andere App.</p></li>
-      </ol>
-      <p class="klein">Samsung-Internet: unten rechts <b>☰</b> → „Aktuelle Seite hinzufügen zu" → „Startbildschirm".</p>
+<header class="kopf" id="kopf">
+  <div class="wrap">
+    <a class="marke" href="#top" aria-label="Elif Be — nach oben">
+      <svg viewBox="0 0 120 110" aria-hidden="true" focusable="false"><use href="#rahle-klein"/></svg>
+      <b>Elif <span>Be</span></b>
+    </a>
+    <div class="sprache" role="group" aria-label="Sprache wählen" data-i18n-aria="lang_gruppe">
+      <button type="button" data-lang="de" aria-pressed="true" lang="de">DE</button>
+      <button type="button" data-lang="tr" aria-pressed="false" lang="tr">TR</button>
     </div>
+  </div>
+</header>
 
-    <div class="panel" data-g="ios">
-      <h3>iPhone &amp; iPad (Safari)</h3>
-      <ol class="schritte">
-        <li><span class="nr">1</span><p>Diese Seite in <b>Safari</b> öffnen — nicht in WhatsApp oder Instagram.</p></li>
-        <li><span class="nr">2</span><p>Unten in der Mitte auf das <b>Teilen-Symbol</b> <span class="sym"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13M8 7l4-4 4 4"/><path d="M5 11v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8"/></svg></span> tippen. Auf dem iPad sitzt es oben rechts.</p></li>
-        <li><span class="nr">3</span><p>Etwas nach unten wischen und <b>„Zum Home-Bildschirm"</b> <span class="sym"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg></span> antippen.</p></li>
-        <li><span class="nr">4</span><p>Oben rechts auf <b>„Hinzufügen"</b>. Fertig — Axi ist auf deinem Home-Bildschirm.</p></li>
-      </ol>
-      <p class="klein">Apple erlaubt keinen Installieren-Knopf — darum diese vier Tipps. Danach läuft die App wie aus dem App Store: Vollbild, offline, mit deinem Fortschritt.</p>
+<main id="top">
+  <section class="hero">
+    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="hero-muster" id="muster" aria-hidden="true"></div>
+    <div class="wrap hero-grid">
+      <div class="hero-text">
+        <p class="eyebrow" data-i18n="eyebrow">Elifba-Methode · für Kinder von 6 bis 12</p>
+        <p class="wortmarke" aria-hidden="true">Elif <span>Be</span></p>
+        <h1><span data-i18n="h1_a">Kuran lesen lernen —</span> <span class="gold" data-i18n="h1_b">Schritt für Schritt,</span> <span class="leise" data-i18n="h1_c">mit der Stimme des Hoca.</span></h1>
+
+        <p class="klassen-plakette" id="klassen-plakette" hidden>
+          <span data-i18n="klasse_label">Klassen-Code</span> <b id="klassen-code"></b>
+        </p>
+
+        <div class="hinweis" id="hinweis" hidden>
+          <svg viewBox="0 0 120 88" aria-hidden="true" focusable="false"><use href="#menue-punkte"/></svg>
+          <div>
+            <b id="hinweis-titel" data-i18n="hinweis_titel">Von hier geht Installieren nicht.</b>
+            <p id="hinweis-text" data-i18n="hinweis_ios">Tippe oben auf ⋯ und wähle „In Safari öffnen“.</p>
+          </div>
+        </div>
+
+        <div class="aktionen">
+          <a class="knopf knopf-primaer" id="btn-primaer" href="https://elif-be.de" data-i18n="btn_install">App installieren</a>
+          <div class="reihe-zwei" id="reihe-zwei" hidden>
+            <button type="button" class="knopf knopf-zweit" id="btn-install2" data-i18n="btn_install">App installieren</button>
+            <figure class="qr-mini" id="qr-mini">
+              <div class="qr-bild" id="qr-hero"></div>
+              <figcaption data-i18n="qr_hero_text">Mit dem Handy scannen</figcaption>
+            </figure>
+          </div>
+          <a class="nebenlink" id="btn-neben" href="https://elif-be.de" data-i18n="btn_browser">Im Browser öffnen</a>
+        </div>
+      </div>
+
+      <div class="buehne" aria-hidden="false">
+        <div class="bogen" id="ornament" aria-hidden="true">
+          <svg viewBox="0 0 300 410" focusable="false">
+            <defs>
+              <linearGradient id="gBogen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD35C"/><stop offset="1" stop-color="#F5B000" stop-opacity=".35"/></linearGradient>
+              <radialGradient id="gGlut" cx="50%" cy="62%" r="55%"><stop offset="0" stop-color="#7F71F5" stop-opacity=".9"/><stop offset="1" stop-color="#7F71F5" stop-opacity="0"/></radialGradient>
+            </defs>
+            <ellipse class="bogen-glut" cx="150" cy="250" rx="150" ry="170" fill="url(#gGlut)"/>
+            <path d="M30 410 V190 C30 100 84 44 150 14 C216 44 270 100 270 190 V410" fill="rgba(255,255,255,.04)" stroke="url(#gBogen)" stroke-width="2.5"/>
+            <path d="M56 410 V200 C56 128 100 78 150 50 C200 78 244 128 244 200 V410" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="1.5"/>
+            <g fill="#FFD35C" opacity=".85">
+              <use href="#stern8" x="138" y="84" width="24" height="24"/>
+              <use href="#stern8" x="92" y="150" width="12" height="12" opacity=".6"/>
+              <use href="#stern8" x="198" y="150" width="12" height="12" opacity=".6"/>
+            </g>
+          </svg>
+        </div>
+        <p class="blase" data-i18n="rahle_gruss">Selamünaleyküm! Schön, dass du da bist.</p>
+        <svg class="hero-rahle rahle-figur" viewBox="0 0 280 262" role="img" aria-label="Ein hölzerner Rahle mit dem Mushaf" data-i18n-aria="rahle_alt" focusable="false">
+        <defs>
+        <path id="rflp-umriss" d="M117 44C117 30.5 126.5 20.5 140 20.5C153.5 20.5 163 30.5 163 44L163 196L160.6 246L145 246L145 213.2A9 9 0 1 0 135 213.2L135 246L119.4 246L117 196Z"/>
+        <clipPath id="rflp-clip"><use href="#rflp-umriss"/></clipPath>
+        <clipPath id="rflp-clipH"><use href="#rflp-umriss" transform="rotate(-21 140 150)"/></clipPath>
+        <clipPath id="rflp-buchclip"><rect x="98" y="34" width="80" height="56" rx="1.4"/></clipPath>
+        <g id="rflp-orn"><g fill="none" stroke="url(#rflp-band)" stroke-linecap="round" stroke-linejoin="round"><path d="M120.6 44.1L120.9 40.2L121.8 36.8L123.1 33.6L125 30.9L127.2 28.6L129.9 26.7L132.9 25.3L136.3 24.4L140 24.1L143.7 24.4L147.1 25.3L150.1 26.7L152.8 28.6L155 30.9L156.9 33.6L158.2 36.8L159.1 40.2L159.4 44.1L159.4 100L159.4 150L159.4 195.9L158.2 220.8L157.2 242.4L148.6 242.4L148.6 214.9L149.2 214.3L151 212L152.1 209.3L152.6 206.4L152.4 203.5L151.6 200.7L150.1 198.2L148.1 196L145.7 194.4L142.9 193.4L140 193.1L137.1 193.4L134.3 194.4L131.9 196L129.9 198.2L128.4 200.7L127.6 203.5L127.4 206.4L127.9 209.3L129 212L130.8 214.3L131.4 214.9L131.4 242.4L122.8 242.4L121.8 220.8L120.6 195.9L120.6 150L120.6 100Z" stroke-width="2.3"/><g stroke-width="2.5"><path d="M140 57.4Q151 63.45 140 69.5Q129 75.55 140 81.6Q151 87.65 140 93.7Q129 99.75 140 105.8Q151 111.85 140 117.9Q129 123.95 140 130Q151 136.05 140 142.1Q129 148.15 140 154.2Q151 160.25 140 166.3Q129 172.35 140 178.4"/><path d="M140 57.4Q129 63.45 140 69.5Q151 75.55 140 81.6Q129 87.65 140 93.7Q151 99.75 140 105.8Q129 111.85 140 117.9Q151 123.95 140 130Q129 136.05 140 142.1Q151 148.15 140 154.2Q129 160.25 140 166.3Q151 172.35 140 178.4"/></g><g stroke-width="2"><path d="M127.6 47.4L152.4 47.4"/><path d="M127.6 52.4L152.4 52.4"/><path d="M127.6 180.6L152.4 180.6"/><path d="M127.6 185.6L152.4 185.6"/></g></g><g fill="url(#rflp-band)"><path d="M143 34.2C144.36 35.7 146.4 34.7 146.4 34.2C146.4 33.7 144.36 32.7 143 34.2Z"/><path d="M142.12 36.32C142.02 38.34 144.17 39.08 144.53 38.73C144.88 38.37 144.14 36.22 142.12 36.32Z"/><path d="M140 37.2C138.5 38.56 139.5 40.6 140 40.6C140.5 40.6 141.5 38.56 140 37.2Z"/><path d="M137.88 36.32C135.86 36.22 135.12 38.37 135.47 38.73C135.83 39.08 137.98 38.34 137.88 36.32Z"/><path d="M137 34.2C135.64 32.7 133.6 33.7 133.6 34.2C133.6 34.7 135.64 35.7 137 34.2Z"/><path d="M137.88 32.08C137.98 30.06 135.83 29.32 135.47 29.67C135.12 30.03 135.86 32.18 137.88 32.08Z"/><path d="M140 31.2C141.5 29.84 140.5 27.8 140 27.8C139.5 27.8 138.5 29.84 140 31.2Z"/><path d="M142.12 32.08C144.14 32.18 144.88 30.03 144.53 29.67C144.17 29.32 142.02 30.06 142.12 32.08Z"/><path d="M126.5 44C124 40 124.6 35.4 127.8 33.2C129.8 36 129.6 40.6 126.5 44Z"/><path d="M153.5 44C156 40 155.4 35.4 152.2 33.2C150.2 36 150.4 40.6 153.5 44Z"/><path d="M128.4 48.4L130.3 51.4L132.2 48.4Z"/><path d="M132.4 48.4L134.3 51.4L136.2 48.4Z"/><path d="M136.4 48.4L138.3 51.4L140.2 48.4Z"/><path d="M140.4 48.4L142.3 51.4L144.2 48.4Z"/><path d="M144.4 48.4L146.3 51.4L148.2 48.4Z"/><path d="M148.4 48.4L150.3 51.4L152.2 48.4Z"/><path d="M128.4 181.6L130.3 184.6L132.2 181.6Z"/><path d="M132.4 181.6L134.3 184.6L136.2 181.6Z"/><path d="M136.4 181.6L138.3 184.6L140.2 181.6Z"/><path d="M140.4 181.6L142.3 184.6L144.2 181.6Z"/><path d="M144.4 181.6L146.3 184.6L148.2 181.6Z"/><path d="M148.4 181.6L150.3 184.6L152.2 181.6Z"/><path d="M140 59.45C142.2 62.05 142.2 64.85 140 67.45C137.8 64.85 137.8 62.05 140 59.45Z"/><path d="M140 71.55C142.2 74.15 142.2 76.95 140 79.55C137.8 76.95 137.8 74.15 140 71.55Z"/><path d="M146.7 65.85C150.1 66.75 151.9 63.65 150.7 59.65C148.6 62.45 147.3 64.55 146.7 65.85Z"/><path d="M133.3 61.05C129.9 60.15 128.1 63.25 129.3 67.25C131.4 64.45 132.7 62.35 133.3 61.05Z"/><path d="M146.7 77.95C150.1 78.85 151.9 75.75 150.7 71.75C148.6 74.55 147.3 76.65 146.7 77.95Z"/><path d="M133.3 73.15C129.9 72.25 128.1 75.35 129.3 79.35C131.4 76.55 132.7 74.45 133.3 73.15Z"/><path d="M140 83.65C142.2 86.25 142.2 89.05 140 91.65C137.8 89.05 137.8 86.25 140 83.65Z"/><path d="M140 95.75C142.2 98.35 142.2 101.15 140 103.75C137.8 101.15 137.8 98.35 140 95.75Z"/><path d="M146.7 90.05C150.1 90.95 151.9 87.85 150.7 83.85C148.6 86.65 147.3 88.75 146.7 90.05Z"/><path d="M133.3 85.25C129.9 84.35 128.1 87.45 129.3 91.45C131.4 88.65 132.7 86.55 133.3 85.25Z"/><path d="M146.7 102.15C150.1 103.05 151.9 99.95 150.7 95.95C148.6 98.75 147.3 100.85 146.7 102.15Z"/><path d="M133.3 97.35C129.9 96.45 128.1 99.55 129.3 103.55C131.4 100.75 132.7 98.65 133.3 97.35Z"/><path d="M140 107.85C142.2 110.45 142.2 113.25 140 115.85C137.8 113.25 137.8 110.45 140 107.85Z"/><path d="M140 119.95C142.2 122.55 142.2 125.35 140 127.95C137.8 125.35 137.8 122.55 140 119.95Z"/><path d="M146.7 114.25C150.1 115.15 151.9 112.05 150.7 108.05C148.6 110.85 147.3 112.95 146.7 114.25Z"/><path d="M133.3 109.45C129.9 108.55 128.1 111.65 129.3 115.65C131.4 112.85 132.7 110.75 133.3 109.45Z"/><path d="M146.7 126.35C150.1 127.25 151.9 124.15 150.7 120.15C148.6 122.95 147.3 125.05 146.7 126.35Z"/><path d="M133.3 121.55C129.9 120.65 128.1 123.75 129.3 127.75C131.4 124.95 132.7 122.85 133.3 121.55Z"/><path d="M140 132.05C142.2 134.65 142.2 137.45 140 140.05C137.8 137.45 137.8 134.65 140 132.05Z"/><path d="M140 144.15C142.2 146.75 142.2 149.55 140 152.15C137.8 149.55 137.8 146.75 140 144.15Z"/><path d="M146.7 138.45C150.1 139.35 151.9 136.25 150.7 132.25C148.6 135.05 147.3 137.15 146.7 138.45Z"/><path d="M133.3 133.65C129.9 132.75 128.1 135.85 129.3 139.85C131.4 137.05 132.7 134.95 133.3 133.65Z"/><path d="M146.7 150.55C150.1 151.45 151.9 148.35 150.7 144.35C148.6 147.15 147.3 149.25 146.7 150.55Z"/><path d="M133.3 145.75C129.9 144.85 128.1 147.95 129.3 151.95C131.4 149.15 132.7 147.05 133.3 145.75Z"/><path d="M140 156.25C142.2 158.85 142.2 161.65 140 164.25C137.8 161.65 137.8 158.85 140 156.25Z"/><path d="M140 168.35C142.2 170.95 142.2 173.75 140 176.35C137.8 173.75 137.8 170.95 140 168.35Z"/><path d="M146.7 162.65C150.1 163.55 151.9 160.45 150.7 156.45C148.6 159.25 147.3 161.35 146.7 162.65Z"/><path d="M133.3 157.85C129.9 156.95 128.1 160.05 129.3 164.05C131.4 161.25 132.7 159.15 133.3 157.85Z"/><path d="M146.7 174.75C150.1 175.65 151.9 172.55 150.7 168.55C148.6 171.35 147.3 173.45 146.7 174.75Z"/><path d="M133.3 169.95C129.9 169.05 128.1 172.15 129.3 176.15C131.4 173.35 132.7 171.25 133.3 169.95Z"/><path d="M128.8 202.4C129.52 203.9 130.6 202.9 130.6 202.4C130.6 201.9 129.52 200.9 128.8 202.4Z"/><path d="M128.1 203.61C127.16 204.99 128.57 205.42 129 205.17C129.43 204.92 129.76 203.49 128.1 203.61Z"/><path d="M126.7 203.61C125.04 203.49 125.37 204.92 125.8 205.17C126.23 205.42 127.64 204.99 126.7 203.61Z"/><path d="M126 202.4C125.28 200.9 124.2 201.9 124.2 202.4C124.2 202.9 125.28 203.9 126 202.4Z"/><path d="M126.7 201.19C127.64 199.81 126.23 199.38 125.8 199.63C125.37 199.88 125.04 201.31 126.7 201.19Z"/><path d="M128.1 201.19C129.76 201.31 129.43 199.88 129 199.63C128.57 199.38 127.16 199.81 128.1 201.19Z"/><path d="M127.4 213C130.1 219 130.1 228 127.4 234C124.7 228 124.7 219 127.4 213Z"/><path d="M154 202.4C154.72 203.9 155.8 202.9 155.8 202.4C155.8 201.9 154.72 200.9 154 202.4Z"/><path d="M153.3 203.61C152.36 204.99 153.77 205.42 154.2 205.17C154.63 204.92 154.96 203.49 153.3 203.61Z"/><path d="M151.9 203.61C150.24 203.49 150.57 204.92 151 205.17C151.43 205.42 152.84 204.99 151.9 203.61Z"/><path d="M151.2 202.4C150.48 200.9 149.4 201.9 149.4 202.4C149.4 202.9 150.48 203.9 151.2 202.4Z"/><path d="M151.9 201.19C152.84 199.81 151.43 199.38 151 199.63C150.57 199.88 150.24 201.31 151.9 201.19Z"/><path d="M153.3 201.19C154.96 201.31 154.63 199.88 154.2 199.63C153.77 199.38 152.36 199.81 153.3 201.19Z"/><path d="M152.6 213C155.3 219 155.3 228 152.6 234C149.9 228 149.9 219 152.6 213Z"/><path d="M138.4 34.2A1.6 1.6 0 1 1 141.6 34.2A1.6 1.6 0 1 1 138.4 34.2"/><path d="M130.4 43.4A1.15 1.15 0 1 1 132.7 43.4A1.15 1.15 0 1 1 130.4 43.4"/><path d="M147.3 43.4A1.15 1.15 0 1 1 149.6 43.4A1.15 1.15 0 1 1 147.3 43.4"/><path d="M138.5 57.4A1.5 1.5 0 1 1 141.5 57.4A1.5 1.5 0 1 1 138.5 57.4"/><path d="M138.5 69.5A1.5 1.5 0 1 1 141.5 69.5A1.5 1.5 0 1 1 138.5 69.5"/><path d="M138.5 81.6A1.5 1.5 0 1 1 141.5 81.6A1.5 1.5 0 1 1 138.5 81.6"/><path d="M138.5 93.7A1.5 1.5 0 1 1 141.5 93.7A1.5 1.5 0 1 1 138.5 93.7"/><path d="M138.5 105.8A1.5 1.5 0 1 1 141.5 105.8A1.5 1.5 0 1 1 138.5 105.8"/><path d="M138.5 117.9A1.5 1.5 0 1 1 141.5 117.9A1.5 1.5 0 1 1 138.5 117.9"/><path d="M138.5 130A1.5 1.5 0 1 1 141.5 130A1.5 1.5 0 1 1 138.5 130"/><path d="M138.5 142.1A1.5 1.5 0 1 1 141.5 142.1A1.5 1.5 0 1 1 138.5 142.1"/><path d="M138.5 154.2A1.5 1.5 0 1 1 141.5 154.2A1.5 1.5 0 1 1 138.5 154.2"/><path d="M138.5 166.3A1.5 1.5 0 1 1 141.5 166.3A1.5 1.5 0 1 1 138.5 166.3"/><path d="M125.8 202.4A1.6 1.6 0 1 1 129 202.4A1.6 1.6 0 1 1 125.8 202.4"/><path d="M126.2 239A1.2 1.2 0 1 1 128.6 239A1.2 1.2 0 1 1 126.2 239"/><path d="M151 202.4A1.6 1.6 0 1 1 154.2 202.4A1.6 1.6 0 1 1 151 202.4"/><path d="M151.4 239A1.2 1.2 0 1 1 153.8 239A1.2 1.2 0 1 1 151.4 239"/></g></g>
+        <g id="rflp-rillen"><g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M118.5 44.1L118.8 39.9L119.8 36.1L121.3 32.6L123.3 29.6L125.8 27L128.8 24.9L132.2 23.3L135.9 22.3L140 22L144.1 22.3L147.8 23.3L151.2 24.9L154.2 27L156.7 29.6L158.7 32.6L160.2 36.1L161.2 39.9L161.5 44.1L161.5 100L161.5 150L161.5 196L160.3 220.9L159.2 244.5L146.5 244.5L146.5 213.9L147.7 212.9L149.1 210.9L150.1 208.7L150.5 206.3L150.3 203.9L149.6 201.5L148.4 199.4L146.7 197.7L144.7 196.3L142.4 195.5L140 195.2L137.6 195.5L135.3 196.3L133.3 197.7L131.6 199.4L130.4 201.5L129.7 203.9L129.5 206.3L129.9 208.7L130.9 210.9L132.3 212.9L133.5 213.9L133.5 244.5L120.8 244.5L119.7 220.9L118.5 196L118.5 150L118.5 100Z" stroke="#2A1509" stroke-width=".9" opacity=".7"/><path d="M118.5 44.1L118.8 39.9L119.8 36.1L121.3 32.6L123.3 29.6L125.8 27L128.8 24.9L132.2 23.3L135.9 22.3L140 22L144.1 22.3L147.8 23.3L151.2 24.9L154.2 27L156.7 29.6L158.7 32.6L160.2 36.1L161.2 39.9L161.5 44.1L161.5 100L161.5 150L161.5 196L160.3 220.9L159.2 244.5L146.5 244.5L146.5 213.9L147.7 212.9L149.1 210.9L150.1 208.7L150.5 206.3L150.3 203.9L149.6 201.5L148.4 199.4L146.7 197.7L144.7 196.3L142.4 195.5L140 195.2L137.6 195.5L135.3 196.3L133.3 197.7L131.6 199.4L130.4 201.5L129.7 203.9L129.5 206.3L129.9 208.7L130.9 210.9L132.3 212.9L133.5 213.9L133.5 244.5L120.8 244.5L119.7 220.9L118.5 196L118.5 150L118.5 100Z" stroke="#FFDCA8" stroke-width=".4" opacity=".3" transform="translate(-.35 -.4)"/><path d="M124.8 45.5C124.8 35.6 131.6 28.4 140 25.6C148.4 28.4 155.2 35.6 155.2 45.5" stroke="#180A03" stroke-width="1.1" opacity=".8"/><path d="M131.4 241V214.6A8.6 8.6 0 1 1 148.6 214.6V241" stroke="#180A03" stroke-width="1.1" opacity=".8"/><path d="M124.8 45.5C124.8 35.6 131.6 28.4 140 25.6C148.4 28.4 155.2 35.6 155.2 45.5" stroke="#FFDCA8" stroke-width=".45" opacity=".32" transform="translate(-.4 -.45)"/><path d="M131.4 241V214.6A8.6 8.6 0 1 1 148.6 214.6V241" stroke="#FFDCA8" stroke-width=".45" opacity=".32" transform="translate(-.4 -.45)"/></g></g>
+        <filter id="rflp-maserv" x="-2%" y="-1%" width="104%" height="102%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.05 0.005" numOctaves="2" seed="4" result="fig"/>
+        <feColorMatrix in="fig" type="matrix" values=".8 0 0 0 .12  .8 0 0 0 .09  .8 0 0 0 .06  0 0 0 0 1" result="fig1"/>
+        <feBlend in="fig1" in2="SourceGraphic" mode="overlay" result="b0"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.30 0.010" numOctaves="4" seed="5" result="n"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.02 0.035" numOctaves="2" seed="11" result="w"/>
+        <feDisplacementMap in="n" in2="w" scale="9" xChannelSelector="R" yChannelSelector="G" result="nd"/>
+        <feColorMatrix in="nd" type="matrix" values="1 0 0 0 .44  1 0 0 0 .38  1 0 0 0 .32  0 0 0 0 1" result="g1"/>
+        <feBlend in="g1" in2="b0" mode="multiply" result="b1"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.9 0.03" numOctaves="2" seed="21" result="fp"/>
+        <feColorMatrix in="fp" type="matrix" values=".33 0 0 0 .81  .33 0 0 0 .79  .33 0 0 0 .77  0 0 0 0 1" result="f1"/>
+        <feBlend in="f1" in2="b1" mode="multiply" result="b2"/>
+        <feComposite in="b2" in2="SourceAlpha" operator="in"/>
+        </filter>
+        <filter id="rflp-maserh" x="-2%" y="-1%" width="104%" height="102%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.042 0.0072" numOctaves="2" seed="17" result="fig"/>
+        <feColorMatrix in="fig" type="matrix" values=".8 0 0 0 .12  .8 0 0 0 .09  .8 0 0 0 .06  0 0 0 0 1" result="fig1"/>
+        <feBlend in="fig1" in2="SourceGraphic" mode="overlay" result="b0"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.26 0.014" numOctaves="4" seed="23" result="n"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.02 0.035" numOctaves="2" seed="29" result="w"/>
+        <feDisplacementMap in="n" in2="w" scale="7" xChannelSelector="R" yChannelSelector="G" result="nd"/>
+        <feColorMatrix in="nd" type="matrix" values="1 0 0 0 .44  1 0 0 0 .38  1 0 0 0 .32  0 0 0 0 1" result="g1"/>
+        <feBlend in="g1" in2="b0" mode="multiply" result="b1"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.8 0.04" numOctaves="2" seed="37" result="fp"/>
+        <feColorMatrix in="fp" type="matrix" values=".33 0 0 0 .81  .33 0 0 0 .79  .33 0 0 0 .77  0 0 0 0 1" result="f1"/>
+        <feBlend in="f1" in2="b1" mode="multiply" result="b2"/>
+        <feComposite in="b2" in2="SourceAlpha" operator="in"/>
+        </filter>
+        <filter id="rflp-kornv" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.55 0.011" numOctaves="3" seed="13" result="n"/>
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 .17  0 0 0 0 .07  0 0 0 0 .025  1.7 0 0 0 -.68"/>
+        </filter>
+        <filter id="rflp-kornh" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.47 0.015" numOctaves="3" seed="41" result="n"/>
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 .17  0 0 0 0 .07  0 0 0 0 .025  1.7 0 0 0 -.68"/>
+        </filter>
+        <filter id="rflp-steg" x="-4%" y="-3%" width="108%" height="106%" color-interpolation-filters="sRGB">
+        <feGaussianBlur in="SourceAlpha" stdDeviation=".72" result="b"/>
+        <feSpecularLighting in="b" surfaceScale="2.4" specularConstant=".34" specularExponent="11" lighting-color="#FFEBCC" result="sp">
+        <feDistantLight azimuth="228" elevation="40"/>
+        </feSpecularLighting>
+        <feComposite in="sp" in2="SourceAlpha" operator="in" result="sp2"/>
+        <feDiffuseLighting in="b" surfaceScale="2.4" diffuseConstant="1.12" lighting-color="#FFFFFF" result="df">
+        <feDistantLight azimuth="228" elevation="55"/>
+        </feDiffuseLighting>
+        <feComposite in="df" in2="SourceAlpha" operator="in" result="df2"/>
+        <feBlend in="df2" in2="SourceGraphic" mode="multiply" result="lit"/>
+        <feComposite in="sp2" in2="lit" operator="arithmetic" k2="1" k3="1"/>
+        </filter>
+        <filter id="rflp-kerbe" x="-4%" y="-3%" width="108%" height="106%" color-interpolation-filters="sRGB">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="1.3" result="b"/>
+        <feDiffuseLighting in="b" surfaceScale="4.5" diffuseConstant="1.2" lighting-color="#FFF0DC" result="df">
+        <feDistantLight azimuth="48" elevation="52"/>
+        </feDiffuseLighting>
+        <feComposite in="df" in2="SourceAlpha" operator="in" result="df2"/>
+        <feBlend in="df2" in2="SourceGraphic" mode="multiply"/>
+        </filter>
+        <filter id="rflp-ornschatten" x="-5%" y="-4%" width="110%" height="108%" color-interpolation-filters="sRGB">
+        <feGaussianBlur in="SourceAlpha" stdDeviation=".75" result="b"/>
+        <feOffset in="b" dx="1" dy="1.25" result="o"/>
+        <feFlood flood-color="#000000" flood-opacity=".75" result="c"/>
+        <feComposite in="c" in2="o" operator="in"/>
+        </filter>
+        <filter id="rflp-leder" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="2" result="n"/>
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 .45  0 0 0 0 .35  0 0 0 0 .2  .45 0 0 0 -.11" result="c"/>
+        <feComposite in="c" in2="SourceAlpha" operator="in"/>
+        </filter>
+        <filter id="rflp-weich1" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation=".8"/></filter>
+        <filter id="rflp-weich2" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.2"/></filter>
+        <filter id="rflp-weich3" x="-25%" y="-15%" width="150%" height="130%"><feGaussianBlur stdDeviation="2.8"/></filter>
+        <filter id="rflp-boden" x="-40%" y="-90%" width="180%" height="280%"><feGaussianBlur stdDeviation="5"/></filter>
+        <linearGradient id="rflp-holzv" x1="117" y1="0" x2="163" y2="0" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#6E3712"/><stop offset=".12" stop-color="#A75C2A"/><stop offset=".34" stop-color="#CA7E47"/>
+        <stop offset=".56" stop-color="#BE743E"/><stop offset=".82" stop-color="#954D24"/><stop offset="1" stop-color="#602D10"/>
+        </linearGradient>
+        <linearGradient id="rflp-holzh" x1="117" y1="0" x2="163" y2="0" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#5E2E0E"/><stop offset=".12" stop-color="#985024"/><stop offset=".34" stop-color="#B96E3C"/>
+        <stop offset=".56" stop-color="#AC6333"/><stop offset=".82" stop-color="#85431E"/><stop offset="1" stop-color="#53260C"/>
+        </linearGradient>
+        <linearGradient id="rflp-band" x1="117" y1="0" x2="163" y2="0" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#8A4A1B"/><stop offset=".3" stop-color="#BE743E"/><stop offset=".55" stop-color="#CB8249"/>
+        <stop offset=".78" stop-color="#A9632F"/><stop offset="1" stop-color="#773C16"/>
+        </linearGradient>
+        <linearGradient id="rflp-grundholz" x1="117" y1="0" x2="163" y2="0" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#43200C"/><stop offset=".38" stop-color="#6B3618"/><stop offset="1" stop-color="#36180A"/>
+        </linearGradient>
+        <linearGradient id="rflp-grund" x1="0" y1="27" x2="0" y2="193" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#1A0D06" stop-opacity=".85"/><stop offset=".45" stop-color="#110702" stop-opacity=".89"/>
+        <stop offset="1" stop-color="#160A04" stop-opacity=".87"/>
+        </linearGradient>
+        <linearGradient id="rflp-rundung" x1="117" y1="0" x2="163" y2="0" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#000" stop-opacity=".36"/><stop offset=".14" stop-color="#000" stop-opacity=".05"/>
+        <stop offset=".45" stop-color="#FFF" stop-opacity=".05"/><stop offset=".8" stop-color="#000" stop-opacity=".1"/>
+        <stop offset="1" stop-color="#000" stop-opacity=".4"/>
+        </linearGradient>
+        <linearGradient id="rflp-hoehe" x1="0" y1="20" x2="0" y2="246" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#FFE0A8" stop-opacity=".2"/><stop offset=".26" stop-color="#FFE0A8" stop-opacity="0"/>
+        <stop offset=".72" stop-color="#000" stop-opacity=".07"/><stop offset="1" stop-color="#000" stop-opacity=".24"/>
+        </linearGradient>
+        <linearGradient id="rflp-sheen" x1="117" y1="30" x2="163" y2="66" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#FFF3DC" stop-opacity="0"/><stop offset=".34" stop-color="#FFF3DC" stop-opacity=".1"/>
+        <stop offset=".5" stop-color="#FFF3DC" stop-opacity=".2"/><stop offset=".64" stop-color="#FFF3DC" stop-opacity=".04"/>
+        <stop offset="1" stop-color="#FFF3DC" stop-opacity="0"/>
+        </linearGradient>
+        <radialGradient id="rflp-perle" cx=".35" cy=".3" r=".8">
+        <stop offset="0" stop-color="#7A4E2C"/><stop offset=".45" stop-color="#3A2110"/><stop offset="1" stop-color="#140902"/>
+        </radialGradient>
+        <linearGradient id="rflp-einband" x1="0" y1="0" x2=".7" y2="1">
+        <stop offset="0" stop-color="#F4E8CB"/><stop offset=".55" stop-color="#E3D3AA"/><stop offset="1" stop-color="#C4B087"/>
+        </linearGradient>
+        <linearGradient id="rflp-buchfuss" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#3A2408" stop-opacity="0"/><stop offset="1" stop-color="#2A1806" stop-opacity=".4"/>
+        </linearGradient>
+        <radialGradient id="rflp-einbandlicht" cx=".38" cy=".3" r=".78">
+        <stop offset="0" stop-color="#FFF8E6" stop-opacity=".3"/><stop offset=".55" stop-color="#FFF8E6" stop-opacity="0"/>
+        <stop offset="1" stop-color="#4A3208" stop-opacity=".3"/>
+        </radialGradient>
+        <linearGradient id="rflp-schimmer" x1="0" y1="0" x2=".55" y2="1">
+        <stop offset="0" stop-color="#FFE9BC" stop-opacity=".2"/><stop offset=".42" stop-color="#FFE9BC" stop-opacity=".05"/>
+        <stop offset="1" stop-color="#FFE9BC" stop-opacity="0"/>
+        </linearGradient>
+        <linearGradient id="rflp-kopfschnitt" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#F6EEDA"/><stop offset="1" stop-color="#D5C8A5"/>
+        </linearGradient>
+        <linearGradient id="rflp-vorderschnitt" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#F2E9CF"/><stop offset="1" stop-color="#CFC4A2"/>
+        </linearGradient>
+        <linearGradient id="rflp-brettAO" x1="99" y1="0" x2="117" y2="0" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#2A1608" stop-opacity="0"/><stop offset=".55" stop-color="#25130A" stop-opacity=".3"/><stop offset="1" stop-color="#1C0E06" stop-opacity=".62"/>
+        </linearGradient>
+        <linearGradient id="rflp-gold" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#FFEBB0"/><stop offset=".3" stop-color="#D4A237"/><stop offset=".55" stop-color="#FFF1C2"/>
+        <stop offset=".8" stop-color="#B8860B"/><stop offset="1" stop-color="#E9C766"/>
+        </linearGradient>
+        </defs>
+        <ellipse class="schatten" cx="140" cy="249" rx="90" ry="10" fill="#1E1208" opacity=".38" filter="url(#rflp-boden)"/>
+        <g class="ganz">
+        <g class="bein-l" transform="rotate(-21 140 150)">
+        <path d="M117 44L117.3 39.6L115.7 34.7L115.4 39.1Z" fill="#694221" stroke="#694221" stroke-width=".45"/><path d="M117.3 39.6L118.3 35.6L116.7 30.6L115.7 34.7Z" fill="#754b26" stroke="#754b26" stroke-width=".45"/><path d="M118.3 35.6L120 31.9L118.4 27L116.7 30.6Z" fill="#80532a" stroke="#80532a" stroke-width=".45"/><path d="M120 31.9L122.1 28.6L120.5 23.7L118.4 27Z" fill="#89592e" stroke="#89592e" stroke-width=".45"/><path d="M122.1 28.6L124.9 25.9L123.3 20.9L120.5 23.7Z" fill="#8a5a2e" stroke="#8a5a2e" stroke-width=".45"/><path d="M124.9 25.9L128 23.6L126.4 18.6L123.3 20.9Z" fill="#8a5a2e" stroke="#8a5a2e" stroke-width=".45"/><path d="M128 23.6L131.7 21.9L130.1 17L126.4 18.6Z" fill="#8a5a2e" stroke="#8a5a2e" stroke-width=".45"/><path d="M131.7 21.9L135.7 20.9L134.1 15.9L130.1 17Z" fill="#8a5a2e" stroke="#8a5a2e" stroke-width=".45"/><path d="M135.7 20.9L140 20.5L138.4 15.6L134.1 15.9Z" fill="#8a5a2e" stroke="#8a5a2e" stroke-width=".45"/><path d="M140 20.5L144.3 20.9L142.7 15.9L138.4 15.6Z" fill="#8a5a2e" stroke="#8a5a2e" stroke-width=".45"/><path d="M144.3 20.9L148.3 21.9L146.7 17L142.7 15.9Z" fill="#82542b" stroke="#82542b" stroke-width=".45"/><path d="M148.3 21.9L152 23.6L150.4 18.6L146.7 17Z" fill="#774c27" stroke="#774c27" stroke-width=".45"/><path d="M152 23.6L155.1 25.9L153.5 20.9L150.4 18.6Z" fill="#6a4322" stroke="#6a4322" stroke-width=".45"/><path d="M155.1 25.9L157.9 28.6L156.3 23.7L153.5 20.9Z" fill="#5c391c" stroke="#5c391c" stroke-width=".45"/><path d="M157.9 28.6L160 31.9L158.4 27L156.3 23.7Z" fill="#4d2e16" stroke="#4d2e16" stroke-width=".45"/><path d="M160 31.9L161.7 35.6L160.1 30.6L158.4 27Z" fill="#402411" stroke="#402411" stroke-width=".45"/><path d="M145 246L145 213.2L143.4 208.3L143.4 241.1Z" fill="#341c0d" stroke="#341c0d" stroke-width=".45"/><path d="M145 213.2L146.6 211.9L145 206.9L143.4 208.3Z" fill="#452813" stroke="#452813" stroke-width=".45"/><path d="M146.6 211.9L147.8 210.2L146.2 205.2L145 206.9Z" fill="#432712" stroke="#432712" stroke-width=".45"/><path d="M147.8 210.2L148.6 208.3L147 203.3L146.2 205.2Z" fill="#3f2411" stroke="#3f2411" stroke-width=".45"/><path d="M148.6 208.3L149 206.2L147.4 201.3L147 203.3Z" fill="#3a200f" stroke="#3a200f" stroke-width=".45"/><path d="M149 206.2L148.9 204.1L147.3 199.2L147.4 201.3Z" fill="#331c0c" stroke="#331c0c" stroke-width=".45"/><path d="M148.9 204.1L148.3 202.1L146.7 197.2L147.3 199.2Z" fill="#2d170a" stroke="#2d170a" stroke-width=".45"/><path d="M131.4 208.3L132.2 210.2L130.6 205.2L129.8 203.3Z" fill="#281308" stroke="#281308" stroke-width=".45"/><path d="M132.2 210.2L133.4 211.9L131.8 206.9L130.6 205.2Z" fill="#2e180a" stroke="#2e180a" stroke-width=".45"/><path d="M133.4 211.9L135 213.2L133.4 208.3L131.8 206.9Z" fill="#351d0d" stroke="#351d0d" stroke-width=".45"/><path d="M119.4 246L118.2 221L116.6 216.1L117.8 241.1Z" fill="#492b15" stroke="#492b15" stroke-width=".45"/><path d="M118.2 221L117 196L115.4 191.1L116.6 216.1Z" fill="#4c2d16" stroke="#4c2d16" stroke-width=".45"/><path d="M117 196L117 150L115.4 145.1L115.4 191.1Z" fill="#533219" stroke="#533219" stroke-width=".45"/><path d="M117 150L117 100L115.4 95.1L115.4 145.1Z" fill="#59371b" stroke="#59371b" stroke-width=".45"/><path d="M117 100L117 44L115.4 39.1L115.4 95.1Z" fill="#5f3b1d" stroke="#5f3b1d" stroke-width=".45"/>
+        <g clip-path="url(#rflp-clip)">
+        <use href="#rflp-umriss" fill="url(#rflp-holzh)" filter="url(#rflp-maserh)"/>
+        <g fill="none" stroke="#3A1A08" stroke-linecap="round" filter="url(#rflp-weich1)"><path d="M137.4 27C135.06 62 133 104 133 214" stroke-width="4.6" opacity="0.3"/><path d="M142.6 27C144.94 62 147 104 147 214" stroke-width="4.6" opacity="0.3"/><path d="M134 29.4C128.6 62 124.8 104 124.8 214" stroke-width="3.9" opacity="0.26"/><path d="M146 29.4C151.4 62 155.2 104 155.2 214" stroke-width="3.9" opacity="0.26"/><path d="M130.6 31.8C122.14 62 116.6 104 116.6 214" stroke-width="3.2" opacity="0.21"/><path d="M149.4 31.8C157.86 62 163.4 104 163.4 214" stroke-width="3.2" opacity="0.21"/><path d="M127.2 34.2C115.68 62 108.4 104 108.4 214" stroke-width="2.5" opacity="0.16"/><path d="M152.8 34.2C164.32 62 171.6 104 171.6 214" stroke-width="2.5" opacity="0.16"/></g>
+        <rect x="116" y="19" width="48" height="228" fill="url(#rflp-rundung)"/>
+        <rect x="116" y="19" width="48" height="228" fill="url(#rflp-hoehe)"/>
+        <g filter="url(#rflp-kerbe)">
+        <path d="M126.3 47C126.3 37 132.5 30 140 30C147.5 30 153.7 37 153.7 47L153.7 189.6Q153.7 191.6 151.7 191.6L128.3 191.6Q126.3 191.6 126.3 189.6Z" fill="url(#rflp-grundholz)" filter="url(#rflp-maserh)"/>
+        <path d="M126.3 47C126.3 37 132.5 30 140 30C147.5 30 153.7 37 153.7 47L153.7 189.6Q153.7 191.6 151.7 191.6L128.3 191.6Q126.3 191.6 126.3 189.6Z" fill="url(#rflp-grund)"/>
+        </g>
+        <use href="#rflp-orn" filter="url(#rflp-ornschatten)"/>
+        <use href="#rflp-orn" filter="url(#rflp-steg)"/>
+        <use href="#rflp-rillen"/>
+        <rect x="116" y="19" width="48" height="228" filter="url(#rflp-kornh)" opacity=".38"/>
+        <rect x="116" y="19" width="48" height="228" fill="url(#rflp-sheen)"/>
+        <rect x="112" y="14" width="58" height="238" fill="#160A03" opacity=".13"/>
+        </g>
+        <path d="M117 44C117 30.5 126.5 20.5 140 20.5C153.5 20.5 163 30.5 163 44L163 196L160.6 246L145 246L145 213.2A9 9 0 1 0 135 213.2L135 246L119.4 246L117 196Z" fill="none" stroke="#1B0C05" stroke-width=".7" opacity=".8"/>
+        <path d="M117.7 43.6C117.7 31 127 21.3 140 21.3C150 21.3 157.6 27 160.8 34.6" fill="none" stroke="#FFE2B0" stroke-width=".9" opacity=".45"/>
+        <path d="M117.7 44L117.7 196L120 245.4" fill="none" stroke="#FFD9A0" stroke-width=".6" opacity=".26"/>
+        <path d="M162.3 44L162.3 196L160 245.4" fill="none" stroke="#000" stroke-width=".8" opacity=".4"/>
+        <g clip-path="url(#rflp-clip)"><use href="#rflp-umriss" transform="translate(-4.5 5.5) rotate(42 140 150)" fill="#000" opacity=".5" filter="url(#rflp-weich3)"/></g>
+        </g>
+        <g class="buch">
+        <g clip-path="url(#rflp-clipH)">
+        <path d="M96 84L180 84L180 100L96 100Z" transform="rotate(-11 138 62)" fill="#0E0603" opacity=".62" filter="url(#rflp-weich2)"/>
+        <path d="M97 89L179 89L179 93.2L97 93.2Z" transform="rotate(-11 138 62)" fill="#0A0402" opacity=".7" filter="url(#rflp-weich1)"/>
+        </g>
+        <g transform="rotate(-11 138 62)">
+        <path d="M99.5 37L180 37L180 93.5L99.5 93.5Z" fill="#180C06" opacity=".42" filter="url(#rflp-weich2)"/>
+        <path d="M98 34Q138 32.6 178 34L173 27.2Q133 25.8 95.2 27.2Q93 27.2 93 29.4Z" fill="url(#rflp-kopfschnitt)"/>
+        <path d="M98 34L98 90L93 83.2L93 29.4Q93 27.2 95.2 27.2Z" fill="url(#rflp-vorderschnitt)"/>
+        <g stroke="#B5A478" stroke-width=".4" fill="none"><path d="M97.6 34.1Q137.6 32.6 177.6 33.5M97.6 34.7L97.6 89.5" opacity="0.66"/><path d="M97.3 33.6Q137.3 32.1 177.3 33M97.3 34.2L97.3 89" opacity="0.53"/><path d="M96.9 33.1Q136.9 31.6 176.9 32.5M96.9 33.7L96.9 88.5" opacity="0.51"/><path d="M96.6 32.7Q136.6 31.2 176.6 32.1M96.6 33.3L96.6 88.1" opacity="0.67"/><path d="M96.2 32.2Q136.2 30.7 176.2 31.6M96.2 32.8L96.2 87.6" opacity="0.33"/><path d="M95.9 31.7Q135.9 30.2 175.9 31.1M95.9 32.3L95.9 87.1" opacity="0.65"/><path d="M95.5 31.2Q135.5 29.7 175.5 30.6M95.5 31.8L95.5 86.6" opacity="0.55"/><path d="M95.1 30.7Q135.1 29.2 175.1 30.1M95.1 31.3L95.1 86.1" opacity="0.48"/><path d="M94.8 30.2Q134.8 28.7 174.8 29.6M94.8 30.8L94.8 85.6" opacity="0.67"/><path d="M94.4 29.7Q134.4 28.2 174.4 29.1M94.4 30.3L94.4 85.1" opacity="0.36"/><path d="M94.1 29.3Q134.1 27.8 174.1 28.7M94.1 29.9L94.1 84.7" opacity="0.64"/><path d="M93.7 28.8Q133.7 27.3 173.7 28.2M93.7 29.4L93.7 84.2" opacity="0.57"/><path d="M93.4 28.3Q133.4 26.8 173.4 27.7M93.4 28.9L93.4 83.7" opacity="0.46"/></g>
+        <path d="M93 83.2L93 29.4Q93 27.2 95.2 27.2L173 27.2" fill="none" stroke="#FFFCF0" stroke-width=".7" opacity=".8"/>
+        <rect x="98" y="34" width="80" height="56" rx="1.4" fill="url(#rflp-einband)"/>
+        <rect x="98" y="34" width="80" height="56" rx="1.4" filter="url(#rflp-leder)" opacity=".55"/>
+        <rect x="102.5" y="38.5" width="71" height="47" fill="none" stroke="url(#rflp-gold)" stroke-width="1.7"/>
+        <rect x="105.8" y="41.8" width="64.4" height="40.4" fill="none" stroke="url(#rflp-gold)" stroke-width=".6"/>
+        <g fill="url(#rflp-gold)" stroke="#8C6414" stroke-width=".3">
+        <path d="M105.8 41.8L117 41.8Q105.8 41.8 105.8 53Z"/>
+        <path d="M170.2 41.8L159 41.8Q170.2 41.8 170.2 53Z"/>
+        <path d="M105.8 82.2L117 82.2Q105.8 82.2 105.8 71Z"/>
+        <path d="M170.2 82.2L159 82.2Q170.2 82.2 170.2 71Z"/>
+        <path d="M149.5 62Q151.36 65.31 148.09 67.25Q148.05 71.05 144.25 71.09Q142.31 74.36 139 72.5Q135.69 74.36 133.75 71.09Q129.95 71.05 129.91 67.25Q126.64 65.31 128.5 62Q126.64 58.69 129.91 56.75Q129.95 52.95 133.75 52.91Q135.69 49.64 139 51.5Q142.31 49.64 144.25 52.91Q148.05 52.95 148.09 56.75Q151.36 58.69 149.5 62Z"/>
+        <path d="M139 43C141.6 46 141.6 49 139 51.5C136.4 49 136.4 46 139 43Z"/>
+        <path d="M139 72.5C141.6 75 141.6 78 139 81C136.4 78 136.4 75 139 72.5Z"/>
+        <path d="M115 62C118 59.5 121 59.5 124 62C121 64.5 118 64.5 115 62Z"/>
+        <path d="M154 62C157 59.5 160 59.5 163 62C160 64.5 157 64.5 154 62Z"/>
+        </g>
+        <circle cx="139" cy="62" r="7" fill="#F4E8CB" stroke="#A67C1E" stroke-width=".5"/>
+        <path d="M139 56.5L140.03 59.51L142.89 58.11L141.49 60.97L144.5 62L141.49 63.03L142.89 65.89L140.03 64.49L139 67.5L137.97 64.49L135.11 65.89L136.51 63.03L133.5 62L136.51 60.97L135.11 58.11L137.97 59.51Z" fill="url(#rflp-gold)" stroke="#8C6414" stroke-width=".3"/>
+        <circle cx="139" cy="62" r="1.2" fill="#7A1F1A"/>
+        <rect x="98" y="34" width="80" height="56" rx="1.4" fill="url(#rflp-einbandlicht)"/>
+        <rect x="98" y="74" width="80" height="16" fill="url(#rflp-buchfuss)"/>
+        <rect class="glanz" x="98" y="34" width="80" height="56" rx="1.4" fill="url(#rflp-schimmer)"/>
+        <rect x="98" y="34" width="80" height="56" rx="1.4" fill="none" stroke="#9B8656" stroke-width=".6" opacity=".85"/>
+        <g clip-path="url(#rflp-buchclip)"><g transform="rotate(11 138 62) rotate(21 140 150)"><rect x="99" y="0" width="18" height="250" fill="url(#rflp-brettAO)"/></g></g>
+        </g>
+        
+        </g>
+        <g class="bein-r" transform="rotate(21 140 150)">
+        <path d="M117 44L117.3 39.6L112.8 37L112.5 41.4Z" fill="#8b5c30" stroke="#8b5c30" stroke-width=".45"/><path d="M117.3 39.6L118.3 35.6L113.8 33L112.8 37Z" fill="#9a6836" stroke="#9a6836" stroke-width=".45"/><path d="M118.3 35.6L120 31.9L115.5 29.3L113.8 33Z" fill="#a8723c" stroke="#a8723c" stroke-width=".45"/><path d="M120 31.9L122.1 28.6L117.6 26L115.5 29.3Z" fill="#b37b41" stroke="#b37b41" stroke-width=".45"/><path d="M122.1 28.6L124.9 25.9L120.4 23.3L117.6 26Z" fill="#b57c42" stroke="#b57c42" stroke-width=".45"/><path d="M124.9 25.9L128 23.6L123.5 21L120.4 23.3Z" fill="#b57c42" stroke="#b57c42" stroke-width=".45"/><path d="M128 23.6L131.7 21.9L127.2 19.3L123.5 21Z" fill="#b57c42" stroke="#b57c42" stroke-width=".45"/><path d="M131.7 21.9L135.7 20.9L131.2 18.3L127.2 19.3Z" fill="#b57c42" stroke="#b57c42" stroke-width=".45"/><path d="M135.7 20.9L140 20.5L135.5 17.9L131.2 18.3Z" fill="#b57c42" stroke="#b57c42" stroke-width=".45"/><path d="M140 20.5L144.3 20.9L139.8 18.3L135.5 17.9Z" fill="#b57c42" stroke="#b57c42" stroke-width=".45"/><path d="M144.3 20.9L148.3 21.9L143.8 19.3L139.8 18.3Z" fill="#ab743d" stroke="#ab743d" stroke-width=".45"/><path d="M148.3 21.9L152 23.6L147.5 21L143.8 19.3Z" fill="#9d6a38" stroke="#9d6a38" stroke-width=".45"/><path d="M145 246L145 213.2L140.5 210.6L140.5 243.4Z" fill="#472813" stroke="#472813" stroke-width=".45"/><path d="M145 213.2L146.6 211.9L142.1 209.3L140.5 210.6Z" fill="#5e391c" stroke="#5e391c" stroke-width=".45"/><path d="M146.6 211.9L147.8 210.2L143.3 207.6L142.1 209.3Z" fill="#5a371b" stroke="#5a371b" stroke-width=".45"/><path d="M147.8 210.2L148.6 208.3L144.1 205.7L143.3 207.6Z" fill="#553319" stroke="#553319" stroke-width=".45"/><path d="M148.6 208.3L149 206.2L144.5 203.6L144.1 205.7Z" fill="#4f2e16" stroke="#4f2e16" stroke-width=".45"/><path d="M149 206.2L148.9 204.1L144.4 201.5L144.5 203.6Z" fill="#472812" stroke="#472812" stroke-width=".45"/><path d="M148.9 204.1L148.3 202.1L143.8 199.5L144.4 201.5Z" fill="#3e210f" stroke="#3e210f" stroke-width=".45"/><path d="M148.3 202.1L147.2 200.3L142.7 197.7L143.8 199.5Z" fill="#391d0c" stroke="#391d0c" stroke-width=".45"/><path d="M147.2 200.3L145.8 198.8L141.3 196.2L142.7 197.7Z" fill="#391d0c" stroke="#391d0c" stroke-width=".45"/><path d="M145.8 198.8L144 197.7L139.5 195.1L141.3 196.2Z" fill="#391d0c" stroke="#391d0c" stroke-width=".45"/><path d="M119.4 246L118.2 221L113.7 218.4L114.9 243.4Z" fill="#633d1f" stroke="#633d1f" stroke-width=".45"/><path d="M118.2 221L117 196L112.5 193.4L113.7 218.4Z" fill="#674020" stroke="#674020" stroke-width=".45"/><path d="M117 196L117 150L112.5 147.4L112.5 193.4Z" fill="#6f4724" stroke="#6f4724" stroke-width=".45"/><path d="M117 150L117 100L112.5 97.4L112.5 147.4Z" fill="#774c27" stroke="#774c27" stroke-width=".45"/><path d="M117 100L117 44L112.5 41.4L112.5 97.4Z" fill="#7f522a" stroke="#7f522a" stroke-width=".45"/>
+        <g clip-path="url(#rflp-clip)">
+        <use href="#rflp-umriss" fill="url(#rflp-holzv)" filter="url(#rflp-maserv)"/>
+        <g fill="none" stroke="#3A1A08" stroke-linecap="round" filter="url(#rflp-weich1)"><path d="M137.4 27C135.06 62 133 104 133 214" stroke-width="4.6" opacity="0.3"/><path d="M142.6 27C144.94 62 147 104 147 214" stroke-width="4.6" opacity="0.3"/><path d="M134 29.4C128.6 62 124.8 104 124.8 214" stroke-width="3.9" opacity="0.26"/><path d="M146 29.4C151.4 62 155.2 104 155.2 214" stroke-width="3.9" opacity="0.26"/><path d="M130.6 31.8C122.14 62 116.6 104 116.6 214" stroke-width="3.2" opacity="0.21"/><path d="M149.4 31.8C157.86 62 163.4 104 163.4 214" stroke-width="3.2" opacity="0.21"/><path d="M127.2 34.2C115.68 62 108.4 104 108.4 214" stroke-width="2.5" opacity="0.16"/><path d="M152.8 34.2C164.32 62 171.6 104 171.6 214" stroke-width="2.5" opacity="0.16"/></g>
+        <rect x="116" y="19" width="48" height="228" fill="url(#rflp-rundung)"/>
+        <rect x="116" y="19" width="48" height="228" fill="url(#rflp-hoehe)"/>
+        <g filter="url(#rflp-kerbe)">
+        <path d="M126.3 47C126.3 37 132.5 30 140 30C147.5 30 153.7 37 153.7 47L153.7 189.6Q153.7 191.6 151.7 191.6L128.3 191.6Q126.3 191.6 126.3 189.6Z" fill="url(#rflp-grundholz)" filter="url(#rflp-maserv)"/>
+        <path d="M126.3 47C126.3 37 132.5 30 140 30C147.5 30 153.7 37 153.7 47L153.7 189.6Q153.7 191.6 151.7 191.6L128.3 191.6Q126.3 191.6 126.3 189.6Z" fill="url(#rflp-grund)"/>
+        </g>
+        <use href="#rflp-orn" filter="url(#rflp-ornschatten)"/>
+        <use href="#rflp-orn" filter="url(#rflp-steg)"/>
+        <use href="#rflp-rillen"/>
+        <rect x="116" y="19" width="48" height="228" filter="url(#rflp-kornv)" opacity=".38"/>
+        <rect x="116" y="19" width="48" height="228" fill="url(#rflp-sheen)"/>
+        </g>
+        <path d="M117 44C117 30.5 126.5 20.5 140 20.5C153.5 20.5 163 30.5 163 44L163 196L160.6 246L145 246L145 213.2A9 9 0 1 0 135 213.2L135 246L119.4 246L117 196Z" fill="none" stroke="#1B0C05" stroke-width=".7" opacity=".8"/>
+        <path d="M117.7 43.6C117.7 31 127 21.3 140 21.3C150 21.3 157.6 27 160.8 34.6" fill="none" stroke="#FFE2B0" stroke-width=".9" opacity=".45"/>
+        <path d="M117.7 44L117.7 196L120 245.4" fill="none" stroke="#FFD9A0" stroke-width=".6" opacity=".26"/>
+        <path d="M162.3 44L162.3 196L160 245.4" fill="none" stroke="#000" stroke-width=".8" opacity=".4"/>
+        
+        
+        </g>
+        </g>
+        </svg>
+      </div>
     </div>
-
-    <div class="panel" data-g="pc">
-      <h3>Computer</h3>
-      <ol class="schritte">
-        <li><span class="nr">1</span><p><b>Chrome oder Edge:</b> rechts in der Adressleiste auf das Installieren-Symbol <span class="sym"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M12 8v5M9.5 10.5 12 13l2.5-2.5M8 20h8"/></svg></span> klicken — oder oben auf „App installieren".</p></li>
-        <li><span class="nr">2</span><p><b>Safari (Mac):</b> Menü <b>Ablage → „Zum Dock hinzufügen"</b>.</p></li>
-        <li><span class="nr">3</span><p>Oder einfach <a href="./"><b>im Browser lernen</b></a> — geht genauso gut.</p></li>
-      </ol>
+    <div class="band" aria-hidden="true">
+      <div class="band-spur"><span>ا</span><span>ب</span><span>ت</span><span class="g">ث</span><span>ج</span><span>ح</span><span>خ</span><span>د</span><span>ذ</span><span>ر</span><span class="g">ز</span><span>س</span><span>ش</span><span>ص</span><span>ض</span><span>ط</span><span>ظ</span><span class="g">ع</span><span>غ</span><span>ف</span><span>ق</span><span>ك</span><span>ل</span><span>م</span><span class="g">ن</span><span>ه</span><span>و</span><span>ي</span><span>ا</span><span>ب</span><span>ت</span><span class="g">ث</span><span>ج</span><span>ح</span><span>خ</span><span>د</span><span>ذ</span><span>ر</span><span class="g">ز</span><span>س</span><span>ش</span><span>ص</span><span>ض</span><span>ط</span><span>ظ</span><span class="g">ع</span><span>غ</span><span>ف</span><span>ق</span><span>ك</span><span>ل</span><span>م</span><span class="g">ن</span><span>ه</span><span>و</span><span>ي</span></div>
     </div>
   </section>
 
-  <section>
-    <h2>Warum installieren?</h2>
-    <div class="warum">
-      <div><span>📴</span><b>Offline lernen</b><p>Auch ohne WLAN, im Bus oder bei Oma.</p></div>
-      <div><span>⚡</span><b>Startet sofort</b><p>Kein Laden, kein Suchen im Browser.</p></div>
-      <div><span>📱</span><b>Vollbild</b><p>Keine Browserleiste — nur die App.</p></div>
-      <div><span>💾</span><b>Fortschritt bleibt</b><p>Name eintippen reicht. Kein Passwort, keine E-Mail.</p></div>
+  <section class="stationen" aria-labelledby="stationen-titel">
+    <div class="wrap stationen-grid">
+      <div class="stationen-kopf">
+        <p class="eyebrow" data-i18n="stationen_eyebrow">Die App</p>
+        <h2 id="stationen-titel"><span data-i18n="stationen_h">Was die App kann</span></h2>
+        <p class="stationen-sub" data-i18n="stationen_sub">Vier Stationen, ein Weg. Der Rahle steht bei jedem Schritt bereit.</p>
+        <div class="punkte" id="punkte" aria-hidden="true"><i class="an"></i><i></i><i></i><i></i>
+          <svg viewBox="0 0 120 110" focusable="false"><use href="#rahle-klein"/></svg>
+        </div>
+      </div>
+      <ul class="stationen-liste">
+      <li class="station enthuellen" data-nr="01">
+        <svg viewBox="0 0 70 70" role="img" aria-label="Buchstabenkarte mit Ton" data-i18n-aria="f1_alt" focusable="false">
+          <rect x="2" y="8" width="42" height="54" rx="12" fill="url(#gB)"/>
+          <rect x="2" y="8" width="42" height="54" rx="12" fill="none" stroke="#8273F5" stroke-width="2.2"/>
+          <text x="23" y="47" font-size="30" font-weight="700" text-anchor="middle" fill="#5142C2" font-family="system-ui, sans-serif">ب</text>
+          <g fill="none" stroke="#F5B000" stroke-width="3.4" stroke-linecap="round">
+            <path d="M52 28 Q58 35 52 42"/><path d="M60 22 Q70 35 60 48" opacity=".55"/>
+          </g>
+        </svg>
+        <div>
+          <h3 data-i18n="f1_t">Alle Buchstaben, alle Zeichen — in der Stimme des Hoca.</h3>
+          <p data-i18n="f1_b">Elif, Ba, Te, Se … jeder Buchstabe zum Antippen, vorgesprochen von der Lehrkraft aus der Gemeinde.</p>
+        </div>
+      </li>
+      <li class="station enthuellen" data-nr="02">
+        <svg viewBox="0 0 70 70" role="img" aria-label="Wiederholungspfeil mit Haken" data-i18n-aria="f2_alt" focusable="false">
+          <path d="M35 10 A25 25 0 1 1 12 44" fill="none" stroke="#8273F5" stroke-width="5" stroke-linecap="round"/>
+          <path d="M24 6 L35 10 L31 21" fill="none" stroke="#8273F5" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="35" cy="38" r="15" fill="url(#gB)"/>
+          <path d="M28 38 L33 44 L43 32" fill="none" stroke="#F5B000" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <h3 data-i18n="f2_t">Fehler werden wiederholt, bis sie sitzen.</h3>
+          <p data-i18n="f2_b">Was noch wackelt, kommt von selbst wieder — ohne Druck, so oft wie nötig.</p>
+        </div>
+      </li>
+      <li class="station enthuellen" data-nr="03">
+        <svg viewBox="0 0 70 70" role="img" aria-label="Drei Stufen mit arabischem Wort" data-i18n-aria="f3_alt" focusable="false">
+          <rect x="4" y="46" width="18" height="18" rx="5" fill="url(#gB)"/>
+          <rect x="25" y="34" width="18" height="30" rx="5" fill="#AFA2FF"/>
+          <rect x="46" y="20" width="18" height="44" rx="5" fill="#6A5AE0"/>
+          <text x="55" y="14" font-size="15" font-weight="700" text-anchor="middle" fill="#F5B000" font-family="system-ui, sans-serif">ث</text>
+        </svg>
+        <div>
+          <h3 data-i18n="f3_t">Wortschatz in drei Stufen: den Kuran verstehen.</h3>
+          <p data-i18n="f3_b">Von den häufigsten Wörtern bis zu ganzen Versen — die Bedeutung Schritt für Schritt.</p>
+        </div>
+      </li>
+      <li class="station enthuellen" data-nr="04">
+        <svg viewBox="0 0 70 70" role="img" aria-label="Wochenübersicht der Lernzeit" data-i18n-aria="f4_alt" focusable="false">
+          <rect x="3" y="10" width="64" height="50" rx="12" fill="url(#gB)"/>
+          <g fill="#6A5AE0">
+            <rect x="12" y="38" width="6" height="13" rx="3"/><rect x="21" y="30" width="6" height="21" rx="3"/>
+            <rect x="30" y="34" width="6" height="17" rx="3"/><rect x="39" y="24" width="6" height="27" rx="3"/>
+            <rect x="48" y="32" width="6" height="19" rx="3"/>
+          </g>
+          <rect x="57" y="19" width="6" height="32" rx="3" fill="#F5B000"/>
+        </svg>
+        <div>
+          <h3 data-i18n="f4_t">Für Eltern: Sie sehen jeden Tag, wie lange Ihr Kind gelernt hat.</h3>
+          <p data-i18n="f4_b">Eine ruhige Übersicht der Woche. Kein Konto, keine Werbung, keine Bestenliste.</p>
+        </div>
+      </li>
+      </ul>
     </div>
   </section>
 
-  <section>
-    <h2>Für die Klasse &amp; die Eltern-Gruppe</h2>
-    <p class="unter">Den Code scannen — oder den Link in die Gruppe schicken.</p>
-    <div class="teilen">
-      <div id="qr" aria-label="QR-Code zu dieser Seite"></div>
-      <div class="link" id="link"></div>
-      <div class="knoepfe">
-        <button class="btn btn-ghost btn-full" id="kopieren">🔗 Link kopieren</button>
-        <button class="btn btn-ghost btn-full" id="drucken">🖨️ Aushang drucken</button>
+  <section class="installieren" aria-labelledby="klasse-titel">
+    <div class="wrap">
+      <div class="karte-dunkel enthuellen">
+        <div class="install-grid">
+          <div>
+            <p class="eyebrow" data-i18n="install_eyebrow">Für Klasse und Familie</p>
+            <h2 id="klasse-titel" data-i18n="install_h">In unter einer Minute auf dem Handy.</h2>
+            <p class="install-p" data-i18n="install_p">QR-Code zeigen, Aushang aufhängen oder den Link in die WhatsApp-Gruppe — der Rest geht von selbst.</p>
+            <ol class="schritte-kurz">
+              <li><b>1</b><span data-i18n="s1">Mit der Kamera scannen</span></li>
+              <li><b>2</b><span data-i18n="s2">„App installieren“ antippen</span></li>
+              <li><b>3</b><span data-i18n="s3">Liegt auf dem Home-Bildschirm</span></li>
+            </ol>
+            <div class="klasse-aktionen">
+              <p class="klasse-code-gross" id="klasse-code-gross" hidden>
+                <span data-i18n="klasse_label">Klassen-Code</span> <b></b>
+              </p>
+              <button type="button" class="knopf knopf-zweit" id="btn-kopieren" data-i18n="btn_kopieren">Link kopieren</button>
+              <button type="button" class="knopf knopf-zweit" id="btn-drucken" data-i18n="btn_drucken">Aushang drucken</button>
+            </div>
+          </div>
+          <figure class="qr-karte">
+            <div class="qr-bild" id="qr-gross"></div>
+            <figcaption id="qr-adresse">elif-be.de/installieren.html</figcaption>
+          </figure>
+        </div>
       </div>
     </div>
   </section>
+</main>
 
-  <footer>
-    <img src="assets/logo-gemeinde.jpg" alt="">
-    <div><span class="gemeinde-name">Elif &amp; Ba</span> · Koran-Kurs</div>
-    <div id="version"></div>
-  </footer>
+<footer>
+  <div class="wrap">
+    <div class="fuss-marke">
+      <img src="assets/logo-gemeinde.png" alt="Logo der Gemeinde" data-i18n-alt="logo_alt" width="39" height="60">
+      <div><b id="gemeinde">Moscheegemeinde</b><small data-i18n="footer_frei">Kostenlos, ohne Werbung, ohne Konto — nur ein Name.</small></div>
+    </div>
+    <p id="version"></p>
+  </div>
+</footer>
+
+<div class="leiste" id="leiste" aria-hidden="true">
+  <a href="https://elif-be.de" id="leiste-btn" tabindex="-1"><svg viewBox="0 0 120 110" focusable="false"><use href="#rahle-klein"/></svg><span id="leiste-text">App installieren</span></a>
 </div>
 
-<div class="nur-druck" id="aushang">
-  <h1>Elif <i>&amp;</i> Ba</h1>
-  <p class="claim">Koran lesen lernen — Schritt für Schritt, mit Axi.</p>
-  <div id="qr-druck"></div>
-  <div class="url" id="url-druck"></div>
-  <div id="druck-klasse" hidden style="font-size:26px;font-weight:900;margin:0 0 14px">Klassen-Code: <span style="color:#6A5AE0;letter-spacing:6px" id="druck-code"></span></div>
-  <ol>
-    <li>Code mit der Kamera scannen</li>
-    <li>„App installieren" antippen (iPhone: Teilen → „Zum Home-Bildschirm")</li>
-    <li>Namen eintippen — los geht's!</li>
-  </ol>
-</div>
+<section class="anleitung" id="anleitung" aria-labelledby="anleitung-titel">
+  <div class="anleitung-panel" id="anleitung-panel" role="document">
+    <div class="anleitung-kopf">
+      <h2 id="anleitung-titel" data-i18n="anleitung_h">So kommt die App auf dein iPhone</h2>
+      <button type="button" class="schliessen" id="btn-schliessen" aria-label="Anleitung schließen" data-i18n-aria="btn_schliessen">✕</button>
+    </div>
+    <div class="fortschritt" id="fortschritt" hidden>
+      <div class="fortschritt-spur" aria-hidden="true"><i class="an"></i><i></i><i></i><i></i></div>
+      <p class="fortschritt-text" id="fortschritt-text" role="status">Schritt 1 / 4</p>
+    </div>
 
-<script src="vendor/qrcode.min.js"></script>
+    <ol class="schritte" id="schritte">
+      <li class="schritt">
+        <div class="schritt-bild">
+          <svg viewBox="0 0 220 400" role="img" aria-label="Safari-Leiste unten am iPhone, das Teilen-Symbol ist markiert" data-i18n-aria="ios1_alt" focusable="false">
+            <rect x="10" y="10" width="200" height="380" rx="30" fill="var(--flaeche)" stroke="var(--rand)" stroke-width="3"/>
+            <rect x="20" y="20" width="180" height="360" rx="22" fill="var(--panel)"/>
+            <rect x="83" y="26" width="54" height="10" rx="5" fill="#1F1B3A" opacity=".8"/>
+            <path d="M70 130 L70 96 C70 74 88 56 110 48 C132 56 150 74 150 96 L150 130" fill="none" stroke="#AFA2FF" stroke-width="4"/>
+            <rect x="66" y="148" width="88" height="14" rx="7" fill="#CFC6FF"/>
+            <rect x="78" y="172" width="64" height="10" rx="5" fill="#CFC6FF" opacity=".7"/>
+            <rect x="56" y="200" width="108" height="30" rx="12" fill="#6A5AE0"/>
+            <rect x="40" y="300" width="140" height="28" rx="14" fill="#fff" stroke="var(--rand)" stroke-width="2"/>
+            <text x="110" y="319" font-size="12" font-weight="700" text-anchor="middle" fill="#565080">elif-be.de</text>
+            <g stroke="#565080" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M45 352 L38 358 L45 364"/><path d="M72 352 L79 358 L72 364"/>
+              <path d="M140 351 h14 v14 h-14 z"/><path d="M168 351 h14 v14 h-14 z" opacity=".55"/>
+            </g>
+            <g stroke="#1F1B3A" stroke-width="2.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M103 356 v13 h14 v-13"/><path d="M110 366 v-18"/><path d="M104 354 l6 -6 l6 6"/>
+            </g>
+            <circle cx="110" cy="358" r="20" fill="none" stroke="url(#gGold)" stroke-width="3.4"/>
+            <path d="M110 288 v-34" stroke="url(#gGold)" stroke-width="4" stroke-linecap="round" fill="none" opacity="0"/>
+            <path d="M148 330 L124 350" stroke="url(#gGold)" stroke-width="4" stroke-linecap="round" fill="none"/>
+            <path d="M133 348 L124 350 L126 341" fill="none" stroke="url(#gGold)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="schritt-text">
+          <span class="schritt-nr" aria-hidden="true">1</span>
+          <p id="ios-schritt1" data-i18n="ios1">Tippe unten auf das Teilen-Symbol.</p>
+        </div>
+        <p class="rahle-sagt">
+          <svg viewBox="0 0 120 110" aria-hidden="true" focusable="false"><use href="#rahle-klein"/></svg>
+          <span data-i18n="tipp1">Die Leiste ist ganz unten am Bildschirm.</span>
+        </p>
+      </li>
+
+      <li class="schritt">
+        <div class="schritt-bild">
+          <svg viewBox="0 0 220 400" role="img" aria-label="Geöffnetes Teilen-Menü mit dem Eintrag „Zum Home-Bildschirm“" data-i18n-aria="ios2_alt" focusable="false">
+            <rect x="10" y="10" width="200" height="380" rx="30" fill="var(--flaeche)" stroke="var(--rand)" stroke-width="3"/>
+            <rect x="20" y="20" width="180" height="360" rx="22" fill="var(--panel)"/>
+            <rect x="83" y="26" width="54" height="10" rx="5" fill="#1F1B3A" opacity=".8"/>
+            <path d="M20 148 h180 v210 a22 22 0 0 1 -22 22 h-136 a22 22 0 0 1 -22 -22 z" fill="#fff" stroke="var(--rand)" stroke-width="2"/>
+            <rect x="94" y="156" width="32" height="5" rx="2.5" fill="#CFC6FF"/>
+            <g fill="#EEEBFF" stroke="#CFC6FF" stroke-width="1.5">
+              <rect x="34" y="176" width="40" height="40" rx="12"/><rect x="82" y="176" width="40" height="40" rx="12"/><rect x="130" y="176" width="40" height="40" rx="12"/>
+            </g>
+            <g font-size="11" font-weight="700" fill="#565080">
+              <rect x="30" y="232" width="160" height="34" rx="10" fill="#fff" stroke="var(--rand)" stroke-width="1.5"/>
+              <text x="42" y="253" font-size="9.5" data-i18n="ios2_r1">Lesezeichen hinzufügen</text>
+              <rect x="30" y="274" width="160" height="38" rx="10" fill="#EEEBFF" stroke="#6A5AE0" stroke-width="2"/>
+              <text x="42" y="297" fill="#1F1B3A" font-weight="800" data-i18n="ios2_menu">Zum Home-Bildschirm</text>
+              <rect x="30" y="320" width="160" height="34" rx="10" fill="#fff" stroke="var(--rand)" stroke-width="1.5"/>
+              <text x="42" y="341" data-i18n="ios2_r3">Drucken</text>
+            </g>
+            <g stroke="#8273F5" stroke-width="2" fill="none">
+              <path d="M168 243 h10 v12 h-10 z"/><path d="M168 331 h10 v12 h-10 z"/>
+              <path d="M167 287 h12 v12 h-12 z" stroke="#5142C2" stroke-width="2.4"/><path d="M173 290 v6 M170 293 h6" stroke="#5142C2" stroke-width="2.4"/>
+            </g>
+            <rect x="26" y="270" width="168" height="46" rx="13" fill="none" stroke="url(#gGold)" stroke-width="3.4"/>
+            <path d="M110 208 v44" stroke="url(#gGold)" stroke-width="4" stroke-linecap="round" fill="none" opacity="0"/>
+            <g stroke="url(#gGold)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none">
+              <path d="M205 246 v24"/><path d="M198 263 l7 7 l7 -7"/>
+            </g>
+          </svg>
+        </div>
+        <div class="schritt-text">
+          <span class="schritt-nr" aria-hidden="true">2</span>
+          <p data-i18n="ios2">Wische nach unten und tippe auf „Zum Home-Bildschirm“.</p>
+        </div>
+        <p class="rahle-sagt">
+          <svg viewBox="0 0 120 110" aria-hidden="true" focusable="false"><use href="#rahle-klein"/></svg>
+          <span data-i18n="tipp2">Ein bisschen weiter nach unten wischen — dort steht es.</span>
+        </p>
+      </li>
+
+      <li class="schritt">
+        <div class="schritt-bild">
+          <svg viewBox="0 0 220 400" role="img" aria-label="Dialog mit dem Knopf „Hinzufügen“ oben rechts" data-i18n-aria="ios3_alt" focusable="false">
+            <rect x="10" y="10" width="200" height="380" rx="30" fill="var(--flaeche)" stroke="var(--rand)" stroke-width="3"/>
+            <rect x="20" y="20" width="180" height="360" rx="22" fill="var(--panel)"/>
+            <rect x="83" y="26" width="54" height="10" rx="5" fill="#1F1B3A" opacity=".8"/>
+            <path d="M20 60 h180 v298 a22 22 0 0 1 -22 22 h-136 a22 22 0 0 1 -22 -22 z" fill="#fff" stroke="var(--rand)" stroke-width="2"/>
+            <g font-size="10.5" font-weight="700">
+              <text x="32" y="84" fill="#6A5AE0" data-i18n="ios3_abbr">Abbrechen</text>
+              <text x="188" y="84" fill="#6A5AE0" font-weight="800" text-anchor="end" data-i18n="ios3_add">Hinzufügen</text>
+              <text x="110" y="104" fill="#565080" font-size="9.5" text-anchor="middle" data-i18n="ios3_titel">Zum Home-Bildschirm</text>
+            </g>
+            <rect x="128" y="70" width="70" height="22" rx="9" fill="none" stroke="url(#gGold)" stroke-width="3.4"/>
+            <path d="M32 116 h156" stroke="var(--rand)" stroke-width="1.5"/>
+            <rect x="34" y="136" width="46" height="46" rx="13" fill="#6A5AE0"/>
+            <path d="M48 172 L48 154 C48 146 52 140 57 137 C62 140 66 146 66 154 L66 172" fill="none" stroke="#fff" stroke-width="2.6"/>
+            <rect x="90" y="140" width="98" height="20" rx="7" fill="#F3F0FF" stroke="var(--rand)" stroke-width="1.5"/>
+            <text x="98" y="154" font-size="11" font-weight="800" fill="#1F1B3A">Elif Be</text>
+            <text x="90" y="177" font-size="9.5" font-weight="600" fill="#565080">elif-be.de</text>
+            <g fill="#EEEBFF"><rect x="34" y="204" width="154" height="9" rx="4.5"/><rect x="34" y="220" width="120" height="9" rx="4.5"/></g>
+          </svg>
+        </div>
+        <div class="schritt-text">
+          <span class="schritt-nr" aria-hidden="true">3</span>
+          <p data-i18n="ios3">Tippe oben rechts auf „Hinzufügen“.</p>
+        </div>
+        <p class="rahle-sagt">
+          <svg viewBox="0 0 120 110" aria-hidden="true" focusable="false"><use href="#rahle-klein"/></svg>
+          <span data-i18n="tipp3">Oben rechts, in blauer Schrift.</span>
+        </p>
+      </li>
+
+      <li class="schritt">
+        <div class="schritt-bild">
+          <svg viewBox="0 0 220 400" role="img" aria-label="Home-Bildschirm mit dem neuen Elif-Be-Symbol" data-i18n-aria="ios4_alt" focusable="false">
+            <rect x="10" y="10" width="200" height="380" rx="30" fill="var(--flaeche)" stroke="var(--rand)" stroke-width="3"/>
+            <rect x="20" y="20" width="180" height="360" rx="22" fill="url(#gB)"/>
+            <rect x="83" y="26" width="54" height="10" rx="5" fill="#1F1B3A" opacity=".8"/>
+            <g fill="#fff" opacity=".65">
+              <rect x="38" y="70" width="42" height="42" rx="12"/><rect x="90" y="70" width="42" height="42" rx="12"/><rect x="142" y="70" width="42" height="42" rx="12"/>
+              <rect x="38" y="196" width="42" height="42" rx="12"/><rect x="142" y="196" width="42" height="42" rx="12"/>
+            </g>
+            <rect x="90" y="196" width="42" height="42" rx="12" fill="#6A5AE0"/>
+            <path d="M102 232 L102 214 C102 205 106 199 111 196 C116 199 120 205 120 214 L120 232" fill="none" stroke="#fff" stroke-width="2.6"/>
+            <circle cx="120" cy="236" r="2.6" fill="#FFD35C"/>
+            <text x="111" y="252" font-size="9.5" font-weight="800" text-anchor="middle" fill="#1F1B3A">Elif Be</text>
+            <rect x="84" y="190" width="54" height="70" rx="16" fill="none" stroke="url(#gGold)" stroke-width="3.4"/>
+            <g fill="#F5B000"><use href="#stern8" x="146" y="176" width="14" height="14"/><use href="#stern8" x="66" y="246" width="10" height="10"/></g>
+            <rect x="38" y="316" width="146" height="52" rx="18" fill="#fff" opacity=".5"/>
+          </svg>
+        </div>
+        <div class="schritt-text">
+          <span class="schritt-nr" aria-hidden="true">4</span>
+          <p data-i18n="ios4">Fertig! Elif Be ist jetzt eine App auf deinem Handy.</p>
+        </div>
+        <p class="rahle-sagt">
+          <svg viewBox="0 0 120 110" aria-hidden="true" focusable="false"><use href="#rahle-klein"/></svg>
+          <span data-i18n="tipp4">Maşallah! Tippe auf das Symbol — dann fangen wir an.</span>
+        </p>
+      </li>
+    </ol>
+
+    <div class="anleitung-nav">
+      <button type="button" class="knopf knopf-zweit" id="btn-zurueck" data-i18n="btn_zurueck">Zurück</button>
+      <button type="button" class="knopf knopf-primaer" id="btn-weiter" data-i18n="btn_weiter">Weiter</button>
+    </div>
+  </div>
+</section>
+
+<section class="aushang" id="aushang" aria-hidden="true">
+  <div class="aushang-kopf">
+    <svg viewBox="0 0 120 110" aria-hidden="true" focusable="false"><use href="#rahle-klein"/></svg>
+    <div>
+      <h2>Elif Be</h2>
+      <p data-i18n="aushang_claim">Kuran lesen lernen — Schritt für Schritt, mit der Stimme des Hoca.</p>
+    </div>
+    <img class="aushang-logo" src="assets/logo-gemeinde.png" alt="Logo der Gemeinde" data-i18n-alt="logo_alt" width="36" height="56">
+  </div>
+  <div class="aushang-mitte">
+    <div class="aushang-qr" id="aushang-qr"></div>
+    <ol class="aushang-schritte">
+      <li><b>1</b><span data-i18n="aushang_s1">Kamera öffnen und den QR-Code scannen.</span></li>
+      <li><b>2</b><span data-i18n="aushang_s2">Auf „App installieren“ tippen.</span></li>
+      <li><b>3</b><span data-i18n="aushang_s3">Elif Be liegt auf dem Home-Bildschirm.</span></li>
+    </ol>
+  </div>
+  <p class="aushang-code" id="aushang-code" hidden><span data-i18n="klasse_label">Klassen-Code</span> <b></b></p>
+  <p class="aushang-url" id="aushang-url">elif-be.de</p>
+  <p class="aushang-fuss"><span id="aushang-gemeinde"></span><span data-i18n="footer_frei">Kostenlos, ohne Werbung, ohne Konto — nur ein Name.</span></p>
+</section>
+
 <script src="app/config.js"></script>
+<script src="vendor/qrcode.min.js"></script>
 <script>
 (function () {
-  var ua = navigator.userAgent || '';
-  var iOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  var android = /Android/i.test(ua);
-  var inApp = /FBAN|FBAV|Instagram|WhatsApp|Line\/|Twitter|TikTok|Snapchat|; wv\)/i.test(ua);
-  var standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
-  var geraet = iOS ? 'ios' : android ? 'android' : 'pc';
+  "use strict";
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
 
-  /* Reiter */
-  var tabs = document.querySelectorAll('.tab'), panels = document.querySelectorAll('.panel');
-  function zeige(g) {
-    tabs.forEach(function (t) { t.classList.toggle('ist-an', t.dataset.g === g); t.setAttribute('aria-selected', t.dataset.g === g); });
-    panels.forEach(function (p) { p.classList.toggle('ist-an', p.dataset.g === g); });
+  var SCHLUESSEL = "eb_sprache_v1";
+  var APP = String(window.APP_URL || "https://elif-be.de").replace(/\/+$/, "");
+  var params = new URLSearchParams(location.search);
+  var klasse = (params.get("klasse") || "").replace(/\D/g, "").slice(0, 4);
+  var wenigBewegung = window.matchMedia ? matchMedia("(prefers-reduced-motion: reduce)").matches : false;
+
+  /* ---------- Sprache ---------- */
+  var TR = {
+    lang_gruppe: "Dil seç",
+    rahle_alt: "Mushaf ile ahşap bir rahle",
+    rahle_gruss: "Selamünaleyküm! Hoş geldin.",
+    eyebrow: "Elifba yöntemi · 6–12 yaş çocuklar için",
+    h1_a: "Kur'an okumayı öğren —",
+    h1_b: "adım adım,",
+    h1_c: "hocanın sesiyle.",
+    stationen_eyebrow: "Uygulama",
+    stationen_sub: "Dört durak, tek yol. Rahle her adımda hazır.",
+    install_eyebrow: "Sınıf ve aile için",
+    install_h: "Bir dakikadan kısa sürede telefonda.",
+    install_p: "QR kodu göster, ilanı as ya da bağlantıyı WhatsApp'a gönder — gerisi kendiliğinden.",
+    s1: "Kamerayla okut",
+    s2: "„Uygulamayı yükle\"ye dokun",
+    s3: "Ana ekranda hazır",
+    marquee_alt: "Arap harfleri",
+    logo_alt: "Cemaatin logosu",
+    claim: "Kur'an okumayı öğren — adım adım, hocanın sesiyle.",
+    klasse_label: "Sınıf kodu",
+    btn_install: "Uygulamayı yükle",
+    btn_browser: "Tarayıcıda aç",
+    btn_desktop: "Hemen öğren → elif-be.de",
+    btn_installiert: "Yüklendi ✓ — aç",
+    btn_standalone: "Zaten uygulamadasın ✓ — başla",
+    qr_hero_text: "Telefonla okut",
+    hinweis_titel: "Buradan yükleme olmaz.",
+    hinweis_ios: "Üstteki ⋯ simgesine dokun ve „Safari'de aç\"ı seç.",
+    btn_safari: "Safari'de aç",
+    btn_trotzdem: "Yine de uygulamaya geç",
+    hinweis_safari: "Yüklemek için Safari gerekir. Üstteki ⋯ simgesine dokun ve „Safari'de aç\"ı seç.",
+    ios1_tablet: "Üstteki Paylaş simgesine dokun.",
+    hinweis_android: "Üstteki ⋮ simgesine dokun ve „Chrome'da aç\"ı seç.",
+    hinweis_and_titel: "Yükleme menüde duruyor.",
+    hinweis_and_menue: "Üstteki ⋮ simgesine dokun ve „Uygulamayı yükle\"yi seç.",
+    hinweis_desk_titel: "Yükleme tarayıcı menüsünde.",
+    hinweis_desk: "Sağ üstteki ⋮ simgesine tıkla ve „Uygulamayı yükle\"yi seç — ya da QR kodu telefonla okut.",
+    stationen_h: "Uygulama ne yapıyor",
+    f1_alt: "Sesli harf kartı",
+    f1_t: "Bütün harfler, bütün işaretler — hocanın sesiyle.",
+    f1_b: "Elif, Ba, Te, Se… her harfe dokun, cemaatin hocasının sesinden dinle.",
+    f2_alt: "Tekrar oku ve onay işareti",
+    f2_t: "Yanlışlar oturana kadar tekrar edilir.",
+    f2_b: "Eksik kalan her şey kendiliğinden geri gelir — baskı yok, gerektiği kadar.",
+    f3_alt: "Arapça harfle üç basamak",
+    f3_t: "Üç aşamada kelime hazinesi: Kur'an'ı anlamak.",
+    f3_b: "En çok geçen kelimelerden ayetlere — anlam adım adım.",
+    f4_alt: "Haftalık çalışma süresi özeti",
+    f4_t: "Anne babalar için: Çocuğunuzun her gün ne kadar çalıştığını görürsünüz.",
+    f4_b: "Haftanın sakin bir özeti. Hesap yok, reklam yok, sıralama yok.",
+    klasse_h: "Sınıf için",
+    klasse_p: "QR kodu göster ya da ilanı yazdır — çocuklar okutup başlıyor.",
+    btn_kopieren: "Bağlantıyı kopyala",
+    btn_kopiert: "Kopyalandı ✓",
+    btn_drucken: "İlanı yazdır",
+    footer_frei: "Ücretsiz, reklamsız, hesapsız — sadece bir isim.",
+    anleitung_h: "Uygulama iPhone'una nasıl gelir",
+    btn_schliessen: "Anlatımı kapat",
+    fortschritt: "Adım %s / 4",
+    ios1: "Alttaki Paylaş simgesine dokun.",
+    ios2: "Aşağı kaydır ve „Ana Ekrana Ekle\"ye dokun.",
+    ios3: "Sağ üstteki „Ekle\"ye dokun.",
+    ios4: "Bitti! Elif Be artık telefonunda bir uygulama.",
+    tipp1: "Çubuk ekranın en altında.",
+    tipp2: "Biraz daha aşağı kaydır — orada yazıyor.",
+    tipp3: "Sağ üstte, mavi yazıyla.",
+    tipp4: "Maşallah! Simgeye dokun, başlıyoruz.",
+    ios1_alt: "iPhone'un altındaki Safari çubuğu, Paylaş simgesi işaretli",
+    ios2_alt: "Açık Paylaş menüsü, „Ana Ekrana Ekle\" satırı işaretli",
+    ios3_alt: "Sağ üstte „Ekle\" düğmesi olan pencere",
+    ios4_alt: "Yeni Elif Be simgesiyle ana ekran",
+    ios2_r1: "Yer İşareti Ekle",
+    ios2_menu: "Ana Ekrana Ekle",
+    ios2_r3: "Yazdır",
+    ios3_abbr: "İptal",
+    ios3_titel: "Ana Ekrana Ekle",
+    ios3_add: "Ekle",
+    btn_zurueck: "Geri",
+    btn_weiter: "Devam",
+    btn_fertig: "Tamam",
+    aushang_claim: "Kur'an okumayı öğren — adım adım, hocanın sesiyle.",
+    aushang_s1: "Kamerayı aç ve QR kodu okut.",
+    aushang_s2: "„Uygulamayı yükle\"ye dokun.",
+    aushang_s3: "Elif Be ana ekranında hazır.",
+    version: "Sürüm"
+  };
+
+  var DE = {
+    btn_desktop: "Jetzt lernen → elif-be.de",
+    btn_installiert: "Installiert ✓ — öffnen",
+    btn_standalone: "Du bist schon in der App ✓ — los geht’s",
+    btn_kopiert: "Kopiert ✓",
+    btn_fertig: "Fertig",
+    fortschritt: "Schritt %s / 4",
+    hinweis_android: "Tippe oben auf ⋮ und wähle „In Chrome öffnen“.",
+    hinweis_and_titel: "Installieren steckt im Menü.",
+    hinweis_and_menue: "Tippe oben auf ⋮ und wähle „App installieren“.",
+    hinweis_desk_titel: "Installieren steckt im Browser-Menü.",
+    hinweis_desk: "Klicke oben rechts auf ⋮ und wähle „App installieren“ — oder scanne den QR-Code mit dem Handy.",
+    /* Auf dem iPhone kann nur Safari zum Home-Bildschirm hinzufügen. (14.09.2026) */
+    btn_safari: "In Safari öffnen",
+    btn_trotzdem: "Trotzdem weiter zur App",
+    hinweis_safari: "Zum Installieren brauchst du Safari. Tippe oben auf ⋯ und wähle „In Safari öffnen“.",
+    ios1_tablet: "Tippe oben auf das Teilen-Symbol.",
+    version: "Version"
+  };
+  /* Alle übrigen deutschen Texte stehen im HTML und werden dort ausgelesen. */
+  $$("[data-i18n]").forEach(function (el) { var k = el.getAttribute("data-i18n"); if (!(k in DE)) DE[k] = el.textContent; });
+  $$("[data-i18n-aria]").forEach(function (el) { var k = el.getAttribute("data-i18n-aria"); if (!(k in DE)) DE[k] = el.getAttribute("aria-label") || ""; });
+  $$("[data-i18n-alt]").forEach(function (el) { var k = el.getAttribute("data-i18n-alt"); if (!(k in DE)) DE[k] = el.getAttribute("alt") || ""; });
+  var T = { de: DE, tr: TR };
+
+  var sprache = "de";
+  function t(k) { return (T[sprache] && T[sprache][k] != null) ? T[sprache][k] : (DE[k] != null ? DE[k] : k); }
+
+  function setzeSprache(l, speichern) {
+    sprache = (l === "tr") ? "tr" : "de";
+    document.documentElement.lang = sprache;
+    $$("[data-i18n]").forEach(function (el) {
+      var v = t(el.getAttribute("data-i18n"));
+      if (v != null) { if (el.tagName.toLowerCase() === "text") el.textContent = v; else el.textContent = v; }
+    });
+    $$("[data-i18n-aria]").forEach(function (el) {
+      var v = t(el.getAttribute("data-i18n-aria"));
+      if (v != null) el.setAttribute("aria-label", v);
+    });
+    $$("[data-i18n-alt]").forEach(function (el) {
+      var v = t(el.getAttribute("data-i18n-alt"));
+      if (v != null) el.setAttribute("alt", v);
+    });
+    $$(".sprache button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-lang") === sprache)); });
+    if (speichern) { try { localStorage.setItem(SCHLUESSEL, sprache); } catch (e) {} }
+    zeigeFuss(); zeichneQR(); setzeModus(); zeigeSchritt(schrittNr, false);
   }
-  tabs.forEach(function (t) { t.addEventListener('click', function () { zeige(t.dataset.g); }); });
-  zeige(geraet);
 
-  /* Installieren-Knopf: echter Dialog, wo der Browser ihn erlaubt (Android/Chrome/Edge),
-     sonst zur passenden Anleitung springen. */
-  var prompt = null, btn = document.getElementById('install'), stand = document.getElementById('stand');
-  window.addEventListener('beforeinstallprompt', function (e) {
-    e.preventDefault(); prompt = e;
-    btn.classList.add('bereit'); btn.textContent = '📲 Jetzt installieren';
+  var start = params.get("lang");
+  if (start !== "de" && start !== "tr") { try { start = localStorage.getItem(SCHLUESSEL); } catch (e) { start = null; } }
+  if (start !== "de" && start !== "tr") { start = /^tr\b/i.test(navigator.language || "") ? "tr" : "de"; }
+
+  $$(".sprache button").forEach(function (b) {
+    b.addEventListener("click", function () { setzeSprache(b.getAttribute("data-lang"), true); });
   });
-  function fertig() {
-    stand.textContent = '✅ Installiert! Öffne „Elif & Ba" jetzt vom Startbildschirm.';
-    btn.hidden = true;
+
+  /* ---------- Adressen ---------- */
+  function appLink() {
+    var q = []; if (klasse) q.push("klasse=" + klasse); q.push("lang=" + sprache);
+    return APP + "/?" + q.join("&");
   }
-  window.addEventListener('appinstalled', fertig);
-  btn.addEventListener('click', function () {
-    if (prompt) {
-      prompt.prompt();
-      prompt.userChoice.then(function (r) { if (r && r.outcome === 'accepted') fertig(); prompt = null; btn.classList.remove('bereit'); btn.textContent = '📲 App installieren'; });
+  function seitenLink() {
+    var eigen = /^https?:$/.test(location.protocol) && /(^|\.)elif-be\.de$/i.test(location.hostname);
+    var basis = eigen ? (location.origin + location.pathname) : (APP + "/installieren.html");
+    var q = []; if (klasse) q.push("klasse=" + klasse); if (sprache !== "de") q.push("lang=" + sprache);
+    return basis + (q.length ? "?" + q.join("&") : "");
+  }
+  function kurz(u) { return u.replace(/^https?:\/\//, "").replace(/\/$/, ""); }
+
+  /* ---------- Klassen-Code ---------- */
+  if (klasse) {
+    $("#klassen-plakette").hidden = false;
+    $("#klassen-code").textContent = klasse;
+    var kg = $("#klasse-code-gross"); kg.hidden = false; $("b", kg).textContent = klasse;
+    var ac = $("#aushang-code"); ac.hidden = false; $("b", ac).textContent = klasse;
+  }
+
+  /* ---------- Fußzeile ---------- */
+  function zeigeFuss() {
+    var name = window.GEMEINDE_NAME || "";
+    var ver = window.APP_VERSION || "";
+    $("#gemeinde").textContent = name;
+    $("#gemeinde").hidden = !name;
+    /* app/config.js liefert bereits „Version 11.9 · 14.09.2026" — das Wort
+       also nicht ein zweites Mal davorsetzen. (14.09.2026) */
+    $("#version").textContent = ver ? (/^\s*(Version|Sürüm|Surum)\b/i.test(ver) ? ver : t("version") + " " + ver) : "";
+    /* Der Trennpunkt gehoert zum Namen — sonst beginnt die Fusszeile mit
+       einem einsamen „ · ", solange GEMEINDE_NAME leer ist. (14.09.2026) */
+    $("#aushang-gemeinde").textContent = name ? name + " · " : "";
+  }
+
+  /* ---------- QR ---------- */
+  /* Die mitgelieferte Bibliothek (vendor/qrcode.min.js) heisst QRCode und malt
+     in ein Element — sie hat kein EBQR.svg(). Der Aufruf hier ging deshalb ins
+     Leere: kein QR-Code auf der Seite und ein leerer Rahmen auf dem gedruckten
+     Aushang. Die App macht es an ihrer eigenen Stelle richtig
+     (app/main.js: new window.QRCode(el, {...})); genauso jetzt auch hier.
+     (14.09.2026) */
+  function zeichneQR() {
+    var url = seitenLink();
+    $("#qr-adresse").textContent = kurz(url).replace(/\//g, "/\u200B");
+    $("#aushang-url").textContent = kurz(url);
+    if (!window.QRCode) return;
+    [["#qr-gross", 190], ["#qr-hero", 130], ["#aushang-qr", 300]].forEach(function (paar) {
+      var el = $(paar[0]);
+      if (!el) return;
+      el.innerHTML = "";
+      try {
+        new window.QRCode(el, {
+          text: url, width: paar[1], height: paar[1],
+          colorDark: "#1F1B3A", colorLight: "#FFFFFF",
+          correctLevel: window.QRCode.CorrectLevel ? window.QRCode.CorrectLevel.M : undefined
+        });
+        var bild = el.querySelector("img, canvas");
+        if (bild) { bild.setAttribute("alt", "QR-Code: " + kurz(url)); bild.style.display = "block"; bild.style.margin = "0 auto"; }
+      } catch (e) { /* ohne QR bleibt der Link darunter lesbar */ }
+    });
+  }
+
+  /* ---------- Umgebung ---------- */
+  var ua = navigator.userAgent || "";
+  var inApp = /WhatsApp|Instagram|FBAN|FBAV|FB_IAB|FBIOS|Line\/|Snapchat|Twitter/i.test(ua);
+  var istIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var istAndroid = /Android/i.test(ua);
+  var mobil = istIOS || istAndroid || /Mobi/i.test(ua);
+  /* Auf dem iPhone kann NUR Safari zum Home-Bildschirm hinzufuegen. Chrome,
+     Firefox, Edge und Opera zeigen dort denselben Menue-Eintrag nicht — wer
+     ihnen die Safari-Anleitung gibt, schickt Eltern auf die Suche nach einem
+     Knopf, den es nicht gibt. (14.09.2026) */
+  var iosFremd = /iPad|iPhone|iPod/.test(ua) && /CriOS|FxiOS|EdgiOS|OPiOS/i.test(ua);
+  var istTablet = /iPad/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var standalone = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+  var angebot = null, installiert = false, modus = "";
+
+  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); angebot = e; setzeModus(); });
+  window.addEventListener("appinstalled", function () { installiert = true; angebot = null; setzeModus(); rahleFreut(); });
+
+  var btnP = $("#btn-primaer"), btnN = $("#btn-neben"), btnI2 = $("#btn-install2"),
+      reihe2 = $("#reihe-zwei"), hinweis = $("#hinweis");
+
+  function setzeModus() {
+    modus = standalone ? "standalone" : installiert ? "installiert" : (inApp || iosFremd) ? "inapp" : !mobil ? "desktop" : istIOS ? "ios" : "android";
+
+    hinweis.hidden = true;
+    reihe2.hidden = true;
+    btnN.hidden = false;
+    btnP.classList.remove("pulst");
+    btnP.removeAttribute("aria-haspopup");
+
+    if (modus === "standalone" || modus === "installiert") {
+      btnP.textContent = t(modus === "standalone" ? "btn_standalone" : "btn_installiert");
+      btnP.href = appLink();
+      btnN.hidden = true;
+    } else if (modus === "inapp") {
+      /* Eine Webseite kann aus dem eingebauten Browser von WhatsApp oder
+         Instagram nicht ausbrechen — das kann nur der Mensch ueber das
+         ⋯-Menue, und genau das steht im Kasten darueber. Der Knopf hiess
+         trotzdem „Im Browser oeffnen" und versprach damit etwas, das er nicht
+         leistet; jetzt sagt er, was er wirklich tut. (14.09.2026) */
+      btnP.textContent = t("btn_trotzdem");
+      btnP.href = appLink();
+      btnN.hidden = true;
+      $("#hinweis-titel").textContent = t("hinweis_titel");
+      $("#hinweis-text").textContent = (iosFremd && !inApp) ? t("hinweis_safari")
+        : t(istAndroid ? "hinweis_android" : "hinweis_ios");
+      if (iosFremd && !inApp) btnP.textContent = t("btn_safari");
+      hinweis.hidden = false;
+    } else if (modus === "desktop") {
+      btnP.textContent = t("btn_desktop");
+      btnP.href = appLink();
+      btnN.hidden = true;
+      /* Den Installieren-Knopf nur zeigen, wenn der Browser die Installation
+         wirklich anbietet (Chrome/Edge melden sich mit beforeinstallprompt).
+         Firefox und Safari am Rechner koennen das nicht — dort fuehrte der
+         Knopf nur zu einer Erklaerung, warum es nicht geht. (14.09.2026) */
+      reihe2.hidden = !angebot;
+      btnI2.textContent = t("btn_install");
+      btnI2.hidden = !angebot;
+    } else {
+      btnP.textContent = t("btn_install");
+      btnP.href = appLink();
+      btnN.textContent = t("btn_browser");
+      btnN.href = appLink();
+      if (modus === "ios") btnP.setAttribute("aria-haspopup", "dialog");
+      /* Chrome schickt `beforeinstallprompt` erst kurz nach dem Laden. Sofort
+         zu warnen hiess: Die Warnung blitzt bei jedem Android-Besuch auf und
+         verschwindet wieder. Deshalb eine Atempause — und nur, wenn bis dahin
+         wirklich kein Angebot kam. (14.09.2026) */
+      if (modus === "android" && !angebot) {
+        $("#hinweis-titel").textContent = t("hinweis_and_titel");
+        $("#hinweis-text").textContent = t("hinweis_and_menue");
+        clearTimeout(window.__andWarte);
+        window.__andWarte = setTimeout(function () {
+          if (!angebot && modus === "android") hinweis.hidden = false;
+        }, 1800);
+      }
+      if (!wenigBewegung) { void btnP.offsetWidth; btnP.classList.add("pulst"); }
+    }
+  }
+
+  function installieren(ev) {
+    if (modus === "standalone" || modus === "installiert" || modus === "inapp") return;
+    if (modus === "desktop" && ev.currentTarget === btnP) return;
+    ev.preventDefault();
+    if (!angebot && modus === "desktop") {
+      ev.preventDefault();
+      $("#hinweis-titel").textContent = t("hinweis_desk_titel");
+      $("#hinweis-text").textContent = t("hinweis_desk");
+      hinweis.hidden = false;
       return;
     }
-    zeige(geraet);
-    document.getElementById('anleitung').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    if (iOS) stand.textContent = 'Auf dem iPhone geht es über Teilen → „Zum Home-Bildschirm" — siehe unten.';
-    else stand.textContent = 'Folge den Schritten unten — dauert eine Minute.';
-  });
-  if (standalone) { stand.textContent = '✅ Du bist schon in der App — es gibt nichts zu installieren.'; btn.hidden = true; }
-  if (inApp) document.getElementById('inapp').hidden = false;
-
-  /* Klassen-Code aus der Adresse (?klasse=1234): vom Aushang oder aus der Gruppe */
-  var klasse = '';
-  try { klasse = (new URLSearchParams(location.search).get('klasse') || '').replace(/\D/g, '').slice(0, 4); } catch (e) {}
-  if (klasse.length === 4) {
-    document.getElementById('klasse').hidden = false;
-    document.getElementById('klasse-code').textContent = klasse;
-    document.getElementById('oeffnen').href = './?klasse=' + klasse;
-    document.getElementById('druck-klasse').hidden = false;
-    document.getElementById('druck-code').textContent = klasse;
-    fetch('api/klasse?code=' + klasse, { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) {
-      if (j && j.found) document.getElementById('klasse-name').textContent = j.name + (j.teacher ? ' · ' + j.teacher : '');
-    }).catch(function () {});
+    if (angebot) {
+      var p = angebot; angebot = null;
+      p.prompt();
+      if (p.userChoice && p.userChoice.then) {
+        p.userChoice.then(function (r) {
+          if (r && r.outcome === "accepted") { installiert = true; rahleFreut(); }
+          setzeModus();
+        });
+      }
+      return;
+    }
+    if (modus === "ios") { anleitungAuf(); return; }
+    $("#hinweis-titel").textContent = t("hinweis_and_titel");
+    $("#hinweis-text").textContent = t("hinweis_and_menue");
+    hinweis.hidden = false;
+    hinweis.setAttribute("tabindex", "-1");
+    hinweis.focus();
   }
-  /* QR-Code + Link (diese Seite, mit Klassen-Code, falls vorhanden) */
-  var url = location.origin + location.pathname + (klasse.length === 4 ? '?klasse=' + klasse : '');
-  document.getElementById('link').textContent = url.replace(/^https?:\/\//, '');
-  document.getElementById('url-druck').textContent = url.replace(/^https?:\/\//, '');
-  try {
-    new QRCode(document.getElementById('qr'), { text: url, width: 176, height: 176, correctLevel: QRCode.CorrectLevel.M });
-    new QRCode(document.getElementById('qr-druck'), { text: url, width: 380, height: 380, correctLevel: QRCode.CorrectLevel.M });
-  } catch (e) {}
-  document.getElementById('kopieren').addEventListener('click', function () {
-    var b = this;
-    var ok = function () { b.textContent = '✓ Kopiert'; setTimeout(function () { b.textContent = '🔗 Link kopieren'; }, 2000); };
-    if (navigator.share) { navigator.share({ title: 'Elif & Ba', text: 'Koran lesen lernen mit Axi — hier installieren:', url: url }).then(ok).catch(function () {}); return; }
-    if (navigator.clipboard) navigator.clipboard.writeText(url).then(ok).catch(function () {});
+  btnP.addEventListener("click", installieren);
+  btnI2.addEventListener("click", installieren);
+
+  /* ---------- Der Rahle freut sich ---------- */
+  function rahleFreut() {
+    $$(".rahle-figur").forEach(function (el) {
+      el.setAttribute("data-stimmung", "froh");
+      setTimeout(function () { el.removeAttribute("data-stimmung"); }, 3200);
+    });
+  }
+
+  /* ---------- Anleitung ---------- */
+  var anleitung = $("#anleitung"), schritte = $$(".schritt"), schrittNr = 0, letzterFokus = null;
+  var nav = $(".anleitung-nav"), btnW = $("#btn-weiter"), btnZ = $("#btn-zurueck"), fortschritt = $("#fortschritt");
+
+  function zeigeSchritt(i, fokus) {
+    if (!document.documentElement.classList.contains("js")) return;
+    schrittNr = Math.max(0, Math.min(schritte.length - 1, i));
+    schritte.forEach(function (li, n) { li.hidden = (n !== schrittNr); });
+    $$(".fortschritt-spur i").forEach(function (b, n) { b.classList.toggle("an", n <= schrittNr); });
+    $("#fortschritt-text").textContent = t("fortschritt").replace("%s", String(schrittNr + 1));
+    /* Auf dem iPad sitzt das Teilen-Symbol OBEN in der Leiste, auf dem iPhone
+       unten. Derselbe Satz fuer beide schickt die Haelfte der Leute an die
+       falsche Bildschirmkante. (14.09.2026) */
+    var s1 = $("#ios-schritt1");
+    if (s1) s1.textContent = t(istTablet ? "ios1_tablet" : "ios1");
+    btnZ.hidden = schrittNr === 0;
+    btnW.textContent = t(schrittNr === schritte.length - 1 ? "btn_fertig" : "btn_weiter");
+    if (fokus) $("#anleitung-panel").focus();
+  }
+  function anleitungAuf() {
+    letzterFokus = document.activeElement;
+    fortschritt.hidden = false;
+    anleitung.setAttribute("data-offen", "");
+    anleitung.setAttribute("role", "dialog");
+    anleitung.setAttribute("aria-modal", "true");
+    $("#anleitung-panel").setAttribute("tabindex", "-1");
+    zeigeSchritt(0, true);
+    document.body.style.overflow = "hidden";
+  }
+  function anleitungZu() {
+    anleitung.removeAttribute("data-offen");
+    anleitung.removeAttribute("aria-modal");
+    document.body.style.overflow = "";
+    if (letzterFokus && letzterFokus.focus) letzterFokus.focus();
+  }
+  $("#btn-schliessen").addEventListener("click", anleitungZu);
+  btnZ.addEventListener("click", function () { zeigeSchritt(schrittNr - 1, true); });
+  btnW.addEventListener("click", function () {
+    if (schrittNr === schritte.length - 1) anleitungZu(); else zeigeSchritt(schrittNr + 1, true);
   });
-  document.getElementById('drucken').addEventListener('click', function () { window.print(); });
+  anleitung.addEventListener("click", function (e) { if (e.target === anleitung) anleitungZu(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && anleitung.hasAttribute("data-offen")) anleitungZu();
+  });
 
-  /* Gemeinde-Name und Version aus app/config.js */
-  if (window.GEMEINDE_NAME) document.querySelectorAll('.gemeinde-name').forEach(function (el) { el.textContent = window.GEMEINDE_NAME; });
-  if (window.APP_VERSION) document.getElementById('version').textContent = window.APP_VERSION;
+  /* ---------- Kopieren & Drucken ---------- */
+  $("#btn-kopieren").addEventListener("click", function () {
+    var b = this, url = seitenLink();
+    function ok() { b.textContent = t("btn_kopiert"); setTimeout(function () { b.textContent = t("btn_kopieren"); }, 2200); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(ok, hilf);
+    } else hilf();
+    function hilf() {
+      var ta = document.createElement("textarea");
+      ta.value = url; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); ok(); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+  });
+  $("#btn-drucken").addEventListener("click", function () { window.print(); });
 
-  /* Service Worker: nötig, damit der Browser die App als installierbar erkennt */
-  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-    navigator.serviceWorker.register('sw.js').catch(function () {});
+  /* ---------- Bewegung ---------- */
+  var zuEnthuellen = $$(".enthuellen");
+  function enthuelle(el) { el.classList.add("da"); }
+  function pruefeSichtbar() {
+    var h = window.innerHeight || document.documentElement.clientHeight;
+    zuEnthuellen = zuEnthuellen.filter(function (el) {
+      var r = el.getBoundingClientRect();
+      if (r.top < h * 0.94 && r.bottom > 0) { enthuelle(el); return false; }
+      return true;
+    });
+  }
+
+  if (!wenigBewegung && "IntersectionObserver" in window) {
+    var beo = new IntersectionObserver(function (eintraege) {
+      eintraege.forEach(function (e) {
+        if (e.isIntersecting) {
+          enthuelle(e.target);
+          zuEnthuellen = zuEnthuellen.filter(function (x) { return x !== e.target; });
+          beo.unobserve(e.target);
+        }
+      });
+    }, { rootMargin: "0px 0px -12% 0px", threshold: 0.12 });
+    zuEnthuellen.forEach(function (el) { beo.observe(el); });
+    /* Sicherheitsnetz: manche In-App-Browser liefern keine Observer-Meldungen. */
+    pruefeSichtbar();
+    window.addEventListener("scroll", pruefeSichtbar, { passive: true });
+    setTimeout(function () {
+      $$(".enthuellen").forEach(function (el) { el.style.transition = "none"; enthuelle(el); });
+    }, 1600);
+  } else {
+    $$(".enthuellen").forEach(enthuelle);
+  }
+
+  if (!wenigBewegung) {
+    var orn = $("#ornament"), axis = $$(".hero-rahle"), laeuft = false;
+    window.addEventListener("scroll", function () {
+      if (laeuft) return;
+      laeuft = true;
+      requestAnimationFrame(function () {
+        var y = window.pageYOffset || 0;
+        if (orn) orn.style.transform = "translate3d(0," + (y * 0.07).toFixed(2) + "px,0)";
+        var kipp = Math.max(-3.5, Math.min(3.5, y * 0.02));
+        axis.forEach(function (a) {
+          a.style.transform = "translate3d(0," + (y * -0.018).toFixed(2) + "px,0) rotate(" + kipp.toFixed(2) + "deg)";
+        });
+        laeuft = false;
+      });
+    }, { passive: true });
+  }
+
+  /* ---------- Start ---------- */
+  setzeSprache(start, params.get("lang") === "de" || params.get("lang") === "tr");
+  if (window.matchMedia) {
+    var mq = matchMedia("(display-mode: standalone)");
+    var beobachte = mq.addEventListener ? mq.addEventListener.bind(mq, "change") : mq.addListener && mq.addListener.bind(mq);
+    if (beobachte) beobachte(function (e) { standalone = e.matches; setzeModus(); });
   }
 })();
+</script>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (s) { return document.querySelector(s); };
+  var wenig = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var kopf = $("#kopf"), lauf = $("#lauf"), muster = $("#muster"), leiste = $("#leiste"), hero = $(".hero");
+  var btnP = $("#btn-primaer"), lb = $("#leiste-btn"), lt = $("#leiste-text");
+  function sync() { lt.textContent = btnP.textContent; lb.href = btnP.href; }
+  sync();
+  if (window.MutationObserver) new MutationObserver(sync).observe(btnP, { childList: true, characterData: true, subtree: true, attributes: true });
+  lb.addEventListener("click", function (e) { e.preventDefault(); btnP.click(); });
+
+  var laeuft = false;
+  function tick() {
+    laeuft = false;
+    var y = window.pageYOffset || 0;
+    var h = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    lauf.style.transform = "scaleX(" + Math.min(1, y / h).toFixed(4) + ")";
+    kopf.classList.toggle("fest", y > 24);
+    var heroH = hero.offsetHeight;
+    var offen = $("#anleitung").hasAttribute("data-offen");
+    leiste.classList.toggle("da", y > heroH * 0.55 && !offen);
+    leiste.setAttribute("aria-hidden", String(!(y > heroH * 0.55)));
+    lb.tabIndex = y > heroH * 0.55 ? 0 : -1;
+    if (!wenig && muster) muster.style.transform = "translate3d(0," + (y * 0.12).toFixed(1) + "px,0)";
+  }
+  window.addEventListener("scroll", function () { if (!laeuft) { laeuft = true; requestAnimationFrame(tick); } }, { passive: true });
+  window.addEventListener("resize", tick);
+  tick();
+
+  var punkte = document.querySelectorAll("#punkte i"), karten = document.querySelectorAll(".station");
+  if ("IntersectionObserver" in window && punkte.length) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var i = Array.prototype.indexOf.call(karten, e.target);
+        punkte.forEach(function (p, n) { p.classList.toggle("an", n <= i); });
+      });
+    }, { rootMargin: "-40% 0px -40% 0px" });
+    karten.forEach(function (k) { io.observe(k); });
+  }
+})();
+</script>
+<script>
+/* Service Worker der App registrieren — Chrome bietet „Installieren“ nur an,
+   wenn im Geltungsbereich ein Service Worker läuft. Nur über https/localhost;
+   beim Öffnen als Datei passiert nichts. (Elif Be, 14.09.2026) */
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js').catch(function () {});
+  });
+}
 </script>
 </body>
 </html>

@@ -20,7 +20,7 @@
      POST sync    { key, col, baseRev, summary }    speichern + Klassenmeldung
      GET  klasse  ?code=1234                        Klassenzimmer nachschlagen (11.0)
      POST klasse  { action:'create'|'login'|'rename', … }   anlegen / öffnen
-     GET  class   ?tpw=1907[&code=…] | ?code=…&pin=… Klassenliste (Lehrkraft)
+     GET  class   ?tpw=<EB_LEHRER_PW>[&code=…] | ?code=…&pin=… Klassenliste (Lehrkraft)
      POST class   { … }                             Kurzmeldung / entfernen
      GET  audio   ?list=1 | ?k=…                    Aussprache-Aufnahmen
      POST audio   { action:'put'|'del', tpw, … }
@@ -31,8 +31,26 @@ import { pbkdf2Sync, randomBytes, timingSafeEqual } from "node:crypto";
 import { gunzipSync } from "node:zlib";
 import { Buffer } from "node:buffer";
 
-const VERSION = "10.5";
-const TEACHER_PW = "1907";          // Lehrer-Passwort — hier zentral änderbar
+/* Die Versionsnummer des Mini-Servers ist DIESELBE wie die der App
+   (app/config.js APP_BUILD) und wird beim Versionssprung mit angehoben. So
+   kann die App sehen, ob im Netz ein aelterer Stand liegt als auf dem Handy —
+   genau das war am 23.09.2026 der Fall: online 11.0, auf den Geraeten 11.11,
+   und niemand konnte sagen, warum „irgendwie nichts geht". */
+const VERSION = "11.14";
+/* LEHRER-PASSWORT — NICHT MEHR IM CODE. (14.09.2026)
+
+   Hier stand ein festes vierstelliges Passwort im Klartext. Dieselbe Zeile stand in
+   app/simplesync.js und wurde damit ins öffentliche Bündel gebaut: Wer
+   https://elif-be.de/app/bundle.js öffnete, las das Passwort im Klartext und
+   kam an den vollständigen Fortschritt samt Schwächen ALLER Kinder.
+
+   Jetzt kommt es aus der Umgebungsvariablen EB_LEHRER_PW (Netlify →
+   Site configuration → Environment variables). Ist sie nicht gesetzt, gibt es
+   den Sammelklassen-Weg gar nicht mehr; dann zählt ausschließlich
+   Klassencode + PIN, und die PIN liegt nur als Hash auf dem Server.
+   Ein leeres Passwort darf NIE passen — deshalb die Längenprüfung. */
+const TEACHER_PW = String(process.env.EB_LEHRER_PW || "");
+const tpwOk = (v) => TEACHER_PW.length >= 4 && String(v || "") === TEACHER_PW;
 const DEFAULT_CLASS = "ALLE";       // Klasse, in die JEDES Kind automatisch kommt
 const STORE = "site:elifba-sync";   // Blobs-Store (Präfix "site:" = siteweit)
 
@@ -255,11 +273,25 @@ async function readBody(req) {
 const istZahlenCode = (c) => /^\d{4}$/.test(String(c || ""));
 async function klasseFor(code) { const c = cleanCode(code); return c ? (await bGet("klasse:" + c)) : null; }
 async function teacherOk(code, tpw, pin) {
-  if (String(tpw || "") === TEACHER_PW) return true;
+  if (tpwOk(tpw)) return true;
   const k = await klasseFor(code);
   if (!k || !k.pinHash || !pin) return false;
   const a = Buffer.from(hashOf(String(pin), k.salt), "hex"), b = Buffer.from(k.pinHash, "hex");
   return a.length === b.length && timingSafeEqual(a, b);
+}
+
+/* Gehört der mitgeschickte Schlüssel wirklich zu diesem Namen? (14.09.2026)
+
+   Der syncKey ist der einzige Nachweis, den ein Kind hat — er wird beim
+   Anlegen des Kontos vergeben und liegt nur auf seinem Gerät. Bis heute wurde
+   er dort NICHT geprüft, wo ein Name mitkam: Jedes Kind konnte unter fremdem
+   Namen eine Kurzmeldung schicken (fremden Fortschritt überschreiben), fremde
+   Zurufe lesen und leeren. Ein Blob-Lesevorgang schließt das. */
+async function keyGehoertZu(name, key) {
+  const nm = cleanName(name); const k = cleanCode(key);
+  if (!nm || k.length < 4) return false;
+  const rec = await bGet(userKey(nm.toLowerCase()));
+  return !!(rec && rec.syncKey && rec.syncKey === k);
 }
 
 async function joinClass(rec) {
@@ -299,8 +331,16 @@ async function rosterFor(code) {
     if (!reg || !reg.students) continue;
     for (const nm in reg.students) {
       const s = reg.students[nm] || {};
-      out[nm] = { name: nm, classCode: ck.slice(6), ...(out[nm] || {}), ...s,
-                  ts: Math.max(s.ts || 0, (out[nm] && out[nm].ts) || 0) };
+      const da = out[nm];
+      /* (14.09.2026) Hier stand `...(out[nm] || {}), ...s` — die alte
+         Sammeldatei überschrieb also den frisch aus dem Konto gelesenen Stand.
+         Wenn zwei Kinder gleichzeitig abglichen, gewann anschließend eine
+         Datei, in der eines von beiden noch mit den Zahlen von vorgestern
+         stand. Jetzt zählt, was neuer ist; nur unbekannte Kinder kommen aus
+         der Sammeldatei ganz hinzu. */
+      if (!da) { out[nm] = { name: nm, classCode: ck.slice(6), ...s, ts: s.ts || 0 }; continue; }
+      const neuer = (s.ts || 0) > (da.ts || 0);
+      out[nm] = neuer ? { ...da, ...s, ts: s.ts || 0 } : { ...s, ...da, ts: da.ts || 0 };
     }
   }
   return out;
@@ -338,17 +378,27 @@ export default async (req) => {
       if (req.method !== "POST") return json({ error: "Methode nicht unterstützt" }, 405);
       const body = await readBody(req);
 
-      if (body.action === "list") {                       // Namensliste fürs Antippen
+      /* Namensliste fürs Antippen — NUR mit dem Code einer wirklichen Klasse.
+         (14.09.2026) Vorher gab diese Route jedem, der sie aufrief, bis zu 300
+         Kindernamen heraus: ohne Anmeldung, ohne Klasse, aus allen Gemeinden.
+         Zusammen mit der Anmeldung ohne Geheimwort war das der bequemste Weg,
+         einen fremden Lernstand zu übernehmen. Wer den vierstelligen Code hat,
+         sitzt im Unterricht — das ist die Hürde, die zur Wirklichkeit passt. */
+      if (body.action === "list") {
+        const code = cleanCode(body.classCode || "");
+        if (!istZahlenCode(code)) return json({ ok: true, names: [] });
+        if (!(await klasseFor(code))) return json({ ok: true, names: [] });
         const keys = await bList("user:");
         const names = [];
         for (const k of keys) {
           const rec = await bGet(k);
-          if (rec && rec.name && (rec.role || "student") !== "teacher") {
-            names.push({ name: rec.name, hasPass: !!rec.hash });
-          }
+          if (!rec || !rec.name) continue;
+          if ((rec.role || "student") === "teacher") continue;
+          if ((cleanCode(rec.classCode || DEFAULT_CLASS) || DEFAULT_CLASS) !== code) continue;
+          names.push({ name: rec.name, hasPass: !!rec.hash });
         }
         names.sort((a, b) => a.name.localeCompare(b.name, "de"));
-        return json({ ok: true, names: names.slice(0, 300) });
+        return json({ ok: true, names: names.slice(0, 120) });
       }
 
       const displayName = cleanName(body.name);
@@ -367,6 +417,17 @@ export default async (req) => {
       if (body.action === "setpass") {
         const rec = await bGet(ukey);
         if (!rec) return json({ error: "Konto nicht gefunden" }, 404);
+        /* Ein Konto OHNE Geheimwort war bisher schutzlos in die andere
+           Richtung: Jeder konnte für einen fremden Namen eins SETZEN und das
+           Kind damit für immer aussperren — sein Lernstand lag hinter einem
+           Wort, das es nie erfahren würde. Deshalb gilt hier dieselbe Regel
+           wie beim Anmelden: nur vom eigenen Gerät. (14.09.2026) */
+        if (!rec.hash) {
+          const dev = cleanKey(body.device);
+          const bekannt = Array.isArray(rec.devices) ? rec.devices : [];
+          if (bekannt.length && (!dev || bekannt.indexOf(dev) < 0))
+            return json({ error: "Das geht nur auf dem Gerät, auf dem der Name angelegt wurde." }, 403);
+        }
         if (rec.hash) {                                  // altes Geheimwort prüfen
           const old = String(body.oldPass || "");
           const a = Buffer.from(hashOf(old, rec.salt), "hex");
@@ -391,6 +452,14 @@ export default async (req) => {
           const b = Buffer.from(rec.hash, "hex");
           if (!pw || a.length !== b.length || !timingSafeEqual(a, b))
             return json({ error: "Geheimwort erforderlich" }, 401);
+        } else {
+          /* Ohne Geheimwort darf nur das eigene Gerät löschen — sonst könnte
+             ein Kind das Konto eines anderen mitsamt Lernstand auslöschen,
+             indem es dessen Namen schickt. (14.09.2026) */
+          const dev = cleanKey(body.device);
+          const bekannt = Array.isArray(rec.devices) ? rec.devices : [];
+          if (bekannt.length && (!dev || bekannt.indexOf(dev) < 0))
+            return json({ error: "Das geht nur auf dem Gerät, auf dem der Name angelegt wurde." }, 403);
         }
         const code = cleanCode(rec.classCode || DEFAULT_CLASS) || DEFAULT_CLASS;
         try {
@@ -426,6 +495,7 @@ export default async (req) => {
             syncKey: "U" + randomBytes(9).toString("hex").toUpperCase(),
             classCode: wantClass,
             role: wantTeacher ? "teacher" : "student",
+            devices: cleanKey(body.device) ? [cleanKey(body.device)] : [],
             created: Date.now(), lastSeen: Date.now(), summary: {},
           };
           await bSet(ukey, rec);
@@ -445,6 +515,43 @@ export default async (req) => {
           // Erstmalig ein Geheimwort nachtragen
           rec.hash = hashOf(pass, rec.salt);
         }
+
+        /* WESSEN NAME IST DAS? — Gerätebindung. (14.09.2026)
+
+           Die Anmeldung ist mit Absicht kinderleicht: Name eintippen, fertig.
+           Genau deshalb kam bisher aber auch jeder in den Lernstand eines
+           anderen: „Ayşe" tippen konnte jedes Kind, und der Server gab den
+           Schlüssel heraus. Für einen Achtjährigen, dessen Punkte plötzlich
+           einem anderen gehören, ist das kein Randfall, sondern der Tag, an
+           dem er aufhört zu üben.
+
+           Die Lösung, die nichts an der Leichtigkeit ändert: Beim Anlegen
+           merkt sich das Konto das Gerät. Dasselbe Kind auf demselben Handy
+           merkt nie etwas. Kommt ein NEUES Gerät und hat das Konto kein
+           Geheimwort, braucht es einmal die PIN der Lehrkraft — die sitzt im
+           Unterricht daneben. Bis zu fünf Geräte darf ein Kind haben
+           (Handy der Mutter, Tablet, Rechner der Moschee).
+
+           Konten aus der Zeit davor haben noch keine Liste; das erste Gerät,
+           das sich meldet, übernimmt sie. Und in der Sammelklasse „ALLE" gibt
+           es keine PIN, gegen die man prüfen könnte — dort bleibt es wie
+           bisher (ein Grund mehr, eine richtige Klasse anzulegen). */
+        if (!rec.hash && !wantTeacher) {
+          const dev = cleanKey(body.device);
+          const bekannt = Array.isArray(rec.devices) ? rec.devices : [];
+          if (!bekannt.length) {
+            if (dev) rec.devices = [dev];
+          } else if (!dev || bekannt.indexOf(dev) < 0) {
+            const eigeneKlasse = await klasseFor(rec.classCode);
+            const pinStimmt = !!eigeneKlasse && !!body.klassenPin &&
+                              (await teacherOk(rec.classCode, "", body.klassenPin));
+            if (eigeneKlasse && !pinStimmt)
+              return json({ error: "Diesen Namen gibt es schon. Wenn das dein Name ist, frag kurz deine Lehrkraft — sie tippt ihre PIN ein.",
+                            needTeacher: true }, 401);
+            if (dev) rec.devices = bekannt.concat([dev]).slice(-5);
+          }
+        }
+
         const cc = cleanCode(body.classCode || "");
         if (cc && cc !== rec.classCode) rec.classCode = cc;
         if (!rec.classCode) rec.classCode = DEFAULT_CLASS;
@@ -480,14 +587,44 @@ export default async (req) => {
         }
         if (!code) return json({ error: "Gerade kein freier Code — bitte nochmal versuchen" }, 500);
         const salt = randomBytes(16).toString("hex");
-        await bSet("klasse:" + code, { code, name, teacher, salt, pinHash: hashOf(pin, salt), created: Date.now() });
-        return json({ ok: true, code, name, teacher });
+        /* NOTFALL-WORT. (14.09.2026) Bisher war eine vergessene PIN das Ende
+           des Klassenzimmers: Der Server kannte keinen Weg zurück, und die
+           Anleitung riet zu einer neuen Klasse — womit zwanzig Kinder ihren
+           Code neu abtippen müssten. Beim Anlegen gibt es jetzt EINMAL ein
+           Wort zum Aufschreiben, mit dem sich die PIN neu setzen lässt.
+           Gespeichert wird nur sein Hash; wer es verliert, ist so weit wie
+           vorher, aber niemand muss es verlieren. */
+        const AB = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";     // ohne I/O/0/1
+        const rb = randomBytes(8);
+        let notfall = "";
+        for (let i = 0; i < 8; i++) notfall += AB[rb[i] % AB.length];
+        await bSet("klasse:" + code, { code, name, teacher, salt, pinHash: hashOf(pin, salt),
+                                       notfallHash: hashOf(notfall, salt), created: Date.now() });
+        return json({ ok: true, code, name, teacher, notfall });
       }
       if (body.action === "login") {
         const code = cleanCode(body.code);
         const k = await klasseFor(code);
         if (!k) return json({ error: "Diesen Klassen-Code gibt es nicht" }, 404);
         if (!(await teacherOk(code, body.tpw, body.pin))) return json({ error: "Die PIN stimmt nicht" }, 401);
+        return json({ ok: true, code: k.code, name: k.name, teacher: k.teacher });
+      }
+      /* PIN neu setzen — mit dem Notfall-Wort vom Anlegen oder mit der alten PIN. */
+      if (body.action === "pinNeu") {
+        const code = cleanCode(body.code);
+        const k = await klasseFor(code);
+        if (!k) return json({ error: "Diesen Klassen-Code gibt es nicht" }, 404);
+        const neu = String(body.pin || "").trim();
+        if (!/^\d{4,8}$/.test(neu)) return json({ error: "Die neue PIN braucht 4 bis 8 Ziffern" }, 400);
+        let darf = await teacherOk(code, body.tpw, body.altPin);
+        if (!darf && k.notfallHash && body.notfall) {
+          const wort = String(body.notfall).trim().toUpperCase();
+          const a = Buffer.from(hashOf(wort, k.salt), "hex"), b = Buffer.from(k.notfallHash, "hex");
+          darf = a.length === b.length && timingSafeEqual(a, b);
+        }
+        if (!darf) return json({ error: "Dafür braucht es die alte PIN oder das Notfall-Wort." }, 401);
+        k.pinHash = hashOf(neu, k.salt);
+        await bSet("klasse:" + code, k);
         return json({ ok: true, code: k.code, name: k.name, teacher: k.teacher });
       }
       if (body.action === "rename") {
@@ -507,7 +644,7 @@ export default async (req) => {
     if (route === "class") {
       if (req.method === "GET") {
         const codeQ = cleanCode(url.searchParams.get("code") || "");
-        const globalTeacher = (url.searchParams.get("tpw") || "") === TEACHER_PW;
+        const globalTeacher = tpwOk(url.searchParams.get("tpw"));
         const isTeacher = globalTeacher || await teacherOk(codeQ, "", url.searchParams.get("pin"));
         // Eine Klassen-Lehrkraft (PIN) sieht nur ihre eigene Klasse, nie „alle".
         if (isTeacher && !globalTeacher && !codeQ) return json({ error: "Code fehlt" }, 400);
@@ -518,7 +655,21 @@ export default async (req) => {
            Serie, Gesamtfortschritt, auswendig gelernte Suren und die Punkte der
            letzten 7 Tage. KEINE Schwachstellen, KEINE Lektionsdetails, KEINE
            Zeitstempel-Historie — das bleibt Sache der Lehrkraft. */
-        if (!isTeacher && !me) return json({ error: "Lehrer-Passwort erforderlich" }, 403);
+        if (!isTeacher && !me) {
+          /* Sagen, WAS zu tun ist — nicht nur, dass es nicht ging. Wer ein
+             Passwort schickt und keins hinterlegt ist, soll erfahren warum.
+             (14.09.2026) */
+          if (url.searchParams.get("tpw") && TEACHER_PW.length < 4)
+            return json({ error: "Auf diesem Server ist kein Sammelklassen-Passwort hinterlegt (EB_LEHRER_PW). Lege ein Klassenzimmer mit Code und PIN an — das ist der sichere Weg." }, 403);
+          return json({ error: "Lehrer-Passwort erforderlich" }, 403);
+        }
+        /* DIE TAFEL GEHÖRT ZUR KLASSE. (14.09.2026) Ohne Klassencode lieferte
+           sie bisher die Sammelklasse „ALLE" — also Namen und Punkte JEDES
+           Kindes, das die App je benutzt hat, quer über alle Gemeinden. Ein
+           Kind soll seine Mitschüler sehen, nicht Fremde. Ohne richtigen Code
+           gibt es deshalb keine Tafel, sondern einen Hinweis. */
+        if (!isTeacher && !istZahlenCode(codeQ))
+          return json({ ok: true, found: true, board: [], ohneKlasse: true, me, defaultClass: DEFAULT_CLASS });
         const code = codeQ;
         const students = await rosterFor(code);
         if (isTeacher) {
@@ -526,6 +677,23 @@ export default async (req) => {
           return json({ ok: true, found: true, students, defaultClass: DEFAULT_CLASS,
                         klasse: k ? { code: k.code, name: k.name, teacher: k.teacher } : null });
         }
+        /* ZWISCHENSPEICHER FÜR DIE TAFEL. (14.09.2026)
+
+           rosterFor() liest JEDES Konto einzeln aus dem Blob-Speicher. Die
+           Kinder-Tafel fragt alle 90 Sekunden nach — bei 30 Kindern sind das
+           30 × 30 = 900 Lesevorgänge je anderthalb Minuten, bei 100 Kindern
+           schon 10.000. Das wächst im Quadrat und wäre die erste Wand, gegen
+           die mehrere Gemeinden laufen.
+
+           Die Tafel braucht keine Sekundengenauigkeit: Punkte, Level, Serie.
+           Deshalb wird sie einmal je Minute berechnet und bis dahin aus einer
+           kleinen Datei beantwortet — ein Lesevorgang statt dreißig. */
+        const TAFEL_FRISCH = 60000;
+        const tafelKey = "board:" + (code || DEFAULT_CLASS);
+        const zwischen = await bGet(tafelKey);
+        if (zwischen && Array.isArray(zwischen.board) && Date.now() - (zwischen.ts || 0) < TAFEL_FRISCH)
+          return json({ ok: true, found: true, board: zwischen.board, me, defaultClass: DEFAULT_CLASS, cached: true });
+
         const board = [];
         for (const nm in students) {
           const s = students[nm] || {};
@@ -543,6 +711,7 @@ export default async (req) => {
           });
         }
         board.sort((a, b) => b.w7 - a.w7 || b.xp - a.xp);
+        try { await bSet(tafelKey, { board, ts: Date.now() }); } catch (e) { /* Tafel geht auch ohne */ }
         return json({ ok: true, found: true, board, me, defaultClass: DEFAULT_CLASS });
       }
       if (req.method === "POST") {
@@ -554,11 +723,24 @@ export default async (req) => {
           const reg = (await bGet("class:" + code)) || { students: {} };
           delete reg.students[nm];
           await bSet("class:" + code, reg);
+          /* (14.09.2026) Bisher wurde nur der Kontoeintrag gelöscht. Der
+             Spielstand blieb als verwaiste Datei col:<Schlüssel> liegen — für
+             immer, weil niemand mehr wusste, wem er gehörte. Und die Tafel
+             fiel danach in den alten Zustand zurück, weil der Zwischenspeicher
+             das Kind noch kannte. Beides geht jetzt mit. */
+          const weg = await bGet(userKey(nm.toLowerCase()));
+          try { if (weg && weg.syncKey) await bDel("col:" + weg.syncKey); } catch (e) {}
           await bDel(userKey(nm.toLowerCase()));
+          try { await bDel("board:" + code); } catch (e) {}
           return json({ ok: true, removed: true });
         }
         const name = cleanName(body.name);
         if (!name) return json({ error: "Name fehlt" }, 400);
+        /* (14.09.2026) Diese Route stand jedem offen: Ein Kind konnte die
+           Kurzmeldung eines anderen überschreiben — Punkte auf null, Schwächen
+           erfunden. Jetzt weist sich das Kind mit seinem eigenen Schlüssel aus. */
+        if (!(await keyGehoertZu(name, body.key)))
+          return json({ error: "Nicht angemeldet" }, 403);
         const reg = (await bGet("class:" + code)) || { students: {} };
         reg.students[name] = { ...(reg.students[name] || {}), ...(body.summary || {}), ts: Date.now() };
         await bSet("class:" + code, reg);
@@ -584,6 +766,11 @@ export default async (req) => {
       if (req.method === "GET") {
         const name = cleanName(url.searchParams.get("name") || "");
         if (!name) return json({ error: "Name fehlt" }, 400);
+        /* (14.09.2026) Ohne Nachweis konnte jeder den Briefkasten jedes Kindes
+           lesen UND mit `clear=1` leeren — die Zurufe waren weg, bevor das Kind
+           sie gesehen hatte. */
+        if (!(await keyGehoertZu(name, url.searchParams.get("key"))))
+          return json({ error: "Nicht angemeldet" }, 403);
         const rec = (await bGet(cheerKey(name))) || { list: [] };
         const list = fresh(rec.list);
         if (url.searchParams.get("clear")) await bSet(cheerKey(name), { list: [] });
@@ -593,6 +780,9 @@ export default async (req) => {
         const body = await readBody(req);
         const to = cleanName(body.to || ""), from = cleanName(body.from || "");
         if (!to || !from) return json({ error: "Name fehlt" }, 400);
+        // Nur im eigenen Namen anfeuern — sonst wäre der Absender frei erfunden.
+        if (!(await keyGehoertZu(from, body.key)))
+          return json({ error: "Nicht angemeldet" }, 403);
         if (to.toLowerCase() === from.toLowerCase())
           return json({ error: "Sich selbst anfeuern gilt nicht \uD83D\uDE42" }, 400);
         const kind = String(body.kind || "\uD83D\uDCAA").slice(0, 8);
@@ -696,7 +886,8 @@ export default async (req) => {
       }
       if (req.method === "POST") {
         const body = await readBody(req);
-        if (String(body.tpw || "") !== TEACHER_PW) return json({ error: "Lehrer-Passwort erforderlich" }, 403);
+        if (!(await teacherOk(cleanCode(body.code || ""), body.tpw, body.pin)))
+          return json({ error: "Lehrer-Passwort oder PIN erforderlich" }, 403);
         const q = String(body.q || "").trim().slice(0, 60);
         if (!q) return json({ error: "Karte fehlt" }, 400);
         const rec = (await bGet("card-overrides")) || { cards: {}, rev: 0 };
@@ -877,15 +1068,39 @@ export default async (req) => {
       // Lehrkraft nie "fehlen", weil eine zweite Anfrage nicht ankam.
       if (body.name) {
         const nm = cleanName(body.name);
+        /* Hat die Lehrkraft dieses Kind entfernt, gibt es kein Konto mehr.
+           Bisher glich das Gerät munter weiter ab und legte eine verwaiste
+           Datei nach der anderen an; in der Klassenliste tauchte das Kind
+           nicht mehr auf, auf seinem Handy sah alles normal aus. Jetzt
+           erfährt das Gerät es. (14.09.2026) */
+        if (!(await bGet(userKey(nm.toLowerCase()))))
+          return json({ error: "Dieses Konto gibt es nicht mehr.", entfernt: true }, 404);
         const code = cleanCode(body.classCode || DEFAULT_CLASS) || DEFAULT_CLASS;
         const sum = { ...(body.summary || {}), ts: Date.now() };
-        try {
-          const reg = (await bGet("class:" + code)) || { students: {} };
-          reg.students[nm] = { ...(reg.students[nm] || {}), ...sum };
-          await bSet("class:" + code, reg);
+        /* (14.09.2026) Der Spielstand hing schon immer am Schlüssel — der NAME
+           daneben aber nicht. Ein Kind mit gültigem eigenen Schlüssel konnte
+           „name": "Ayşe" mitschicken und damit Ayşes Meldung an die Lehrkraft
+           überschreiben. Der Schlüssel muss zum Namen gehören, sonst wird nur
+           der eigene Spielstand gespeichert und die Meldung stillschweigend
+           verworfen (der Abgleich selbst soll deswegen nicht scheitern). */
+        const darf = await keyGehoertZu(nm, key);
+        if (darf) try {
+          /* NUR NOCH IN DEN EIGENEN KONTO-DATENSATZ. (14.09.2026)
+
+             Hier wurde bisher zusätzlich die Sammeldatei class:<code> komplett
+             gelesen und komplett zurückgeschrieben — bei jedem Abgleich jedes
+             Kindes. Gleichzeitige Abgleiche löschten sich dabei gegenseitig:
+             Wer zuletzt schrieb, schrieb den Stand, den er vor seiner eigenen
+             Anfrage gelesen hatte. Nötig ist die Datei nicht, denn die
+             Klassenliste wird ohnehin aus den Konto-Datensätzen gebaut
+             (rosterFor, Teil a), und jedes Kind hat seinen eigenen. Damit
+             fallen Wettlauf und halbe Schreiblast weg. Die Sammeldatei bleibt
+             als Altbestand lesbar; hineingeschrieben wird nur noch beim
+             Anlegen (joinClass) und über die Route `class`. */
           const ukey = userKey(nm.toLowerCase());
           const rec = await bGet(ukey);
           if (rec) { rec.summary = sum; rec.lastSeen = Date.now(); rec.classCode = code; await bSet(ukey, rec); }
+          try { await bDel("board:" + code); } catch (e) {}   // Tafel neu rechnen lassen
         } catch (e) { /* Spielstand ist gespeichert — Meldung darf scheitern */ }
       }
       return json({ ok: true, ts: payload.ts, rev: payload.rev });
